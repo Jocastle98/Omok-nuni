@@ -3,8 +3,8 @@
 ## 1. 사용중인 유니티 버전 : 
 > Unity 2022.3.57f1
 ## 2. 사용중인 관리 도구: 
-> GitHub
+> [GitHub](https://github.com/Omok-nuni/Omok)
 >
-> Jira
+> [Jira](https://mdddd.atlassian.net/jira/software/projects/OT/boards/9/timeline)
 >
-> Confluence
+> [Confluence](https://mdddd.atlassian.net/wiki/spaces/Omok/overview?homepageId=7537059)
