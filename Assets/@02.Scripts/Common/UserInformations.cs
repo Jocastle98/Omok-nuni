@@ -2,23 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 사용자 정보를 저장하고 관리하는 클래스.
+/// PlayerPrefs를 활용하여 데이터를 저장하고 불러온다.
+/// </summary>
 public class UserInformations
 {
-    private const string COIN_COUNT = "CoinCount";
-    private const string LEVEL_INDEX = "LevelIndex";
-    
     // 코인 개수 정보
     public static int CoinCount
     {
-        get { return PlayerPrefs.GetInt(COIN_COUNT, 5); }
-        set { PlayerPrefs.SetInt(COIN_COUNT, value); PlayerPrefs.Save(); }
+        get { return PlayerPrefs.GetInt(Constants.COIN_COUNT, 5); }
+        set { PlayerPrefs.SetInt(Constants.COIN_COUNT, value); PlayerPrefs.Save(); }
     }
     
     // 급수 정보
     public static int LevelIndex
     {
-        get { return PlayerPrefs.GetInt(LEVEL_INDEX, 0); }
-        set { PlayerPrefs.SetInt(LEVEL_INDEX, value); PlayerPrefs.Save(); }
+        get { return PlayerPrefs.GetInt(Constants.LEVEL_INDEX, 0); }
+        set { PlayerPrefs.SetInt(Constants.LEVEL_INDEX, value); PlayerPrefs.Save(); }
     }
     
     // 배경음악 재생 여부

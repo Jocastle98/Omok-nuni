@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// 게임의 전체적인 흐름을 관리하는 싱글톤 게임 매니저 클래스.
+/// 씬 전환, UI 패널 관리, 게임 상태 관리 등의 역할을 수행.
+/// </summary>
 public class GameManager : Singleton<GameManager>
 {
     // [SerializeField] 각종 패널들 연결
     
     private Canvas mcanvas;
     
-    private Contants.EGameType mgameType;
+    private Enum.EGameType mgameType;
     
     // GamePanelController, GameLogic 구현
     
@@ -18,7 +22,7 @@ public class GameManager : Singleton<GameManager>
         // 로그인 기능 구현?
     }
     
-    public void ChangeToGameScene(Contants.EGameType gameType)
+    public void ChangeToGameScene(Enum.EGameType gameType)
     {
         mgameType = gameType;
         SceneManager.LoadScene("Game");
