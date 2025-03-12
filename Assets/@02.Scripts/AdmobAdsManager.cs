@@ -57,6 +57,8 @@ public class AdmobAdsManager : MonoBehaviour
     {
         const string REWARD_MESSAGE = "보상 제공. Type: {0}, Amount : {1}";
 
+        
+        
         if (mRewardedAd != null && mRewardedAd.CanShowAd())
         {
             mRewardedAd.Show((Reward reward) =>
