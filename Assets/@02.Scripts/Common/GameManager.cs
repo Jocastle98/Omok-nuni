@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : Singleton<GameManager>
 {
-    // [SerializeField] 패널 연결
+    // [SerializeField] 각종 패널들 연결
     
     private Canvas mcanvas;
     
@@ -15,9 +15,9 @@ public class GameManager : Singleton<GameManager>
     
     private void Start()
     {
-        
+        // 로그인 기능 구현?
     }
-
+    
     public void ChangeToGameScene(Contants.EGameType gameType)
     {
         mgameType = gameType;
@@ -26,33 +26,65 @@ public class GameManager : Singleton<GameManager>
 
     public void ChangeToMainScene()
     {
-        // gameLogic 초기화
+        // gameLogic 초기화 추가
+        
         SceneManager.LoadScene("Main");
     }
 
+    public void OpenRecordPanel()
+    {
+        if (mcanvas != null)
+        {
+            
+        }
+    }
+    
     public void OpenLeaderboardPanel()
     {
-        
+        if (mcanvas != null)
+        {
+            
+        }
+    }
+
+    public void OpenShopPanel()
+    {
+        if (mcanvas != null)
+        {
+            
+        }
     }
     
     public void OpenSettingsPanel()
     {
-        
+        if (mcanvas != null)
+        {
+            
+        }
     }
     
     public void OpenConfirmPanel()
     {
-        
+        if (mcanvas != null)
+        {
+            
+        }
     }
     
     public void OpenSigninPanel()
     {
-        
+        if (mcanvas != null)
+        {
+            
+        }
     }
     
     public void OpenSignupPanel()
     {
-        
+        if (mcanvas != null)
+        {
+            
+        }
     }
     
     public void OpenGameOverPanel()

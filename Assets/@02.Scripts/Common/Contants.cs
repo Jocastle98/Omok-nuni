@@ -19,10 +19,10 @@ public class Contants
         PlayerA, 
         PlayerB 
     }
-    
+
     public enum EGameType
     {
-        SinglePlay, 
+        SinglePlay,
         MultiPlay
     }
 }
