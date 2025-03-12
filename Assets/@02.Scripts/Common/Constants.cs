@@ -7,7 +7,5 @@ using UnityEngine;
 /// </summary>
 public class Constants
 {
-    public const string COIN_COUNT = "CoinCount";
     
-    public const string LEVEL_INDEX = "LevelIndex";
 }
