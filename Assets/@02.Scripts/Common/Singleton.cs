@@ -5,32 +5,32 @@ using UnityEngine.SceneManagement;
 
 public abstract class Singleton<T> : MonoBehaviour where T : Component
 {
-    private static T m_instance;
+    private static T mInstance;
 
     public static T Instance
     {
         get
         {
-            if (m_instance == null)
+            if (mInstance == null)
             {
-                m_instance = FindObjectOfType<T>();
-                if (m_instance == null)
+                mInstance = FindObjectOfType<T>();
+                if (mInstance == null)
                 {
                     GameObject obj = new GameObject();
                     obj.name = typeof(T).Name;
-                    m_instance = obj.AddComponent<T>();
+                    mInstance = obj.AddComponent<T>();
                 }
             }
             
-            return m_instance;
+            return mInstance;
         }
     }
     
     private void Awake()
     {
-        if (m_instance == null)
+        if (mInstance == null)
         {
-            m_instance = this as T;
+            mInstance = this as T;
             DontDestroyOnLoad(gameObject);
             
             // 씬 전환시 호출되는 액션 메서드 할당

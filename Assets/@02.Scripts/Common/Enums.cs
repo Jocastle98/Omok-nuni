@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// 게임에서 공용으로 사용되는 열거형(Enum) 정의 클래스.
 /// </summary>
-public class Enum
+public class Enums
 {
     public enum EMultiplayManagerState
     {

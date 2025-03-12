@@ -11,9 +11,9 @@ public class GameManager : Singleton<GameManager>
 {
     // [SerializeField] 각종 패널들 연결
     
-    private Canvas mcanvas;
+    private Canvas mCanvas;
     
-    private Enum.EGameType mgameType;
+    private Enums.EGameType mGameType;
     
     // GamePanelController, GameLogic 구현
     
@@ -22,9 +22,9 @@ public class GameManager : Singleton<GameManager>
         // 로그인 기능 구현?
     }
     
-    public void ChangeToGameScene(Enum.EGameType gameType)
+    public void ChangeToGameScene(Enums.EGameType gameType)
     {
-        mgameType = gameType;
+        mGameType = gameType;
         SceneManager.LoadScene("Game");
     }
 
@@ -37,7 +37,7 @@ public class GameManager : Singleton<GameManager>
 
     public void OpenRecordPanel()
     {
-        if (mcanvas != null)
+        if (mCanvas != null)
         {
             
         }
@@ -45,7 +45,7 @@ public class GameManager : Singleton<GameManager>
     
     public void OpenLeaderboardPanel()
     {
-        if (mcanvas != null)
+        if (mCanvas != null)
         {
             
         }
@@ -53,7 +53,7 @@ public class GameManager : Singleton<GameManager>
 
     public void OpenShopPanel()
     {
-        if (mcanvas != null)
+        if (mCanvas != null)
         {
             
         }
@@ -61,7 +61,7 @@ public class GameManager : Singleton<GameManager>
     
     public void OpenSettingsPanel()
     {
-        if (mcanvas != null)
+        if (mCanvas != null)
         {
             
         }
@@ -69,7 +69,7 @@ public class GameManager : Singleton<GameManager>
     
     public void OpenConfirmPanel()
     {
-        if (mcanvas != null)
+        if (mCanvas != null)
         {
             
         }
@@ -77,7 +77,7 @@ public class GameManager : Singleton<GameManager>
     
     public void OpenSigninPanel()
     {
-        if (mcanvas != null)
+        if (mCanvas != null)
         {
             
         }
@@ -85,7 +85,7 @@ public class GameManager : Singleton<GameManager>
     
     public void OpenSignupPanel()
     {
-        if (mcanvas != null)
+        if (mCanvas != null)
         {
             
         }
@@ -112,7 +112,7 @@ public class GameManager : Singleton<GameManager>
             // Game Logic 객체 생성
         }
         
-        mcanvas = GameObject.FindObjectOfType<Canvas>();
+        mCanvas = GameObject.FindObjectOfType<Canvas>();
     }
 
     private void OnApplicationQuit()
