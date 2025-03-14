@@ -4,6 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Purchasing;
 
+/// <summary>
+/// TODO: 추가 수정사항 = IAPManager에 Singleton상속
+/// TODO: Item 종류, 코인 수, 가격 협의
+/// TODO: enum EItemType Enums로 이동
+/// TODO: Coin 지급 로직
+/// 테스트 사용방법 : BuyProduct에 EItemType 매개변수넣고 호출(테스트는 버튼에 int로 받아 EItemType으로 변환)
+/// </summary>
 public class IAPManager : MonoBehaviour, IStoreListener
 {
     public enum EItemType
@@ -23,6 +30,19 @@ public class IAPManager : MonoBehaviour, IStoreListener
     public const string PRODUCT_ID_COIN_10000 = "coin_10000";
     public const string PRODUCT_ID_NOADS = "noads";
     public const string PRODUCT_ID_NOADS_COIN_2000 = "noads_coin_2000";
+
+    /// <summary>
+    /// HadPurchased() Test용
+    /// </summary>
+    private Dictionary<EItemType, string> ShopItemMapping = new Dictionary<EItemType, string>()
+    {
+        { EItemType.Coin_1000, "coin_1000" },
+        { EItemType.Coin_2000, "coin_2000" },
+        { EItemType.Coin_4500, "coin_4500" },
+        { EItemType.Coin_10000, "coin_10000" },
+        { EItemType.NoAds, "noads" },
+        { EItemType.NoAds_Coin_2000, "noads_coin_2000" },
+    };
     
 
     private IStoreController mStoreController; //구매 과정을 제어하는 함수를 제공
@@ -105,9 +125,11 @@ public class IAPManager : MonoBehaviour, IStoreListener
         }
     }
 
-    public bool HadPurchased(string productId)
+    public bool HadPurchased(EItemType itemType)
     {
         if (!IsInitialized()) return false;
+
+        string productId = ShopItemMapping[itemType];
         var product = mStoreController.products.WithID(productId);
         if (product != null) {return product.hasReceipt;}
         return false;

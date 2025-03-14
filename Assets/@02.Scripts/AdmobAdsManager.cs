@@ -5,7 +5,9 @@ using UnityEngine;
 using GoogleMobileAds.Api;
 
 
-
+/// <summary>
+/// TODO: 실제 보상 지급
+/// </summary>
 public class AdmobAdsManager : MonoBehaviour
 {
 #if UNITY_ANDROID
@@ -64,6 +66,7 @@ public class AdmobAdsManager : MonoBehaviour
             mRewardedAd.Show((Reward reward) =>
             {
                 Debug.Log(string.Format(REWARD_MESSAGE, reward.Type, reward.Amount));
+                //TODO: 코인 지급
             });
         }
     }
