@@ -73,7 +73,7 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            var confirmPanelObject = Instantiate(confirmPanel, mCanvas.transform);
+            GameObject confirmPanelObject = Instantiate(confirmPanel, mCanvas.transform);
             confirmPanelObject.GetComponent<ConfirmPanelController>().Show(message, OnConfirmButtonClick);
         }
     }

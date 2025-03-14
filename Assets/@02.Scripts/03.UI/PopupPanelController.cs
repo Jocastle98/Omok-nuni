@@ -10,8 +10,6 @@ public class PopupPanelController : MonoBehaviour
     [SerializeField] private RectTransform panelRectTransform;  // 팝업될 Panel 자신의 RectTransform
     
     private CanvasGroup mBackgroundCanvasGroup;                 // Panel 뒤를 가릴 (검은)배경
-
-    public Action onPanelControllerHide;
     
     private void Start()
     {
