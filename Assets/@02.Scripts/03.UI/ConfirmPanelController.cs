@@ -1,0 +1,43 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+
+public class ConfirmPanelController : PopupPanelController
+{
+    [SerializeField] private TMP_Text messageText;
+    
+    public Action OnConfirmButtonClick;
+
+    /// <summary>
+    /// 부모 클래스 Show() 메서드의 애니메이션 효과 + 메시지를 표시하고 콜백을 실행하는 기능의 메서드
+    /// </summary>
+    /// <param name="message">표시해야 될 메시지</param>
+    /// <param name="OnConfirmButtonClick">ConfirmPanel이 닫히고 나면 실행되어야 할 콜백</param>
+    public void Show(string message, Action OnConfirmButtonClick)
+    {
+        base.Show();
+        
+        this.messageText.text = message;
+        this.OnConfirmButtonClick = OnConfirmButtonClick;
+    }
+
+    /// <summary>
+    /// Confirm Button 클릭시 호출되는 메서드
+    /// OnConfirmButtonClick에 구독된 콜백이 실행됨
+    /// </summary>
+    public void OnClickConfirmButton()
+    {
+        Hide(() => OnConfirmButtonClick?.Invoke());
+    }
+
+    /// <summary>
+    /// Cancel Button 클릭시 호출되는 메서드
+    /// 콜백이 실행되지 않음, Popup Panel만 닫음
+    /// </summary>
+    public void OnClickCancelButton()
+    {
+        Hide();
+    }
+}

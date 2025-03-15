@@ -18,14 +18,22 @@ public class Enums
     
     public enum EPlayerType 
     { 
-        None, 
-        PlayerA, 
-        PlayerB 
+        None,           // 텅 빈 상태
+        PlayerA,        // 흑돌
+        PlayerB         // 백돌
     }
 
     public enum EGameType
     {
-        SinglePlay,
-        MultiPlay
+        SinglePlay,     // 싱글 플레이
+        MultiPlay       // 멀티 플레이
+    }
+
+    public enum EGameResult
+    {
+        None,           // 게임 진행 중
+        Win,            // 플레이어 승
+        Lose,           // 플레이어 패
+        Draw,           // 무승부
     }
 }

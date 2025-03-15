@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : Singleton<GameManager>
 {
     // [SerializeField] 각종 패널들 연결
+    [SerializeField] private GameObject confirmPanel;
     
     private Canvas mCanvas;
     
@@ -67,11 +69,12 @@ public class GameManager : Singleton<GameManager>
         }
     }
     
-    public void OpenConfirmPanel()
+    public void OpenConfirmPanel(string message, Action OnConfirmButtonClick)
     {
         if (mCanvas != null)
         {
-            
+            GameObject confirmPanelObject = Instantiate(confirmPanel, mCanvas.transform);
+            confirmPanelObject.GetComponent<ConfirmPanelController>().Show(message, OnConfirmButtonClick);
         }
     }
     

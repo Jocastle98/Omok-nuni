@@ -7,5 +7,6 @@ using UnityEngine;
 /// </summary>
 public class Constants
 {
-    
+    public const string SeverURL = "";
+    public const string GameSeverURL = "";
 }
