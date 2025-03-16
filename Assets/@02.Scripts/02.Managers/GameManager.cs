@@ -19,6 +19,9 @@ public class GameManager : Singleton<GameManager>
     
     // GamePanelController, GameLogic 구현
     
+    private GameLogic gameLogic;
+    public Board board;
+    
     private void Start()
     {
         // 로그인 기능 구현?
