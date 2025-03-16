@@ -7,6 +7,7 @@ using GoogleMobileAds.Api;
 
 /// <summary>
 /// TODO: 실제 보상 지급
+/// 사용방법 : ShowRewardedAd 호출
 /// </summary>
 public class AdmobAdsManager : MonoBehaviour
 {
