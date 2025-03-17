@@ -14,6 +14,8 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject gameTypeSelectPanel;
     [SerializeField] private GameObject shopPanel;
     [SerializeField] private GameObject confirmPanel;
+    [SerializeField] private GameObject settingsPanel;
+
     
     private Canvas mCanvas;
     
@@ -26,6 +28,10 @@ public class GameManager : Singleton<GameManager>
     private void Start()
     {
         // 로그인 기능 구현?
+
+        // 인트로 BGM 재생
+        AudioManager.Instance.PlayIntroBgm();
+
     }
     
     public void ChangeToGameScene(Enums.EGameType gameType)
@@ -87,7 +93,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            
+            var settingPanelObject = Instantiate(settingsPanel, mCanvas.transform);
+            settingPanelObject.GetComponent<PopupPanelController>().Show();
         }
     }
     
