@@ -18,8 +18,6 @@ public class AudioManager : Singleton<AudioManager>
     [SerializeField] private Slider bgmSlider;
     [SerializeField] private Slider sfxSlider;
 
-   
-
     void Awake()
     {
         float saveBgmVolume = PlayerPrefs.GetFloat(Constants.BGMVolumeKey, 1f);
