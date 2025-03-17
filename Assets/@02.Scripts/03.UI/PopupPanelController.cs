@@ -11,7 +11,7 @@ public class PopupPanelController : MonoBehaviour
     
     private CanvasGroup mBackgroundCanvasGroup;                 // Panel 뒤를 가릴 (검은)배경
     
-    private void Start()
+    private void Awake()
     {
         mBackgroundCanvasGroup = GetComponent<CanvasGroup>();
     }
