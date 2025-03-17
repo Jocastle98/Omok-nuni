@@ -379,14 +379,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 518f7de88fc57324c8df1a53ddcc554a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bgmSource: {fileID: 0}
-  _sfxSource: {fileID: 0}
+  _bgmSource: {fileID: 291554394}
+  _sfxSource: {fileID: 291554393}
   _audioClips:
   - {fileID: 8300000, guid: 1946cf2b45f59cc46b6f4d722bef3a1e, type: 3}
   - {fileID: 8300000, guid: f97bb9f56ec6a0349afc9856c6ca3342, type: 3}
   - {fileID: 8300000, guid: 2310713910db10d47b1b8c3156430cfc, type: 3}
-  _bgmSlider: {fileID: 0}
-  _sfxSlider: {fileID: 0}
 --- !u!4 &291554392
 Transform:
   m_ObjectHideFlags: 0
