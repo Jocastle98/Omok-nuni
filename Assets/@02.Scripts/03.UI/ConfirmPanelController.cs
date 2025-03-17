@@ -7,6 +7,7 @@ using UnityEngine;
 public class ConfirmPanelController : PopupPanelController
 {
     [SerializeField] private TMP_Text messageText;
+    [SerializeField] private GameObject cancelButton;
     
     public Action OnConfirmButtonClick;
 
@@ -15,12 +16,13 @@ public class ConfirmPanelController : PopupPanelController
     /// </summary>
     /// <param name="message">표시해야 될 메시지</param>
     /// <param name="OnConfirmButtonClick">ConfirmPanel이 닫히고 나면 실행되어야 할 콜백</param>
-    public void Show(string message, Action OnConfirmButtonClick)
+    public void Show(string message, Action OnConfirmButtonClick, bool activeCancelButton)
     {
         base.Show();
         
         this.messageText.text = message;
         this.OnConfirmButtonClick = OnConfirmButtonClick;
+        this.cancelButton.SetActive(activeCancelButton);
     }
 
     /// <summary>

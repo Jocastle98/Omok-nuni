@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : Singleton<GameManager>
 {
     // [SerializeField] 각종 패널들 연결
+    [SerializeField] private GameObject shopPanel;
     [SerializeField] private GameObject confirmPanel;
     
     private Canvas mCanvas;
@@ -19,8 +20,7 @@ public class GameManager : Singleton<GameManager>
     
     // GamePanelController, GameLogic 구현
     
-    private GameLogic gameLogic;
-    public Board board;
+    private GameLogic mGameLogic;
     
     private void Start()
     {
@@ -60,7 +60,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            
+            GameObject shopPanelObject = Instantiate(shopPanel, mCanvas.transform);
+            // shopPanelController 컴포넌트 연결 및 창 띄우는 메서드
         }
     }
     
@@ -72,12 +73,12 @@ public class GameManager : Singleton<GameManager>
         }
     }
     
-    public void OpenConfirmPanel(string message, Action OnConfirmButtonClick)
+    public void OpenConfirmPanel(string message, Action OnConfirmButtonClick, bool activeCancelButton = true)
     {
         if (mCanvas != null)
         {
             GameObject confirmPanelObject = Instantiate(confirmPanel, mCanvas.transform);
-            confirmPanelObject.GetComponent<ConfirmPanelController>().Show(message, OnConfirmButtonClick);
+            confirmPanelObject.GetComponent<ConfirmPanelController>().Show(message, OnConfirmButtonClick, activeCancelButton);
         }
     }
     
@@ -107,15 +108,22 @@ public class GameManager : Singleton<GameManager>
         if (scene.name == "Game")
         {
             // 씬에 배치된 오브젝트 찾기(BoardCellController, GamePanelController)
+            Board board = GameObject.FindObjectOfType<Board>();
             
 
             // BoardCellController 초기화
-            
+            board.InitBoard();
             
             // GamePanelController UI 초기화
             
             
             // Game Logic 객체 생성
+            if (mGameLogic != null)
+            {
+                mGameLogic.Dispose();
+            }
+            mGameLogic = new GameLogic();
+            mGameLogic.GameStart(board, mGameType);
         }
         
         mCanvas = GameObject.FindObjectOfType<Canvas>();
@@ -123,6 +131,7 @@ public class GameManager : Singleton<GameManager>
 
     private void OnApplicationQuit()
     {
-        
+        mGameLogic?.Dispose();
+        mGameLogic = null;
     }
 }

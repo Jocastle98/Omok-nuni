@@ -133,7 +133,7 @@ public class GameLogic : IDisposable
         }
         else
         {
-            GameManager.Instance.OpenConfirmPanel("그 곳에 둘 수 없습니다.", null);
+            GameManager.Instance.OpenConfirmPanel("그 곳에 둘 수 없습니다.", null, false);
             return false;
         }
 
