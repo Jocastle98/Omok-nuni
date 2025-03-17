@@ -11,4 +11,5 @@ public class Constants
     public const string GameSeverURL = "";
     public const string BGMVolumeKey = "BGMVolume";
     public const string SFXVolumeKey = "SFXVolume";
+    
 }
