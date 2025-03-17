@@ -14,6 +14,7 @@ public class ConfirmPanelController : PopupPanelController
 
     /// <summary>
     /// 부모 클래스 Show() 메서드의 애니메이션 효과 + 메시지를 표시하고 콜백을 실행하는 기능의 메서드
+    /// CancelButton의 경우 사용하지 않는 경우도 있어서 false로 비활성화 하여 확인 버튼만 보이게 할 수 있음
     /// </summary>
     /// <param name="message">표시해야 될 메시지</param>
     /// <param name="OnConfirmButtonClick">ConfirmPanel이 닫히고 나면 실행되어야 할 콜백</param>
