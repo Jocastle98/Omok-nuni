@@ -31,14 +31,22 @@ public class GameManager : Singleton<GameManager>
     public void ChangeToGameScene(Enums.EGameType gameType)
     {
         mGameType = gameType;
-        SceneManager.LoadScene("Game");
+        //SceneManager.LoadScene("Game");
+        
+        // 테스트용
+        SceneManager.LoadScene("ysw_Game");
     }
 
     public void ChangeToMainScene()
     {
-        // gameLogic 초기화 추가
+        // gameLogic 초기화
+        mGameLogic?.Dispose();
+        mGameLogic = null;
         
-        SceneManager.LoadScene("Main");
+        //SceneManager.LoadScene("Main");
+        
+        // 테스트용
+        SceneManager.LoadScene("ysw_Main");
     }
 
     public void OpenGameTypeSelectPanel()
@@ -115,7 +123,9 @@ public class GameManager : Singleton<GameManager>
     
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name == "Game")
+        // 테스트용
+        if (scene.name == "ysw_Game")
+        //if (scene.name == "Game")
         {
             // 씬에 배치된 오브젝트 찾기(BoardCellController, GamePanelController)
             BoardCellController boardCellController = GameObject.FindObjectOfType<BoardCellController>();
