@@ -12,7 +12,7 @@ public class Board : MonoBehaviour
     public BoardCell[,] cells;
     public delegate void OnCellClicked(int X, int Y);
     public OnCellClicked onCellClicked;
-    public int size = 13;
+    public int size = 14;
     
     private RectTransform mGrid;
     [SerializeField] private GameObject mCellPrefab;
