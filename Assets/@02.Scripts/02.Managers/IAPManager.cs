@@ -3,26 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Purchasing;
+using UnityEngine.SceneManagement;
 
 /// <summary>
-/// TODO: 추가 수정사항 = IAPManager에 Singleton상속
-/// TODO: Item 종류, 코인 수, 가격 협의
 /// TODO: enum EItemType Enums로 이동
 /// TODO: Coin 지급 로직
 /// 테스트 사용방법 : BuyProduct에 EItemType 매개변수넣고 호출(테스트는 버튼에 int로 받아 EItemType으로 변환)
 /// </summary>
-public class IAPManager : MonoBehaviour, IStoreListener
+public class IAPManager : Singleton<IAPManager>, IStoreListener
 {
-    public enum EItemType
-    {
-        NoAds,          //광고 제거
-        NoAds_Coin_2000, //광고제거 + 코인 2000개
-        Coin_1000,       //코인 1000개
-        Coin_2000,       //코인 2000개
-        Coin_4500,      //코인 4500개
-        Coin_10000,      //코인 10000개
-    }
-    
     //상품의 ID 부여 (앱 상품 페이지에서 직접 설정)
     public const string PRODUCT_ID_COIN_1000 = "coin_1000";
     public const string PRODUCT_ID_COIN_2000 = "coin_2000";
@@ -34,14 +23,14 @@ public class IAPManager : MonoBehaviour, IStoreListener
     /// <summary>
     /// HadPurchased() Test용
     /// </summary>
-    private Dictionary<EItemType, string> ShopItemMapping = new Dictionary<EItemType, string>()
+    private Dictionary<Enums.EItemType, string> ShopItemMapping = new Dictionary<Enums.EItemType, string>()
     {
-        { EItemType.Coin_1000, "coin_1000" },
-        { EItemType.Coin_2000, "coin_2000" },
-        { EItemType.Coin_4500, "coin_4500" },
-        { EItemType.Coin_10000, "coin_10000" },
-        { EItemType.NoAds, "noads" },
-        { EItemType.NoAds_Coin_2000, "noads_coin_2000" },
+        { Enums.EItemType.Coin_1000, "coin_1000" },
+        { Enums.EItemType.Coin_2000, "coin_2000" },
+        { Enums.EItemType.Coin_4500, "coin_4500" },
+        { Enums.EItemType.Coin_10000, "coin_10000" },
+        { Enums.EItemType.NoAds, "noads" },
+        { Enums.EItemType.NoAds_Coin_2000, "noads_coin_2000" },
     };
     
 
@@ -79,26 +68,26 @@ public class IAPManager : MonoBehaviour, IStoreListener
         return mStoreController != null && mStoreExtensionProvider != null;
     }
 
-    public void BuyProduct(EItemType itemType)
+    public void BuyProduct(Enums.EItemType itemType)
     {
         switch (itemType)
         {
-            case EItemType.Coin_1000:
+            case Enums.EItemType.Coin_1000:
                 BuyProductID(PRODUCT_ID_COIN_1000);
                 break;
-            case EItemType.Coin_2000:
+            case Enums.EItemType.Coin_2000:
                 BuyProductID(PRODUCT_ID_COIN_2000);
                 break;
-            case EItemType.Coin_4500:
+            case Enums.EItemType.Coin_4500:
                 BuyProductID(PRODUCT_ID_COIN_4500);
                 break;
-            case EItemType.Coin_10000:
+            case Enums.EItemType.Coin_10000:
                 BuyProductID(PRODUCT_ID_COIN_10000);
                 break;
-            case EItemType.NoAds:
+            case Enums.EItemType.NoAds:
                 BuyProductID(PRODUCT_ID_NOADS);
                 break;
-            case EItemType.NoAds_Coin_2000:
+            case Enums.EItemType.NoAds_Coin_2000:
                 BuyProductID(PRODUCT_ID_NOADS_COIN_2000);
                 break;
         }
@@ -125,7 +114,7 @@ public class IAPManager : MonoBehaviour, IStoreListener
         }
     }
 
-    public bool HadPurchased(EItemType itemType)
+    public bool HadPurchased(Enums.EItemType itemType)
     {
         if (!IsInitialized()) return false;
 
@@ -200,4 +189,5 @@ public class IAPManager : MonoBehaviour, IStoreListener
         return PurchaseProcessingResult.Complete;
     }
 
+    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode) { }
 }
