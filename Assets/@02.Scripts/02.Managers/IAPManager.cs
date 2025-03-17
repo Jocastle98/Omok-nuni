@@ -175,11 +175,13 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
         {
             //TODO: 광고제거 지급
             Debug.Log("광고제거 지급");
+            UserInformations.IsNoAds = true;
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_NOADS_COIN_2000, StringComparison.Ordinal))
         {
             //TODO: 광고제거 + 코인 2000개 지급
             Debug.Log("광고제거 + 코인 2000개 지급");
+            UserInformations.IsNoAds = true;
         }
         else
         {

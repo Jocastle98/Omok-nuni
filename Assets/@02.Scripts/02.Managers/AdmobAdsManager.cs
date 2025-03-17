@@ -56,12 +56,19 @@ public class AdmobAdsManager : MonoBehaviour
         });
     }
 
-    public void ShowRewardedAd()
+    public void ShowRewardedAd() //코인 지급을 하나의 메서드로 빼도 될듯
     {
         const string REWARD_MESSAGE = "보상 제공. Type: {0}, Amount : {1}";
 
+        //광고 제거 아이템을 구매했을 때(광고 스킵 후 코인 지급)
+        if (UserInformations.IsNoAds)
+        {
+            //TODO: 코인 지급
+            Debug.Log("광고제거 아이템이 있어 바로 보상 지급");
+            return;
+        }
         
-        
+        //광고 제거 아이템이 없을 떄
         if (mRewardedAd != null && mRewardedAd.CanShowAd())
         {
             mRewardedAd.Show((Reward reward) =>
