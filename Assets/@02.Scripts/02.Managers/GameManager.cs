@@ -13,6 +13,7 @@ public class GameManager : Singleton<GameManager>
     // [SerializeField] 각종 패널들 연결
     [SerializeField] private GameObject confirmPanel;
     [SerializeField] private GameObject settingsPanel;
+
     
     private Canvas mCanvas;
     
@@ -23,21 +24,20 @@ public class GameManager : Singleton<GameManager>
     private GameLogic gameLogic;
     public Board board;
 
-
-    
     private void Start()
     {
         // 로그인 기능 구현?
-        
+
         // 인트로 BGM 재생
         AudioManager.Instance.PlayIntroBgm();
+
     }
     
     public void ChangeToGameScene(Enums.EGameType gameType)
     {
         mGameType = gameType;
         SceneManager.LoadScene("Game");
-        
+
     }
 
     public void ChangeToMainScene()
