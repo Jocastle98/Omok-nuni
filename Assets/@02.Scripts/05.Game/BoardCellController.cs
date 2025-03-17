@@ -5,7 +5,7 @@ using System.Drawing;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Board : MonoBehaviour
+public class BoardCellController : MonoBehaviour
 {
     //초기기화 작업도 있으면 좋을듯 함
 

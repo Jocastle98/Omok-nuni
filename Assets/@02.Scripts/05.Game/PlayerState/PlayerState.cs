@@ -33,7 +33,7 @@ public class PlayerState : BasePlayerState
     public override void OnEnter(GameLogic gameLogic)
     {
         //수를 둔다
-        gameLogic.board.onCellClicked = (Y, X) =>
+        gameLogic.boardCellController.onCellClicked = (Y, X) =>
         {
             HandleMove(gameLogic, Y, X);
         };
@@ -42,7 +42,7 @@ public class PlayerState : BasePlayerState
     public override void OnExit(GameLogic gameLogic)
     {
         //델리게이트 초기화
-        gameLogic.board.onCellClicked = null;
+        gameLogic.boardCellController.onCellClicked = null;
     }
 
     public override void HandleMove(GameLogic gameLogic, int Y, int X)

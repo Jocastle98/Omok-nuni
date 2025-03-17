@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : Singleton<GameManager>
 {
     // [SerializeField] 각종 패널들 연결
+    [SerializeField] private GameObject gameTypeSelectPanel;
     [SerializeField] private GameObject shopPanel;
     [SerializeField] private GameObject confirmPanel;
     
@@ -40,6 +41,15 @@ public class GameManager : Singleton<GameManager>
         SceneManager.LoadScene("Main");
     }
 
+    public void OpenGameTypeSelectPanel()
+    {
+        if (mCanvas != null)
+        {
+            GameObject gameTypeSelectPanelObject = Instantiate(gameTypeSelectPanel, mCanvas.transform);
+            gameTypeSelectPanelObject.GetComponent<GameTypeSelectPanelController>().Show();
+        }
+    }
+    
     public void OpenRecordPanel()
     {
         if (mCanvas != null)
@@ -108,11 +118,11 @@ public class GameManager : Singleton<GameManager>
         if (scene.name == "Game")
         {
             // 씬에 배치된 오브젝트 찾기(BoardCellController, GamePanelController)
-            Board board = GameObject.FindObjectOfType<Board>();
+            BoardCellController boardCellController = GameObject.FindObjectOfType<BoardCellController>();
             
 
             // BoardCellController 초기화
-            board.InitBoard();
+            boardCellController.InitBoard();
             
             // GamePanelController UI 초기화
             
@@ -123,7 +133,7 @@ public class GameManager : Singleton<GameManager>
                 mGameLogic.Dispose();
             }
             mGameLogic = new GameLogic();
-            mGameLogic.GameStart(board, mGameType);
+            mGameLogic.GameStart(boardCellController, mGameType);
         }
         
         mCanvas = GameObject.FindObjectOfType<Canvas>();

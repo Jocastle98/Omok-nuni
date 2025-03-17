@@ -10,7 +10,7 @@ public class MainPanelController : MonoBehaviour
 {
     public void OnClickStartButton()
     {
-        // 
+        GameManager.Instance.OpenGameTypeSelectPanel();
     }
     
     public void OnClickRecordButton()

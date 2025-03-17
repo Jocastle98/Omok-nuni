@@ -2385,8 +2385,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 741ade6bec547084393aa30a80130e6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameTypeSelectPanel: {fileID: 1795714633042671102, guid: 908f01af89526804cb87556c3ade6596, type: 3}
+  shopPanel: {fileID: 3951547453037586069, guid: a8edaccfc2a2de6498cf49f20d66a96d, type: 3}
   confirmPanel: {fileID: 7605418477416194584, guid: c48e38e28098ae94eab72cd6f36dbc3d, type: 3}
-  board: {fileID: 0}
 --- !u!4 &2140132619
 Transform:
   m_ObjectHideFlags: 0

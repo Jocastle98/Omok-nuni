@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class GameLogic : IDisposable
 {
-    public Board board;
+    public BoardCellController boardCellController;
 
     private BasePlayerState mPlayer_Black;
     private BasePlayerState mPlayer_White;
@@ -19,23 +19,23 @@ public class GameLogic : IDisposable
     /// <summary>
     /// 게임 시작 메서드
     /// </summary>
-    /// <param name="board"></param>
+    /// <param name="boardCellController"></param>
     /// <param name="playMode"></param>
-    public void GameStart(Board board, Enums.EGameType playMode)
+    public void GameStart(BoardCellController boardCellController, Enums.EGameType playMode)
     {
-        this.board = board;
+        this.boardCellController = boardCellController;
 
         switch (playMode)
         {
-            case Enums.EGameType.SinglePlay:
+            case Enums.EGameType.PassAndPlay:
                 mPlayer_Black = new PlayerState(true);
-                // mPlayer_White = new AIState(false)
+                mPlayer_White = new PlayerState(false);
 
                 SetState(mPlayer_Black);
                 break;
-            case Enums.EGameType.DualPlay:
+            case Enums.EGameType.SinglePlay:
                 mPlayer_Black = new PlayerState(true);
-                mPlayer_White = new PlayerState(false);
+                // mPlayer_White = new AIState(false)
 
                 SetState(mPlayer_Black);
                 break;
@@ -46,7 +46,7 @@ public class GameLogic : IDisposable
                     switch (state)
                     {
                         case Enums.EMultiplayManagerState.CreateRoom:
-                            // todo: 대기화면 표시
+                            // todo: 대기화면 표시(제한시간 동안 급수에 맞는 상대 매칭 실패 시 싱글 플레이로 모드 전환)
                             break;
                         case Enums.EMultiplayManagerState.JoinRoom:
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
@@ -128,8 +128,8 @@ public class GameLogic : IDisposable
     {
         if (SetableStone(playerType, Y, X))
         {
-            board.cells[Y, X].SetMark(playerType);
-            board.cells[Y, X].playerType = playerType;
+            boardCellController.cells[Y, X].SetMark(playerType);
+            boardCellController.cells[Y, X].playerType = playerType;
         }
         else
         {
@@ -150,7 +150,7 @@ public class GameLogic : IDisposable
     /// <returns></returns>
     public bool SetableStone(Enums.EPlayerType player, int Y, int X)
     {
-        if (board.cells[Y, X].playerType != Enums.EPlayerType.None) return false;
+        if (boardCellController.cells[Y, X].playerType != Enums.EPlayerType.None) return false;
         
         if (player == Enums.EPlayerType.Player_White) return true;
         
@@ -168,7 +168,7 @@ public class GameLogic : IDisposable
         #region 룰 리스트
 
         // 방향별로 BoardCell 배열을 생성하고 채우는 코드
-        BoardCell[][] lists = MakeLists(board.size,Y,X);
+        BoardCell[][] lists = MakeLists(boardCellController.size,Y,X);
 
         List<BoardCell>[] rule33Results = new List<BoardCell>[4];
         List<BoardCell>[] rule44Results = new List<BoardCell>[4];
@@ -366,7 +366,7 @@ public class GameLogic : IDisposable
     /// <returns></returns>
     public bool GameResult(Enums.EPlayerType player, int Y, int X)
     {
-        BoardCell[][] lists = MakeLists(board.size, Y, X);
+        BoardCell[][] lists = MakeLists(boardCellController.size, Y, X);
 
         int counting = 0;
         for (int i = 0; i < lists.Length; i++)
@@ -422,25 +422,25 @@ public class GameLogic : IDisposable
             // 리스트 0번: 왼쪽 위 -> 오른쪽 아래 대각선 (범위 체크)
             if (nextX1 >= cellMin && nextX1 <= cellMax && nextY1 >= cellMin && nextY1 <= cellMax)
             {
-                lists[0][i] = board.cells[nextY1, nextX1];
+                lists[0][i] = boardCellController.cells[nextY1, nextX1];
             }
 
             // 리스트 1번: 왼쪽 -> 오른쪽 (X 좌표만 체크)
             if (nextX1 >= cellMin && nextX1 <= cellMax)
             {
-                lists[1][i] = board.cells[Y, nextX1];
+                lists[1][i] = boardCellController.cells[Y, nextX1];
             }
 
             // 리스트 2번: 왼쪽 아래 -> 오른쪽 위 대각선 (범위 체크)
             if (nextX1 >= cellMin && nextX1 <= cellMax && nextY2 >= cellMin && nextY2 <= cellMax)
             {
-                lists[2][i] = board.cells[nextY2, nextX1];
+                lists[2][i] = boardCellController.cells[nextY2, nextX1];
             }
 
             // 리스트 3번: 아래 -> 위 (Y 좌표만 체크)
             if (nextY2 >= cellMin && nextY2 <= cellMax)
             {
-                lists[3][i] = board.cells[nextY2, X];
+                lists[3][i] = boardCellController.cells[nextY2, X];
             }
         }
 
