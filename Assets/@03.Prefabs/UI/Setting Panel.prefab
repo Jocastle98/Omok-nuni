@@ -1251,6 +1251,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panelRectTransform: {fileID: 6923252752090926457}
+  _bgmSlider: {fileID: 845801192245174331}
+  _sfxSlider: {fileID: 6319862909384730424}
 --- !u!222 &6012252339127214030
 CanvasRenderer:
   m_ObjectHideFlags: 0
