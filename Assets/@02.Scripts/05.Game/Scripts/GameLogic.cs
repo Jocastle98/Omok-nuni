@@ -7,12 +7,11 @@ using UnityEngine;
 
 public class GameLogic
 {
-
     public Board board;
 
-    private BasePlayerState player1;
-    private BasePlayerState player2;
-    private BasePlayerState currentPlayer;
+    private BasePlayerState mPlayer_Black;
+    private BasePlayerState mPlayer_White;
+    private BasePlayerState mCurrentPlayer;
 
     public void GameStart(Board board, Enums.EGameType playMode)
     {
@@ -21,16 +20,16 @@ public class GameLogic
         switch (playMode)
         {
             case Enums.EGameType.SinglePlay:
-                player1 = new PlayerState(true);
+                mPlayer_Black = new PlayerState(true);
                 //AI
 
-                SetState(player1);
+                SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.DualPlay:
-                player1 = new PlayerState(true);
-                player2 = new PlayerState(false);
+                mPlayer_Black = new PlayerState(true);
+                mPlayer_White = new PlayerState(false);
 
-                SetState(player1);
+                SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.MultiPlay:
                 break;
@@ -42,11 +41,11 @@ public class GameLogic
     {
         switch (player)
         {
-            case Enums.EPlayerType.PlayerA:
-                SetState(player2);
+            case Enums.EPlayerType.Player_Black:
+                SetState(mPlayer_White);
                 break;
-            case Enums.EPlayerType.PlayerB:
-                SetState(player1);
+            case Enums.EPlayerType.Player_White:
+                SetState(mPlayer_Black);
                 break;
         }
     }
@@ -54,8 +53,8 @@ public class GameLogic
     public void EndGame()
     {
         SetState(null);
-        player1 = null;
-        player2 = null;
+        mPlayer_Black = null;
+        mPlayer_White = null;
         
         //점수 랭킹 업데이트
         //씬 혹은 게임화면 위치 변경
@@ -63,9 +62,9 @@ public class GameLogic
 
     public void SetState(BasePlayerState newState)
     {
-        currentPlayer?.OnExit(this);
-        currentPlayer = newState;
-        currentPlayer?.OnEnter(this);
+        mCurrentPlayer?.OnExit(this);
+        mCurrentPlayer = newState;
+        mCurrentPlayer?.OnEnter(this);
     }
 
     public bool SetStone(Enums.EPlayerType playerType, int Y, int X)
@@ -88,16 +87,16 @@ public class GameLogic
     {
         if (board.cells[Y, X].playerType != Enums.EPlayerType.None) return false;
         
-        if (player == Enums.EPlayerType.PlayerB) return true;
+        if (player == Enums.EPlayerType.Player_White) return true;
         
         Enums.EPlayerType oppositePlayerType = Enums.EPlayerType.None;
         switch (player)
         {
-            case Enums.EPlayerType.PlayerA:
-                oppositePlayerType = Enums.EPlayerType.PlayerB;
+            case Enums.EPlayerType.Player_Black:
+                oppositePlayerType = Enums.EPlayerType.Player_White;
                 break;
-            case Enums.EPlayerType.PlayerB:
-                oppositePlayerType = Enums.EPlayerType.PlayerA;
+            case Enums.EPlayerType.Player_White:
+                oppositePlayerType = Enums.EPlayerType.Player_Black;
                 break;
         }
         

@@ -5,16 +5,29 @@ using UnityEngine;
 
 public class PlayerState : BasePlayerState
 {
+    private MultiplayManager mMultiplayManager;
+    private string mRoomId;
+    private bool mbIsMultiplay;
+    
     public PlayerState(bool Black)
     {
         if (Black)
         {
-            playerType = Enums.EPlayerType.PlayerA;
+            playerType = Enums.EPlayerType.Player_Black;
         }
         else
         {
-            playerType = Enums.EPlayerType.PlayerB;
+            playerType = Enums.EPlayerType.Player_White;
         }
+        
+        mbIsMultiplay = false;
+    }
+
+    public PlayerState(bool Black, MultiplayManager multiplayManager, string roomId) : this(Black)
+    {
+        mMultiplayManager = multiplayManager;
+        mRoomId = roomId;
+        mbIsMultiplay = true;
     }
 
     public override void OnEnter(GameLogic gameLogic)
@@ -32,8 +45,13 @@ public class PlayerState : BasePlayerState
         gameLogic.board.onCellClicked = null;
     }
 
-    public override void HandleMove(GameLogic gameLogic,int Y, int X)
+    public override void HandleMove(GameLogic gameLogic, int Y, int X)
     {
         ProcessMove(gameLogic, playerType, Y, X);
+
+        if (mbIsMultiplay)
+        {
+            mMultiplayManager.SendPlayerMove(mRoomId, Y *  15 + X);
+        }
     }
 }

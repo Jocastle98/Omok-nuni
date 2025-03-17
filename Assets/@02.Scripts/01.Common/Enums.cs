@@ -19,8 +19,8 @@ public class Enums
     public enum EPlayerType 
     { 
         None,           // 텅 빈 상태
-        PlayerA,        // 흑돌
-        PlayerB         // 백돌
+        Player_Black,        // 흑돌
+        Player_White         // 백돌
     }
 
     public enum EGameType

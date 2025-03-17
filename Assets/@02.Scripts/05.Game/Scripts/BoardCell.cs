@@ -40,11 +40,11 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
     {
         switch (playerType)
         {
-            case Enums.EPlayerType.PlayerA:
+            case Enums.EPlayerType.Player_Black:
                 //이미지 불러와서 스프라이트에 할당
                 mImage.color =  Color.green;
                 break;
-            case Enums.EPlayerType.PlayerB:
+            case Enums.EPlayerType.Player_White:
                 mImage.color =  Color.red;
                 break;
         }

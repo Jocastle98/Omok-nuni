@@ -2386,6 +2386,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   confirmPanel: {fileID: 7605418477416194584, guid: c48e38e28098ae94eab72cd6f36dbc3d, type: 3}
+  board: {fileID: 0}
 --- !u!4 &2140132619
 Transform:
   m_ObjectHideFlags: 0
