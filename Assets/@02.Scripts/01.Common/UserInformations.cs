@@ -21,11 +21,4 @@ public class UserInformations
         get { return PlayerPrefs.GetInt("IsPlaySFX", 1) == 1; }
         set { PlayerPrefs.SetInt("IsPlaySFX", value ? 1 : 0); PlayerPrefs.Save(); }
     }
-    
-    //광고제거 아이템 구매 여부
-    public static bool IsNoAds
-    {
-        get { return PlayerPrefs.GetInt("IsNoAds", 0) == 1; }
-        set { PlayerPrefs.SetInt("IsNoAds", value ? 1 : 0); PlayerPrefs.Save();}
-    }
 }
