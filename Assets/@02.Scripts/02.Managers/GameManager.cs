@@ -12,6 +12,7 @@ public class GameManager : Singleton<GameManager>
 {
     // [SerializeField] 각종 패널들 연결
     [SerializeField] private GameObject confirmPanel;
+    [SerializeField] private GameObject settingsPanel;
     
     private Canvas mCanvas;
     
@@ -68,7 +69,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            
+            var settingPanelObject = Instantiate(settingsPanel, mCanvas.transform);
+            settingPanelObject.GetComponent<PopupPanelController>().Show();
         }
     }
     
