@@ -8,7 +8,7 @@ public abstract class BasePlayerState
 
     public abstract void OnEnter(GameLogic gameLogic);
     public abstract void OnExit(GameLogic gameLogic);
-    public abstract void HandleMove(GameLogic gameLogic,int x, int y);
+    public abstract void HandleMove(GameLogic gameLogic,int y, int x);
 
     protected void ProcessMove(GameLogic gameLogic, Enums.EPlayerType player, int Y, int X)
     {

@@ -5,106 +5,170 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class GameLogic
+public class GameLogic : IDisposable
 {
+    public BoardCellController boardCellController;
 
-    public Board board;
+    private BasePlayerState mPlayer_Black;
+    private BasePlayerState mPlayer_White;
+    private BasePlayerState mCurrentPlayer;
+    
+    private MultiplayManager mMultiplayManager;
+    private string mRoomId;
 
-    private BasePlayerState player1;
-    private BasePlayerState player2;
-    private BasePlayerState currentPlayer;
-
-    public void GameStart(Board board, Enums.EGameType playMode)
+    /// <summary>
+    /// 게임 시작 메서드
+    /// </summary>
+    /// <param name="boardCellController"></param>
+    /// <param name="playMode"></param>
+    public void GameStart(BoardCellController boardCellController, Enums.EGameType playMode)
     {
-        this.board = board;
+        this.boardCellController = boardCellController;
 
         switch (playMode)
         {
-            case Enums.EGameType.SinglePlay:
-                player1 = new PlayerState(true);
-                //AI
+            case Enums.EGameType.PassAndPlay:
+                mPlayer_Black = new PlayerState(true);
+                mPlayer_White = new PlayerState(false);
 
-                SetState(player1);
+                SetState(mPlayer_Black);
                 break;
-            case Enums.EGameType.DualPlay:
-                player1 = new PlayerState(true);
-                player2 = new PlayerState(false);
+            case Enums.EGameType.SinglePlay:
+                mPlayer_Black = new PlayerState(true);
+                // mPlayer_White = new AIState(false)
 
-                SetState(player1);
+                SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.MultiPlay:
+                mMultiplayManager = new MultiplayManager((state, roomId) =>
+                {
+                    mRoomId = roomId;
+                    switch (state)
+                    {
+                        case Enums.EMultiplayManagerState.CreateRoom:
+                            // todo: 대기화면 표시(제한시간 동안 급수에 맞는 상대 매칭 실패 시 싱글 플레이로 모드 전환)
+                            break;
+                        case Enums.EMultiplayManagerState.JoinRoom:
+                            mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
+                            mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
+                            
+                            SetState(mPlayer_Black);
+                            break;
+                        case Enums.EMultiplayManagerState.StartGame:
+                            mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
+                            mPlayer_White = new MultiplayerState(false, mMultiplayManager);
+                            
+                            SetState(mPlayer_Black);
+                            break;
+                        case Enums.EMultiplayManagerState.ExitRoom:
+                            // todo: 퇴장 처리
+                            break;
+                        case Enums.EMultiplayManagerState.EndGame:
+                            // todo: 게임 종료 처리
+                            break;
+                    }
+                });
                 break;
-
         }
     }
 
+    /// <summary>
+    /// 턴을 변경하면 메서드
+    /// </summary>
+    /// <param name="player"></param>
     public void NextTurn(Enums.EPlayerType player)
     {
         switch (player)
         {
-            case Enums.EPlayerType.PlayerA:
-                SetState(player2);
+            case Enums.EPlayerType.Player_Black:
+                SetState(mPlayer_White);
                 break;
-            case Enums.EPlayerType.PlayerB:
-                SetState(player1);
+            case Enums.EPlayerType.Player_White:
+                SetState(mPlayer_Black);
                 break;
         }
     }
 
+    /// <summary>
+    /// 게임 종료 처리를 해주는 메서드
+    /// </summary>
     public void EndGame()
     {
         SetState(null);
-        player1 = null;
-        player2 = null;
+        mPlayer_Black = null;
+        mPlayer_White = null;
         
+        // GamePanel의 GameOver 표시 UI 업데이트
+        GameManager.Instance.OpenGameOverPanel();
         //점수 랭킹 업데이트
         //씬 혹은 게임화면 위치 변경
     }
 
+    /// <summary>
+    /// 현재 플레이어의 상태(자신, AI, 멀티플레이어)를 변경하는 메서드
+    /// </summary>
+    /// <param name="newState"></param>
     public void SetState(BasePlayerState newState)
     {
-        currentPlayer?.OnExit(this);
-        currentPlayer = newState;
-        currentPlayer?.OnEnter(this);
+        mCurrentPlayer?.OnExit(this);
+        mCurrentPlayer = newState;
+        mCurrentPlayer?.OnEnter(this);
+        
+        // 상태 변경 후 GamePanel의 Turn 표시 UI 업데이트
     }
 
+    /// <summary>
+    /// (Y, X) 좌표에 해당 플레이어의 돌을 놓는 메서드
+    /// </summary>
+    /// <param name="playerType"></param>
+    /// <param name="Y"></param>
+    /// <param name="X"></param>
+    /// <returns></returns>
     public bool SetStone(Enums.EPlayerType playerType, int Y, int X)
     {
         if (SetableStone(playerType, Y, X))
         {
-            board.cells[Y, X].SetMark(playerType);
-            board.cells[Y, X].playerType = playerType;
+            boardCellController.cells[Y, X].SetMark(playerType);
+            boardCellController.cells[Y, X].playerType = playerType;
         }
         else
         {
-            Debug.Log("둘 수 없음");
+            GameManager.Instance.OpenConfirmPanel("그 곳에 둘 수 없습니다.", null, false);
             return false;
         }
 
         return true;
     }
 
+    /// <summary>
+    /// 돌을 놓을 수 있는지 확인 여부를 반환하는 메서드
+    /// 흑돌은 렌주룰 적용
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="Y"></param>
+    /// <param name="X"></param>
+    /// <returns></returns>
     public bool SetableStone(Enums.EPlayerType player, int Y, int X)
     {
-        if (board.cells[Y, X].playerType != Enums.EPlayerType.None) return false;
+        if (boardCellController.cells[Y, X].playerType != Enums.EPlayerType.None) return false;
         
-        if (player == Enums.EPlayerType.PlayerB) return true;
+        if (player == Enums.EPlayerType.Player_White) return true;
         
         Enums.EPlayerType oppositePlayerType = Enums.EPlayerType.None;
         switch (player)
         {
-            case Enums.EPlayerType.PlayerA:
-                oppositePlayerType = Enums.EPlayerType.PlayerB;
+            case Enums.EPlayerType.Player_Black:
+                oppositePlayerType = Enums.EPlayerType.Player_White;
                 break;
-            case Enums.EPlayerType.PlayerB:
-                oppositePlayerType = Enums.EPlayerType.PlayerA;
+            case Enums.EPlayerType.Player_White:
+                oppositePlayerType = Enums.EPlayerType.Player_Black;
                 break;
         }
         
         #region 룰 리스트
 
         // 방향별로 BoardCell 배열을 생성하고 채우는 코드
-        BoardCell[][] lists = MakeLists(board.size,Y,X);
+        BoardCell[][] lists = MakeLists(boardCellController.size,Y,X);
 
         List<BoardCell>[] rule33Results = new List<BoardCell>[4];
         List<BoardCell>[] rule44Results = new List<BoardCell>[4];
@@ -293,9 +357,16 @@ public class GameLogic
         return (rule33Result, rule44Result, true, rule6Result);
     }
 
+    /// <summary>
+    /// 승리 조건을 확인하는 메서드
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="Y"></param>
+    /// <param name="X"></param>
+    /// <returns></returns>
     public bool GameResult(Enums.EPlayerType player, int Y, int X)
     {
-        BoardCell[][] lists = MakeLists(board.size, Y, X);
+        BoardCell[][] lists = MakeLists(boardCellController.size, Y, X);
 
         int counting = 0;
         for (int i = 0; i < lists.Length; i++)
@@ -322,6 +393,13 @@ public class GameLogic
         return false;
     }
 
+    /// <summary>
+    /// (Y, X) 좌표를 기준으로 주위를 탐색하는 메서드
+    /// </summary>
+    /// <param name="boardSize"></param>
+    /// <param name="Y"></param>
+    /// <param name="X"></param>
+    /// <returns></returns>
     public BoardCell[][] MakeLists(int boardSize,int Y, int X)
     {
         int endOfLeft = -4;
@@ -344,28 +422,34 @@ public class GameLogic
             // 리스트 0번: 왼쪽 위 -> 오른쪽 아래 대각선 (범위 체크)
             if (nextX1 >= cellMin && nextX1 <= cellMax && nextY1 >= cellMin && nextY1 <= cellMax)
             {
-                lists[0][i] = board.cells[nextY1, nextX1];
+                lists[0][i] = boardCellController.cells[nextY1, nextX1];
             }
 
             // 리스트 1번: 왼쪽 -> 오른쪽 (X 좌표만 체크)
             if (nextX1 >= cellMin && nextX1 <= cellMax)
             {
-                lists[1][i] = board.cells[Y, nextX1];
+                lists[1][i] = boardCellController.cells[Y, nextX1];
             }
 
             // 리스트 2번: 왼쪽 아래 -> 오른쪽 위 대각선 (범위 체크)
             if (nextX1 >= cellMin && nextX1 <= cellMax && nextY2 >= cellMin && nextY2 <= cellMax)
             {
-                lists[2][i] = board.cells[nextY2, nextX1];
+                lists[2][i] = boardCellController.cells[nextY2, nextX1];
             }
 
             // 리스트 3번: 아래 -> 위 (Y 좌표만 체크)
             if (nextY2 >= cellMin && nextY2 <= cellMax)
             {
-                lists[3][i] = board.cells[nextY2, X];
+                lists[3][i] = boardCellController.cells[nextY2, X];
             }
         }
 
         return lists;
+    }
+
+    public void Dispose()
+    {
+        mMultiplayManager?.LeaveRoom(mRoomId);
+        mMultiplayManager?.Dispose();
     }
 }
