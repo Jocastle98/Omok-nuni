@@ -5,14 +5,14 @@ using System.Drawing;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Board : MonoBehaviour
+public class BoardCellController : MonoBehaviour
 {
     //초기기화 작업도 있으면 좋을듯 함
 
     public BoardCell[,] cells;
     public delegate void OnCellClicked(int X, int Y);
     public OnCellClicked onCellClicked;
-    public int size = 13;
+    public int size = 14;
     
     private RectTransform mGrid;
     [SerializeField] private GameObject mCellPrefab;

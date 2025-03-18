@@ -92,8 +92,18 @@ public class MultiplayManager : IDisposable
         mSocket.Emit("doPlayer", new { roomId , position });
     }
 
+    public void LeaveRoom(string roomId)
+    {
+        mSocket.Emit("leaveRoom", new { roomId });
+    }
+    
     public void Dispose()
     {
-        
+        if (mSocket != null)
+        {
+            mSocket.Disconnect();
+            mSocket.Dispose();
+            mSocket = null;
+        }
     }
 }
