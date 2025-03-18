@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -9,7 +11,9 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] private GameObject timer;
     
     [SerializeField] private GameObject turnUI;
+    [SerializeField] private GameObject resignButton;
     [SerializeField] private GameObject recordUI;
+    [SerializeField] private GameObject backButton;
     
     [SerializeField] private CanvasGroup blackTurnPanel;
     [SerializeField] private CanvasGroup whiteTurnPanel;
@@ -29,7 +33,9 @@ public class GamePanelController : MonoBehaviour
             case Enums.EGameUIState.Init:
                 timer.SetActive(true);
                 turnUI.SetActive(true);
+                resignButton.SetActive(true);
                 recordUI.SetActive(false);
+                backButton.SetActive(false);
                 
                 timer.GetComponent<Timer>().InitTimer();
                 blackTurnPanel.alpha = mDisableAlpha;
@@ -38,7 +44,9 @@ public class GamePanelController : MonoBehaviour
             case Enums.EGameUIState.Turn_Black:
                 timer.SetActive(true);
                 turnUI.SetActive(true);
+                resignButton.SetActive(true);
                 recordUI.SetActive(false);
+                backButton.SetActive(false);
                 
                 timer.GetComponent<Timer>().InitTimer();
                 blackTurnPanel.alpha = mEnableAlpha;
@@ -47,7 +55,9 @@ public class GamePanelController : MonoBehaviour
             case Enums.EGameUIState.Turn_White:
                 timer.SetActive(true);
                 turnUI.SetActive(true);
+                resignButton.SetActive(true);
                 recordUI.SetActive(false);
+                backButton.SetActive(false);
 
                 timer.GetComponent<Timer>().InitTimer();
                 blackTurnPanel.alpha = mDisableAlpha;
@@ -56,7 +66,9 @@ public class GamePanelController : MonoBehaviour
             case Enums.EGameUIState.Record:
                 timer.SetActive(false);
                 turnUI.SetActive(false);
+                resignButton.SetActive(false);
                 recordUI.SetActive(true);
+                backButton.SetActive(true);
                 break;
         }
     }
@@ -123,6 +135,16 @@ public class GamePanelController : MonoBehaviour
     public void OnClickLastMoveButton()
     {
         
+    }
+
+    // 뒤로 가기 버튼
+    public void OnClickBackButton()
+    {
+        GameManager.Instance.OpenConfirmPanel("내 기보를 종료하시겠습니까?", () =>
+        {
+            // 내 기보 목록 팝업 창으로 돌아갈지, 그냥 메인화면 자체로 돌아갈지?(일단은 메인화면)
+            GameManager.Instance.ChangeToMainScene();
+        });
     }
     
     #endregion
