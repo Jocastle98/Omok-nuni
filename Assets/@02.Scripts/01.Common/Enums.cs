@@ -47,4 +47,11 @@ public class Enums
         Coin_4500,      //코인 4500개
         Coin_10000,      //코인 10000개
     }
+    
+    public enum EDifficultyLevel
+    {
+        Easy,
+        Medium,
+        Hard
+    }
 }
