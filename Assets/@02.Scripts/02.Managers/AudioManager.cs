@@ -73,6 +73,14 @@ public class AudioManager : Singleton<AudioManager>
         }
     }
 
+    public void StopBgm()
+    {
+        if (_bgmSource != null && _audioClips.Length > 1 && _audioClips[1] != null)
+        {
+            _bgmSource.Stop();
+        }
+    }
+
     public void PlaySfxSound(int index)
     {
         if (_sfxSource != null && index >= 2 && index < _audioClips.Length && _audioClips[index] != null)

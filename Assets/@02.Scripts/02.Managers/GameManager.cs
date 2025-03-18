@@ -28,10 +28,7 @@ public class GameManager : Singleton<GameManager>
     private void Start()
     {
         // 로그인 기능 구현?
-
-        // 인트로 BGM 재생
-        AudioManager.Instance.PlayIntroBgm();
-
+        
     }
     
     public void ChangeToGameScene(Enums.EGameType gameType)
@@ -130,10 +127,19 @@ public class GameManager : Singleton<GameManager>
     
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        // 인트로 BGM 재생
+        if (scene.name == "ysw_Main")
+        //if (scene.name == "Main")   
+        {
+            AudioManager.Instance.PlayIntroBgm();
+        }
+        
         // 임시기능: 테스트용
         if (scene.name == "ysw_Game")
         //if (scene.name == "Game")
         {
+            AudioManager.Instance.PlayGameBgm();
+            
             // 씬에 배치된 오브젝트 찾기(BoardCellController, GamePanelController)
             BoardCellController boardCellController = GameObject.FindObjectOfType<BoardCellController>();
             GamePanelController gamePanelController = GameObject.FindObjectOfType<GamePanelController>();

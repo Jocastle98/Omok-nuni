@@ -5,7 +5,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(AudioSource))]
 public class Timer : MonoBehaviour
 {
     [SerializeField] private Image fillImage;       // 채워지는 부분
@@ -14,8 +13,6 @@ public class Timer : MonoBehaviour
     [SerializeField] private TMP_Text timerText;    // 시간 표시
     [SerializeField] private float timeLimit;       // 시간 제한 설정(30초?)
     
-    //private AudioSource mAudioSource;               // 시계소리를 재생할 AudioSource
-    
     private float mCurrentTime;                     // 시간 측정을 위한 변수
     private bool mbIsPaused;                        // 시간 정지 여부
 
@@ -23,9 +20,6 @@ public class Timer : MonoBehaviour
     
     private void Awake()
     {
-        //mAudioSource = GetComponent<AudioSource>();
-        //mAudioSource.loop = true;
-        
         mbIsPaused = true;
     }
 
@@ -38,8 +32,8 @@ public class Timer : MonoBehaviour
             {
                 headCapImage.gameObject.SetActive(false);
                 tailCapImage.gameObject.SetActive(false);
-                mbIsPaused = true;
                 
+                PauseTimer();
                 OnTimeOut?.Invoke();
             }
             else                                        // 시간의 흐름에 따라 fillImage를 진행 상태에 맞게 채움
@@ -57,13 +51,13 @@ public class Timer : MonoBehaviour
 
     public void StartTimer()
     {
-        //mAudioSource.Play();
+        AudioManager.Instance.PlayGameBgm();
         mbIsPaused = false;
     }
 
     public void PauseTimer()
     {
-        //mAudioSource.Stop();
+        AudioManager.Instance.StopBgm();
         mbIsPaused = true;
     }
 
