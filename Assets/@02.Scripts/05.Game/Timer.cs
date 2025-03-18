@@ -14,17 +14,17 @@ public class Timer : MonoBehaviour
     [SerializeField] private TMP_Text timerText;    // 시간 표시
     [SerializeField] private float timeLimit;       // 시간 제한 설정(30초?)
     
-    private AudioSource mAudioSource;               // 시계소리를 재생할 AudioSource
+    //private AudioSource mAudioSource;               // 시계소리를 재생할 AudioSource
     
     private float mCurrentTime;                     // 시간 측정을 위한 변수
     private bool mbIsPaused;                        // 시간 정지 여부
 
-    public Action OnTimerOut;                       // 시간이 다 되면 호출할 콜백                 
+    public Action OnTimeOut;                       // 시간이 다 되면 호출할 콜백                 
     
     private void Awake()
     {
-        mAudioSource = GetComponent<AudioSource>();
-        mAudioSource.loop = true;
+        //mAudioSource = GetComponent<AudioSource>();
+        //mAudioSource.loop = true;
         
         mbIsPaused = true;
     }
@@ -40,7 +40,7 @@ public class Timer : MonoBehaviour
                 tailCapImage.gameObject.SetActive(false);
                 mbIsPaused = true;
                 
-                OnTimerOut?.Invoke();
+                OnTimeOut?.Invoke();
             }
             else                                        // 시간의 흐름에 따라 fillImage를 진행 상태에 맞게 채움
             {
@@ -57,13 +57,13 @@ public class Timer : MonoBehaviour
 
     public void StartTimer()
     {
-        mAudioSource.Play();
+        //mAudioSource.Play();
         mbIsPaused = false;
     }
 
     public void PauseTimer()
     {
-        mAudioSource.Stop();
+        //mAudioSource.Stop();
         mbIsPaused = true;
     }
 
