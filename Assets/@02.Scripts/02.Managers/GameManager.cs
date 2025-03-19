@@ -16,20 +16,21 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject confirmPanel;
     [SerializeField] private GameObject watingPanel;
+    [SerializeField] private GameObject mSignupPanel;
+    [SerializeField] private GameObject mSigninPanel;
 
-    
+
     private Canvas mCanvas;
-    
+
     private Enums.EGameType mGameType;
-    
+
     // GamePanelController, GameLogic 구현
     private GamePanelController mGamePanelController;
     private GameLogic mGameLogic;
-    
+
     private void Start()
     {
-        // 로그인 기능 구현?
-        
+        OpenSigninPanel();
     }
     
     // 게임 화면으로 씬 전환하는 메서드
@@ -37,7 +38,7 @@ public class GameManager : Singleton<GameManager>
     {
         mGameType = gameType;
         //SceneManager.LoadScene("Game");
-        
+
         // 임시기능: 테스트용
         SceneManager.LoadScene("ysw_Game");
     }
@@ -48,9 +49,9 @@ public class GameManager : Singleton<GameManager>
         // gameLogic 초기화
         mGameLogic?.Dispose();
         mGameLogic = null;
-        
+
         //SceneManager.LoadScene("Main");
-        
+
         // 임시기능: 테스트용
         SceneManager.LoadScene("ysw_Main");
     }
@@ -70,7 +71,6 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            
         }
     }
     
@@ -79,7 +79,6 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            
         }
     }
 
@@ -109,16 +108,24 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             GameObject confirmPanelObject = Instantiate(confirmPanel, mCanvas.transform);
-            confirmPanelObject.GetComponent<ConfirmPanelController>().Show(message, OnConfirmButtonClick, activeCancelButton);
+            confirmPanelObject.GetComponent<ConfirmPanelController>()
+                .Show(message, OnConfirmButtonClick, activeCancelButton);
         }
     }
     
     // 로그인 패널 호출 메서드
     public void OpenSigninPanel()
     {
+        // TODO: 개별작업 씬 통합 시 삭제
+        if (mSigninPanel == null)
+        {
+            return;
+        }
+        
         if (mCanvas != null)
         {
-            
+            var signinPanelObj = Instantiate(mSigninPanel, mCanvas.transform);
+            signinPanelObj.GetComponent<PanelController>().Show();
         }
     }
     
@@ -127,7 +134,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            
+            var signupPanelObj = Instantiate(mSignupPanel, mCanvas.transform);
+            signupPanelObj.GetComponent<PanelController>().Show();
         }
     }
     
@@ -157,42 +165,46 @@ public class GameManager : Singleton<GameManager>
         {
             
         }
+
+    public void OpenGameOverPanel()
+    {
     }
-    
+
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 인트로 BGM 재생
         if (scene.name == "ysw_Main")
-        //if (scene.name == "Main")   
+            //if (scene.name == "Main")   
         {
             AudioManager.Instance.PlayIntroBgm();
         }
-        
+
         // 임시기능: 테스트용
         if (scene.name == "ysw_Game")
-        //if (scene.name == "Game")
+            //if (scene.name == "Game")
         {
             AudioManager.Instance.PlayGameBgm();
-            
+
             // 씬에 배치된 오브젝트 찾기(BoardCellController, GamePanelController)
             BoardCellController boardCellController = GameObject.FindObjectOfType<BoardCellController>();
             GamePanelController gamePanelController = GameObject.FindObjectOfType<GamePanelController>();
 
             // BoardCellController 초기화
             boardCellController.InitBoard();
-            
+
             // GamePanelController UI 초기화
             gamePanelController.SetGameUI(Enums.EGameUIState.Init);
-            
+
             // Game Logic 객체 생성
             if (mGameLogic != null)
             {
                 mGameLogic.Dispose();
             }
+
             mGameLogic = new GameLogic();
             mGameLogic.GameStart(boardCellController, gamePanelController, mGameType);
         }
-        
+
         mCanvas = GameObject.FindObjectOfType<Canvas>();
     }
 
