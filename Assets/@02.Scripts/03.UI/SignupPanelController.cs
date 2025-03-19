@@ -15,7 +15,7 @@ public class SignupPanelController : PanelController
     [SerializeField] private TMP_InputField mPasswordInputField;
     [SerializeField] private TMP_InputField mConfirmPasswordInputField;
 
-    public void OnClickConfirmButton()
+    public async void OnClickConfirmButton()
     {
         var username = mUsernameInputField.text;
         var nickname = mNicknameInputField.text;
@@ -37,7 +37,7 @@ public class SignupPanelController : PanelController
             signupData.password = password;
 
             // 서버로 SignupData 전달하면서 회원가입 진행
-            NetworkManager.Instance.Signup(signupData, () => { Destroy(gameObject); }, () =>
+            await NetworkManager.Instance.Signup(signupData, () => { Destroy(gameObject); }, () =>
             {
                 mUsernameInputField.text = string.Empty;
                 mNicknameInputField.text = string.Empty;
@@ -51,7 +51,7 @@ public class SignupPanelController : PanelController
             {
                 mPasswordInputField.text = string.Empty;
                 mConfirmPasswordInputField.text = string.Empty;
-            });
+            }, false);
         }
     }
 

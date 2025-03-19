@@ -36,68 +36,32 @@ public class NetworkManager : Singleton<NetworkManager>
             www.downloadHandler = new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
 
-            await www.SendWebRequest().ToUniTask();
-
-            if (www.result == UnityWebRequest.Result.ConnectionError ||
-                www.result == UnityWebRequest.Result.ProtocolError)
+            try
             {
-                Debug.Log("Error: " + www.error);
+                await www.SendWebRequest().ToUniTask();
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("Exception caught: " + ex.Message);
 
                 if (www.responseCode == 409)
                 {
-                    Debug.Log("중복사용자");
-                    GameManager.Instance.OpenConfirmPanel("이미 존재하는 사용자입니다.", () => { failureCallback?.Invoke(); });
-                }
-            }
-            else
-            {
-                var result = www.downloadHandler.text;
-                Debug.Log("Result: " + result);
-
-                GameManager.Instance.OpenConfirmPanel("회원 가입이 완료 되었습니다.", () => { successCallback?.Invoke(); });
-            }
-        }
-    }
-
-    /// <summary>
-    /// 캐시를 통한 자동 로그인
-    /// </summary>
-    /// <param name="sid"></param>
-    /// <returns></returns>
-    public async UniTask<bool> SigninWithSidAsync(string sid)
-    {
-        using (UnityWebRequest www = new UnityWebRequest(Constants.ServerURL + "/users/signin/sid",
-                   UnityWebRequest.kHttpVerbPOST))
-        {
-            www.downloadHandler = new DownloadHandlerBuffer();
-            www.SetRequestHeader("Cookie", sid);
-
-            // UnityWebRequest의 비동기 작업을 UniTask로 변환하여 await합니다.
-            await www.SendWebRequest().ToUniTask();
-
-            if (www.result == UnityWebRequest.Result.ConnectionError ||
-                www.result == UnityWebRequest.Result.ProtocolError)
-            {
-                Debug.Log("Error: " + www.error);
-                return false;
-            }
-            else
-            {
-                var resultStr = www.downloadHandler.text;
-                var result = JsonUtility.FromJson<SigninResult>(resultStr);
-
-                if (result.result == 2)
-                {
-                    Debug.Log("자동 로그인 성공");
-                    GameManager.Instance.OpenConfirmPanel("로그인이 완료 되었습니다.", () => { });
-                    return true;
+                    GameManager.Instance.OpenConfirmPanel("이미 존재하는 사용자입니다.", () => { failureCallback?.Invoke(); },
+                        false);
                 }
                 else
                 {
-                    Debug.Log("쿠키 정보가 잘못되었습니다.");
-                    return false;
+                    GameManager.Instance.OpenConfirmPanel("서버와 통신 중 오류가 발생했습니다.", () => { failureCallback?.Invoke(); },
+                        false);
                 }
+
+                return;
             }
+
+            var result = www.downloadHandler.text;
+            Debug.Log("Result: " + result);
+
+            GameManager.Instance.OpenConfirmPanel("회원 가입이 완료 되었습니다.", () => { successCallback?.Invoke(); }, false);
         }
     }
 
@@ -120,45 +84,49 @@ public class NetworkManager : Singleton<NetworkManager>
             www.downloadHandler = new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
 
-            await www.SendWebRequest().ToUniTask();
-
-            if (www.result == UnityWebRequest.Result.ConnectionError ||
-                www.result == UnityWebRequest.Result.ProtocolError)
+            try
             {
-                Debug.Log("Error: " + www.error);
+                await www.SendWebRequest().ToUniTask();
             }
-            else
+            catch (Exception ex)
             {
-                // 쿠키 저장
-                var cookie = www.GetResponseHeader("set-cookie");
-                if (!string.IsNullOrEmpty(cookie))
-                {
-                    int lastIndex = cookie.LastIndexOf(";");
-                    if (lastIndex > 0)
-                    {
-                        string sid = cookie.Substring(0, lastIndex);
-                        PlayerPrefs.SetString("sid", sid);
-                    }
-                }
+                Debug.Log("Exception caught: " + ex.Message);
+                
+                return;
+            }
 
-                var resultString = www.downloadHandler.text;
-                var result = JsonUtility.FromJson<SigninResult>(resultString);
+            // 쿠키 저장
+            var cookie = www.GetResponseHeader("set-cookie");
+            if (!string.IsNullOrEmpty(cookie))
+            {
+                int lastIndex = cookie.LastIndexOf(";");
+                if (lastIndex > 0)
+                {
+                    string sid = cookie.Substring(0, lastIndex);
+                    PlayerPrefs.SetString("sid", sid);
+                }
+            }
 
-                if (result.result == 0)
-                {
-                    // 유저네임이 유효하지 않음
-                    GameManager.Instance.OpenConfirmPanel("유저네임이 유효하지 않습니다.", () => { failureCallback?.Invoke(result.result); });
-                }
-                else if (result.result == 1)
-                {
-                    // 패스워드가 유효하지 않음
-                    GameManager.Instance.OpenConfirmPanel("패스워드가 유효하지 않습니다.", () => { failureCallback?.Invoke(result.result); });
-                }
-                else if (result.result == 2)
-                {
-                    // 로그인 성공
-                    GameManager.Instance.OpenConfirmPanel("로그인에 성공하였습니다.", () => { successCallback?.Invoke(result.nickname); }, false);
-                }
+            var resultString = www.downloadHandler.text;
+            var result = JsonUtility.FromJson<SigninResult>(resultString);
+
+            if (result.result == 0)
+            {
+                // 유저네임이 유효하지 않음
+                GameManager.Instance.OpenConfirmPanel("유저네임이 유효하지 않습니다.",
+                    () => { failureCallback?.Invoke(result.result); }, false);
+            }
+            else if (result.result == 1)
+            {
+                // 패스워드가 유효하지 않음
+                GameManager.Instance.OpenConfirmPanel("패스워드가 유효하지 않습니다.",
+                    () => { failureCallback?.Invoke(result.result); }, false);
+            }
+            else if (result.result == 2)
+            {
+                // 로그인 성공
+                GameManager.Instance.OpenConfirmPanel("로그인에 성공하였습니다.",
+                    () => { successCallback?.Invoke(result.nickname); }, false);
             }
         }
     }

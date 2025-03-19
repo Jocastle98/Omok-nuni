@@ -59,7 +59,7 @@ public class SigninPanelController : PanelController
 
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
-            GameManager.Instance.OpenConfirmPanel("빈칸을 모두 채워주세요.", () => { });
+            GameManager.Instance.OpenConfirmPanel("빈칸을 모두 채워주세요.", () => { }, false);
             return;
         }
 
