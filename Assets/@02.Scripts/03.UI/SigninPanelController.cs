@@ -9,11 +9,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UserDataStructs;
 
-struct SigninResult
-{
-    public int result;
-    public string nickname;
-}
+
 
 public struct ScoreResult
 {

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
@@ -26,6 +27,12 @@ public class SignupPanelController : PanelController
             string.IsNullOrEmpty(confirmPassword))
         {
             GameManager.Instance.OpenConfirmPanel("입력할 항목이 남아있습니다.", () => { }, false);
+            return;
+        }
+
+        if (!isValidEmailID(username))
+        {
+            GameManager.Instance.OpenConfirmPanel("Email 형식의 ID가 아닙니다.", () => { }, false);
             return;
         }
 
@@ -54,10 +61,16 @@ public class SignupPanelController : PanelController
             }, false);
         }
     }
-
+    
 
     public void OnClickCancelButton()
     {
         Destroy(gameObject);
+    }
+
+    private bool isValidEmailID(string emailID)
+    {
+        string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+        return Regex.IsMatch(emailID, pattern, RegexOptions.IgnoreCase);
     }
 }

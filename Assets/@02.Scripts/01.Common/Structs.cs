@@ -23,4 +23,10 @@ namespace UserDataStructs
             this.password = password;
         }
     }
+    
+    public struct SigninResult
+    {
+        public int result;
+        public string nickname;
+    }
 }
