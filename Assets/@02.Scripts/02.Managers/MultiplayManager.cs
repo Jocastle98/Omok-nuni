@@ -42,6 +42,7 @@ public class MultiplayManager : IDisposable
         mSocket.On("exitRoom", ExitRoom);
         mSocket.On("endGame", EndGame);
         mSocket.On("doOpponent", DoOpponent);
+        mSocket.On("rematchStart", RematchStart);
         
         mSocket.Connect();
     }
@@ -77,6 +78,19 @@ public class MultiplayManager : IDisposable
     private void EndGame(SocketIOResponse response)
     {
         mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.EndGame, null);
+    }
+    
+    // 재대국 신청 메서드
+    public void RequestRematch(string roomId)
+    {
+        mSocket.Emit("requestRematch", new { roomId });
+    }
+    
+    // 새로운 방으로 이동 (서버에서 받은 새로운 방 정보 처리)
+    private void RematchStart(SocketIOResponse response)
+    {
+        var data = response.GetValue<RoomData>();
+        mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.StartGame, data.roomId);
     }
     
     // 서버로부터 상대방의 마커 정보를 받기 위한 메서드
