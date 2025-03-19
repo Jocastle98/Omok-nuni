@@ -163,11 +163,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            
-        }
 
-    public void OpenGameOverPanel()
-    {
+        }
     }
 
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
