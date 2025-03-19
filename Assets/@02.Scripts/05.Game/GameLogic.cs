@@ -76,7 +76,7 @@ public class GameLogic : IDisposable
     }
 
     /// <summary>
-    /// 턴을 변경하면 메서드
+    /// 턴을 변경하는 메서드
     /// </summary>
     /// <param name="player"></param>
     public void NextTurn(Enums.EPlayerType player)
@@ -103,14 +103,14 @@ public class GameLogic : IDisposable
         
         gamePanelController.StopClock();
         
-        // GamePanel의 GameOver 표시 UI 업데이트
-        GameManager.Instance.OpenGameOverPanel();
+        // 점수 확인 패널 호출: 승자 점수 확인, 패자 점수 확인
+        GameManager.Instance.OpenScoreConfirmationPanel();
         //점수 랭킹 업데이트
         //씬 혹은 게임화면 위치 변경
     }
 
     /// <summary>
-    /// 현재 플레이어의 상태(자신, AI, 멀티플레이어)를 변경하는 메서드
+    /// 현재 턴의 플레이어 상태(자신, AI, 멀티플레이어)를 변경하는 메서드
     /// </summary>
     /// <param name="newState"></param>
     public void SetState(BasePlayerState newState)
@@ -120,7 +120,17 @@ public class GameLogic : IDisposable
         mCurrentPlayer?.OnExit(this);
         mCurrentPlayer = newState;
         mCurrentPlayer?.OnEnter(this);
+
+        TurnUIUpdate();
         
+        gamePanelController.StartClock();
+    }
+
+    /// <summary>
+    /// 게임 진행 중일 때 Turn UI 표시
+    /// </summary>
+    private void TurnUIUpdate()
+    {
         // 상태 변경 후 GamePanel의 Turn 표시 UI 업데이트
         if (mCurrentPlayer is PlayerState playerState)
         {
@@ -148,11 +158,8 @@ public class GameLogic : IDisposable
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_White);
             }
         }
-        
-        
-        gamePanelController.StartClock();
     }
-
+    
     /// <summary>
     /// (Y, X) 좌표에 해당 플레이어의 돌을 놓는 메서드
     /// </summary>
@@ -483,6 +490,7 @@ public class GameLogic : IDisposable
         return lists;
     }
 
+    // 멀티 모드에서 룸 초기화하는 메서드
     public void Dispose()
     {
         mMultiplayManager?.LeaveRoom(mRoomId);

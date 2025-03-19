@@ -98,6 +98,7 @@ public class GamePanelController : MonoBehaviour
         {
             // 패배처리
             
+            
             // 임시기능: 메인 화면으로 전환(패배처리 구현 시 삭제)
             GameManager.Instance.ChangeToMainScene();
         });

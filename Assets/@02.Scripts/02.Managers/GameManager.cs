@@ -31,6 +31,7 @@ public class GameManager : Singleton<GameManager>
         
     }
     
+    // 게임 화면으로 씬 전환하는 메서드
     public void ChangeToGameScene(Enums.EGameType gameType)
     {
         mGameType = gameType;
@@ -40,6 +41,7 @@ public class GameManager : Singleton<GameManager>
         SceneManager.LoadScene("ysw_Game");
     }
 
+    // 메인 화면으로 씬 전환하는 메서드
     public void ChangeToMainScene()
     {
         // gameLogic 초기화
@@ -52,6 +54,7 @@ public class GameManager : Singleton<GameManager>
         SceneManager.LoadScene("ysw_Main");
     }
 
+    // 대국 시작 시 모드선택 패널 호출 메서드
     public void OpenGameTypeSelectPanel()
     {
         if (mCanvas != null)
@@ -61,6 +64,7 @@ public class GameManager : Singleton<GameManager>
         }
     }
     
+    // 내 기보(확인하기) 패널 호출 메서드
     public void OpenRecordPanel()
     {
         if (mCanvas != null)
@@ -69,6 +73,7 @@ public class GameManager : Singleton<GameManager>
         }
     }
     
+    // 랭킹(리더보드) 패널 호출 메서드
     public void OpenLeaderboardPanel()
     {
         if (mCanvas != null)
@@ -77,6 +82,7 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
+    // 상점 패널 호출 메서드
     public void OpenShopPanel()
     {
         if (mCanvas != null)
@@ -86,6 +92,7 @@ public class GameManager : Singleton<GameManager>
         }
     }
     
+    // 세팅 패널 호출 메서드
     public void OpenSettingsPanel()
     {
         if (mCanvas != null)
@@ -95,6 +102,7 @@ public class GameManager : Singleton<GameManager>
         }
     }
     
+    // 확인(and 취소) 패널 호출 메서드
     public void OpenConfirmPanel(string message, Action OnConfirmButtonClick, bool activeCancelButton = true)
     {
         if (mCanvas != null)
@@ -104,6 +112,7 @@ public class GameManager : Singleton<GameManager>
         }
     }
     
+    // 로그인 패널 호출 메서드
     public void OpenSigninPanel()
     {
         if (mCanvas != null)
@@ -112,6 +121,7 @@ public class GameManager : Singleton<GameManager>
         }
     }
     
+    // 회원가입 패널 호출 메서드
     public void OpenSignupPanel()
     {
         if (mCanvas != null)
@@ -120,9 +130,13 @@ public class GameManager : Singleton<GameManager>
         }
     }
     
-    public void OpenGameOverPanel()
+    // 승점 확인 패널 호출 메서드
+    public void OpenScoreConfirmationPanel()
     {
-        
+        if (mCanvas != null)
+        {
+            
+        }
     }
     
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
