@@ -6,8 +6,7 @@ using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-
-using UserDataEnums;
+using UserDataStructs;
 
 public class SignupPanelController : PanelController
 {
@@ -26,10 +25,7 @@ public class SignupPanelController : PanelController
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(nickname) || string.IsNullOrEmpty(password) ||
             string.IsNullOrEmpty(confirmPassword))
         {
-            GameManager.Instance.OpenConfirmPanel("입력할 항목이 남아있습니다.", () =>
-            {
-                
-            });
+            GameManager.Instance.OpenConfirmPanel("입력할 항목이 남아있습니다.", () => { }, false);
             return;
         }
 
@@ -39,12 +35,9 @@ public class SignupPanelController : PanelController
             signupData.username = username;
             signupData.nickname = nickname;
             signupData.password = password;
-            
+
             // 서버로 SignupData 전달하면서 회원가입 진행
-            NetworkManager.Instance.Signup(signupData, () =>
-            {
-                Destroy(gameObject);
-            }, () =>
+            NetworkManager.Instance.Signup(signupData, () => { Destroy(gameObject); }, () =>
             {
                 mUsernameInputField.text = string.Empty;
                 mNicknameInputField.text = string.Empty;
@@ -59,11 +52,9 @@ public class SignupPanelController : PanelController
                 mPasswordInputField.text = string.Empty;
                 mConfirmPasswordInputField.text = string.Empty;
             });
-
         }
     }
 
-    
 
     public void OnClickCancelButton()
     {

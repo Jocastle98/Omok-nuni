@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-using UserDataEnums;
+using UserDataStructs;
 
 struct SigninResult
 {

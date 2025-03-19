@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Networking;
-using UserDataEnums;
+using UserDataStructs;
 
 public class NetworkManager : Singleton<NetworkManager>
 {
