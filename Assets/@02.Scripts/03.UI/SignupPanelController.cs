@@ -7,12 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public struct SignupData
-{
-    public string username;
-    public string nickname;
-    public string password;
-}
+using UserDataEnums;
 
 public class SignupPanelController : PanelController
 {
@@ -72,7 +67,6 @@ public class SignupPanelController : PanelController
 
     public void OnClickCancelButton()
     {
-        Debug.Log("OnClickCancelButton");
         Destroy(gameObject);
     }
 }
