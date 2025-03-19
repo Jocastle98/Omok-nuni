@@ -13,8 +13,8 @@ public class GameManager : Singleton<GameManager>
     // [SerializeField] 각종 패널들 연결
     [SerializeField] private GameObject gameTypeSelectPanel;
     [SerializeField] private GameObject shopPanel;
-    [SerializeField] private GameObject confirmPanel;
     [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private GameObject confirmPanel;
 
     
     private Canvas mCanvas;
@@ -22,16 +22,13 @@ public class GameManager : Singleton<GameManager>
     private Enums.EGameType mGameType;
     
     // GamePanelController, GameLogic 구현
-    
+    private GamePanelController mGamePanelController;
     private GameLogic mGameLogic;
     
     private void Start()
     {
         // 로그인 기능 구현?
-
-        // 인트로 BGM 재생
-        AudioManager.Instance.PlayIntroBgm();
-
+        
     }
     
     public void ChangeToGameScene(Enums.EGameType gameType)
@@ -39,7 +36,7 @@ public class GameManager : Singleton<GameManager>
         mGameType = gameType;
         //SceneManager.LoadScene("Game");
         
-        // 테스트용
+        // 임시기능: 테스트용
         SceneManager.LoadScene("ysw_Game");
     }
 
@@ -51,7 +48,7 @@ public class GameManager : Singleton<GameManager>
         
         //SceneManager.LoadScene("Main");
         
-        // 테스트용
+        // 임시기능: 테스트용
         SceneManager.LoadScene("ysw_Main");
     }
 
@@ -130,19 +127,28 @@ public class GameManager : Singleton<GameManager>
     
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 테스트용
+        // 인트로 BGM 재생
+        if (scene.name == "ysw_Main")
+        //if (scene.name == "Main")   
+        {
+            AudioManager.Instance.PlayIntroBgm();
+        }
+        
+        // 임시기능: 테스트용
         if (scene.name == "ysw_Game")
         //if (scene.name == "Game")
         {
+            AudioManager.Instance.PlayGameBgm();
+            
             // 씬에 배치된 오브젝트 찾기(BoardCellController, GamePanelController)
             BoardCellController boardCellController = GameObject.FindObjectOfType<BoardCellController>();
-            
+            GamePanelController gamePanelController = GameObject.FindObjectOfType<GamePanelController>();
 
             // BoardCellController 초기화
             boardCellController.InitBoard();
             
             // GamePanelController UI 초기화
-            
+            gamePanelController.SetGameUI(Enums.EGameUIState.Init);
             
             // Game Logic 객체 생성
             if (mGameLogic != null)
@@ -150,7 +156,7 @@ public class GameManager : Singleton<GameManager>
                 mGameLogic.Dispose();
             }
             mGameLogic = new GameLogic();
-            mGameLogic.GameStart(boardCellController, mGameType);
+            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType);
         }
         
         mCanvas = GameObject.FindObjectOfType<Canvas>();

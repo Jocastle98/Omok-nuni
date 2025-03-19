@@ -8,6 +8,7 @@ using UnityEngine;
 public class GameLogic : IDisposable
 {
     public BoardCellController boardCellController;
+    public GamePanelController gamePanelController;
 
     private BasePlayerState mPlayer_Black;
     private BasePlayerState mPlayer_White;
@@ -15,15 +16,17 @@ public class GameLogic : IDisposable
     
     private MultiplayManager mMultiplayManager;
     private string mRoomId;
-
+    
     /// <summary>
     /// 게임 시작 메서드
     /// </summary>
     /// <param name="boardCellController"></param>
     /// <param name="playMode"></param>
-    public void GameStart(BoardCellController boardCellController, Enums.EGameType playMode)
+    public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController,Enums.EGameType playMode)
     {
         this.boardCellController = boardCellController;
+        this.gamePanelController = gamePanelController;
+        this.gamePanelController.StartClock();
 
         switch (playMode)
         {
@@ -98,6 +101,8 @@ public class GameLogic : IDisposable
         mPlayer_Black = null;
         mPlayer_White = null;
         
+        gamePanelController.StopClock();
+        
         // GamePanel의 GameOver 표시 UI 업데이트
         GameManager.Instance.OpenGameOverPanel();
         //점수 랭킹 업데이트
@@ -110,11 +115,42 @@ public class GameLogic : IDisposable
     /// <param name="newState"></param>
     public void SetState(BasePlayerState newState)
     {
+        gamePanelController.InitClock();
+        
         mCurrentPlayer?.OnExit(this);
         mCurrentPlayer = newState;
         mCurrentPlayer?.OnEnter(this);
         
         // 상태 변경 후 GamePanel의 Turn 표시 UI 업데이트
+        if (mCurrentPlayer is PlayerState playerState)
+        {
+            if (playerState == mPlayer_Black)
+            {
+                gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
+            }
+            else
+            {
+                gamePanelController.SetGameUI(Enums.EGameUIState.Turn_White);
+            }
+        }
+        /*else if (mCurrentPlayer id AIState)
+        {
+            gamePanelController.SetGameUI(Enums.EGameUIState.Turn_White);
+        }*/
+        else if (mCurrentPlayer is MultiplayerState multiplayerState)
+        {
+            if (multiplayerState == mPlayer_Black)
+            {
+                gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
+            }
+            else
+            {
+                gamePanelController.SetGameUI(Enums.EGameUIState.Turn_White);
+            }
+        }
+        
+        
+        gamePanelController.StartClock();
     }
 
     /// <summary>

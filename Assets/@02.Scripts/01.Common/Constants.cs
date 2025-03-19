@@ -12,5 +12,4 @@ public class Constants
     
     public const string BGMVolumeKey = "BGMVolume";
     public const string SFXVolumeKey = "SFXVolume";
-
 }
