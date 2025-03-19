@@ -190,7 +190,7 @@ public class GameManager : Singleton<GameManager>
             boardCellController.InitBoard();
 
             // GamePanelController UI 초기화
-            gamePanelController.SetGameUI(Enums.EGameUIState.Init);
+            gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
 
             // Game Logic 객체 생성
             if (mGameLogic != null)

@@ -11,9 +11,6 @@ public class RoomData
 {
     [JsonProperty("roomId")]
     public string roomId { get; set; }
-    
-    [JsonProperty("hostId")]
-    public string hostId { get; set; }
 }
 
 public class MoveData
@@ -25,7 +22,6 @@ public class MoveData
 public class MultiplayManager : IDisposable
 {
     private SocketIOUnity mSocket;
-    private bool mIsHost;
     
     private event Action<Enums.EMultiplayManagerState, string> mOnMultiplayStateChange;
     public Action<MoveData> OnOpponentMove;
@@ -56,11 +52,6 @@ public class MultiplayManager : IDisposable
     {
         var data = response.GetValue<RoomData>();
         mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.CreateRoom, data.roomId);
-        
-        // 방을 생성한 사용자는 호스트로 설정
-        mIsHost = true;
-        
-        GameManager.Instance.OpenWaitingPanel();
     }
     
     // 상대방이 생성한 방(세션)에 참가
@@ -68,16 +59,6 @@ public class MultiplayManager : IDisposable
     {
         var data = response.GetValue<RoomData>();
         mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.JoinRoom, data.roomId);
-
-        if (data.hostId == mSocket.Id)
-        {
-            mIsHost = true;
-        }
-        
-        if (mIsHost)
-        {
-            GameManager.Instance.CloseWaitingPanel();
-        }
     }
     
     // 생성된 방에 상대방이 참가 했을 때 게임 시작
@@ -115,8 +96,15 @@ public class MultiplayManager : IDisposable
     // 서버로부터 상대방의 마커 정보를 받기 위한 메서드
     private void DoOpponent(SocketIOResponse response)
     {
-        var data = response.GetValue<MoveData>();
-        OnOpponentMove?.Invoke(data);
+        try
+        {
+            var data = response.GetValue<MoveData>();
+            OnOpponentMove?.Invoke(data);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error in DoOpponent: {ex.Message}");
+        }
     }
 
     // 플레이어의 마커 위치를 서버로 전달하기 위한 메서드

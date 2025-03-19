@@ -30,17 +30,6 @@ public class GamePanelController : MonoBehaviour
     {
         switch (gameUIState)
         {
-            case Enums.EGameUIState.Init:
-                timer.SetActive(true);
-                turnUI.SetActive(true);
-                resignButton.SetActive(true);
-                recordUI.SetActive(false);
-                backButton.SetActive(false);
-                
-                timer.GetComponent<Timer>().InitTimer();
-                blackTurnPanel.alpha = mDisableAlpha;
-                whiteTurnPanel.alpha = mDisableAlpha;
-                break;
             case Enums.EGameUIState.Turn_Black:
                 timer.SetActive(true);
                 turnUI.SetActive(true);

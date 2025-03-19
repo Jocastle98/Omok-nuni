@@ -26,8 +26,7 @@ public class GameLogic : IDisposable
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;
-        this.gamePanelController.StartClock();
-
+        
         switch (playMode)
         {
             case Enums.EGameType.PassAndPlay:
@@ -49,24 +48,29 @@ public class GameLogic : IDisposable
                     switch (state)
                     {
                         case Enums.EMultiplayManagerState.CreateRoom:
+                            Debug.Log("## Create Room");
                             // todo: 대기화면 표시(제한시간 동안 급수에 맞는 상대 매칭 실패 시 싱글 플레이로 모드 전환)
                             break;
                         case Enums.EMultiplayManagerState.JoinRoom:
+                            Debug.Log("## Join Room");
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                             mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
                             
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
+                            Debug.Log("## Start Game");
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
+                            Debug.Log("## Exit Room");
                             // todo: 퇴장 처리
                             break;
                         case Enums.EMultiplayManagerState.EndGame:
+                            Debug.Log("## End Game");
                             // todo: 게임 종료 처리
                             break;
                     }
@@ -102,6 +106,7 @@ public class GameLogic : IDisposable
         mPlayer_White = null;
         
         gamePanelController.StopClock();
+        gamePanelController.InitClock();
         
         // 점수 확인 패널 호출: 승자 점수 확인, 패자 점수 확인
         GameManager.Instance.OpenScoreConfirmationPanel();
@@ -115,8 +120,6 @@ public class GameLogic : IDisposable
     /// <param name="newState"></param>
     public void SetState(BasePlayerState newState)
     {
-        gamePanelController.InitClock();
-        
         mCurrentPlayer?.OnExit(this);
         mCurrentPlayer = newState;
         mCurrentPlayer?.OnEnter(this);
