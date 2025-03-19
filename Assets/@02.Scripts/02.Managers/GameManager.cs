@@ -15,6 +15,7 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject shopPanel;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject confirmPanel;
+    [SerializeField] private GameObject watingPanel;
 
     
     private Canvas mCanvas;
@@ -127,6 +128,25 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             
+        }
+    }
+    
+    // 매칭 대기 패널 호출 메서드
+    public void OpenWaitingPanel()
+    {
+        if (mCanvas != null)
+        {
+            GameObject waitingPanelObject = Instantiate(watingPanel, mCanvas.transform);
+            waitingPanelObject.GetComponent<WaitingPanelController>().Show();
+        }
+    }
+
+    public void CloseWaitingPanel()
+    {
+        if (mCanvas != null)
+        {
+            GameObject waitingPanelObject = Instantiate(watingPanel, mCanvas.transform);
+            waitingPanelObject.GetComponent<WaitingPanelController>().OnClickCancelButton();
         }
     }
     
