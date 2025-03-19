@@ -37,4 +37,12 @@ public class Enums
         Lose,           // 플레이어 패
         Draw,           // 무승부
     }
+
+    public enum EGameUIState
+    {
+        Init,
+        Turn_Black,
+        Turn_White,
+        Record
+    }
 }

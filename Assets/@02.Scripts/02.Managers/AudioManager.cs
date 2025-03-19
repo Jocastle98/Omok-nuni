@@ -12,7 +12,7 @@ public class AudioManager : Singleton<AudioManager>
     // 0: 인트로, 1: 메인, 2: 바둑 둘 때, 3: 게임 오버
     [SerializeField] private AudioClip[] _audioClips;
 
-    private void Awake()
+    private void Start()
     {
         float bgmVolume = PlayerPrefs.GetFloat(Constants.BGMVolumeKey, 1f);
         float sfxVolume = PlayerPrefs.GetFloat(Constants.SFXVolumeKey, 1f);
@@ -25,8 +25,6 @@ public class AudioManager : Singleton<AudioManager>
         {
             _sfxSource.volume = sfxVolume;
         }
-
-
     }
 
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -70,6 +68,14 @@ public class AudioManager : Singleton<AudioManager>
             _bgmSource.clip = _audioClips[1];
             _bgmSource.loop = true;
             _bgmSource.Play();
+        }
+    }
+
+    public void StopBgm()
+    {
+        if (_bgmSource != null && _audioClips.Length > 1 && _audioClips[1] != null)
+        {
+            _bgmSource.Stop();
         }
     }
 

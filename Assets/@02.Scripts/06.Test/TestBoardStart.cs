@@ -6,12 +6,14 @@ using UnityEngine.Serialization;
 public class TestBoardStart : MonoBehaviour
 {
     GameLogic gameLogic;
-    [FormerlySerializedAs("board")] public BoardCellController boardCellController;
+    public BoardCellController boardCellController;
+    public GamePanelController gamePanelController;
+    
     // Start is called before the first frame update
     void Start()
     {
         gameLogic = new GameLogic();
-        gameLogic.GameStart(boardCellController,Enums.EGameType.PassAndPlay);
+        gameLogic.GameStart(boardCellController,gamePanelController, Enums.EGameType.PassAndPlay);
     }
 
 }
