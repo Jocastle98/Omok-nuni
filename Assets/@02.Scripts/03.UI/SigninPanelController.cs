@@ -10,39 +10,6 @@ using UnityEngine.Networking;
 using UserDataStructs;
 
 
-
-public struct ScoreResult
-{
-    public string id;
-    public string username;
-    public string nickname;
-    public int score;
-}
-
-[Serializable]
-public struct ScoreInfo
-{
-    public string username;
-    public string nickname;
-    public int score;
-
-    public ScoreInfo(string username, string nickname, int score)
-    {
-        this.username = username;
-        this.nickname = nickname;
-        this.score = score;
-    }
-}
-
-[Serializable]
-public struct Scores
-{
-    public ScoreInfo[] scores;
-    public string playerName;
-    public string playerNickname;
-    public int playerScore;
-}
-
 public class SigninPanelController : PanelController
 {
     [SerializeField] private TMP_InputField mUsernameInputField;
