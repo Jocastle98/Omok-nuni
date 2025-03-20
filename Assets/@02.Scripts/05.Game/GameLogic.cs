@@ -26,14 +26,13 @@ public class GameLogic : IDisposable
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;
-        this.gamePanelController.StartClock();
-
+        
         switch (playMode)
         {
             case Enums.EGameType.PassAndPlay:
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new PlayerState(false);
-
+                
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.SinglePlay:
@@ -49,24 +48,33 @@ public class GameLogic : IDisposable
                     switch (state)
                     {
                         case Enums.EMultiplayManagerState.CreateRoom:
+                            Debug.Log("## Create Room");
+                            
                             // todo: 대기화면 표시(제한시간 동안 급수에 맞는 상대 매칭 실패 시 싱글 플레이로 모드 전환)
+                            WaitingMatch();
                             break;
                         case Enums.EMultiplayManagerState.JoinRoom:
+                            Debug.Log("## Join Room");
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                             mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
                             
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
+                            Debug.Log("## Start Game");
+                            GameManager.Instance.SetIsStartGame(true);
+                            
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
+                            Debug.Log("## Exit Room");
                             // todo: 퇴장 처리
                             break;
                         case Enums.EMultiplayManagerState.EndGame:
+                            Debug.Log("## End Game");
                             // todo: 게임 종료 처리
                             break;
                     }
@@ -74,9 +82,9 @@ public class GameLogic : IDisposable
                 break;
         }
     }
-
+    
     /// <summary>
-    /// 턴을 변경하면 메서드
+    /// 턴을 변경하는 메서드
     /// </summary>
     /// <param name="player"></param>
     public void NextTurn(Enums.EPlayerType player)
@@ -102,25 +110,47 @@ public class GameLogic : IDisposable
         mPlayer_White = null;
         
         gamePanelController.StopClock();
+        gamePanelController.InitClock();
         
-        // GamePanel의 GameOver 표시 UI 업데이트
-        GameManager.Instance.OpenGameOverPanel();
+        // 점수 확인 패널 호출: 멀티플레이이거나 AI플레이일 경우 -> 승자 점수 확인, 패자 점수 확인
+        if (mMultiplayManager != null /* && AI */)
+        {
+            GameManager.Instance.OpenScoreConfirmationPanel();
+        }
         //점수 랭킹 업데이트
         //씬 혹은 게임화면 위치 변경
     }
 
     /// <summary>
-    /// 현재 플레이어의 상태(자신, AI, 멀티플레이어)를 변경하는 메서드
+    /// 현재 턴의 플레이어 상태(자신, AI, 멀티플레이어)를 변경하는 메서드
     /// </summary>
     /// <param name="newState"></param>
     public void SetState(BasePlayerState newState)
     {
-        gamePanelController.InitClock();
-        
         mCurrentPlayer?.OnExit(this);
         mCurrentPlayer = newState;
         mCurrentPlayer?.OnEnter(this);
         
+        TurnUIUpdate();
+        gamePanelController.StartClock();
+    }
+
+    /// <summary>
+    /// 매칭 대기 시간을 알려주는 팝업창을 호출하는 메서드
+    /// </summary>
+    private void WaitingMatch()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenWaitingPanel();
+        });
+    }
+    
+    /// <summary>
+    /// 게임 진행 중일 때 Turn UI 표시
+    /// </summary>
+    private void TurnUIUpdate()
+    {
         // 상태 변경 후 GamePanel의 Turn 표시 UI 업데이트
         if (mCurrentPlayer is PlayerState playerState)
         {
@@ -148,11 +178,8 @@ public class GameLogic : IDisposable
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_White);
             }
         }
-        
-        
-        gamePanelController.StartClock();
     }
-
+    
     /// <summary>
     /// (Y, X) 좌표에 해당 플레이어의 돌을 놓는 메서드
     /// </summary>
@@ -166,6 +193,20 @@ public class GameLogic : IDisposable
         {
             boardCellController.cells[Y, X].SetMark(playerType);
             boardCellController.cells[Y, X].playerType = playerType;
+            
+            BoardCell[][] lists = MakeLists(boardCellController.size,Y,X,4);
+            
+            for (int i = 0; i < 4; i++)
+            {
+                for (int k = 0; k < lists[i]?.Length; k++)
+                {
+                    //금수 최신화
+                    if(lists[i][k] == null) continue;
+                    int x = lists[i][k].blockIndex % (boardCellController.size + 1);
+                    int y = lists[i][k].blockIndex / (boardCellController.size + 1);
+                    CheckCellInRule(y,x);
+                }
+            }
         }
         else
         {
@@ -189,56 +230,232 @@ public class GameLogic : IDisposable
         if (boardCellController.cells[Y, X].playerType != Enums.EPlayerType.None) return false;
         
         if (player == Enums.EPlayerType.Player_White) return true;
-        
-        Enums.EPlayerType oppositePlayerType = Enums.EPlayerType.None;
-        switch (player)
-        {
-            case Enums.EPlayerType.Player_Black:
-                oppositePlayerType = Enums.EPlayerType.Player_White;
-                break;
-            case Enums.EPlayerType.Player_White:
-                oppositePlayerType = Enums.EPlayerType.Player_Black;
-                break;
-        }
-        
-        #region 룰 리스트
-
-        // 방향별로 BoardCell 배열을 생성하고 채우는 코드
-        BoardCell[][] lists = MakeLists(boardCellController.size,Y,X);
-
-        List<BoardCell>[] rule33Results = new List<BoardCell>[4];
-        List<BoardCell>[] rule44Results = new List<BoardCell>[4];
-        bool[] result44Bools = new bool[4];
-        bool[] result6Bools = new bool[4];
-
-        for (int i = 0; i < 4; i++)
-        {
-            (rule33Results[i], rule44Results[i], result44Bools[i],result6Bools[i]) = RenjuRule(lists[i], oppositePlayerType);
-        }
-
-        for (int i = 0; i < 4; i++)
-        {
-            if (!result44Bools[i] || !result6Bools[i]) return false;
-            for (int k = i + 1; k < 4; k++)
-            {
-                if (rule33Results[i].Intersect(rule33Results[k]).Any())
-                {
-                    return false;
-                }
-
-                if (rule44Results[i].Intersect(rule44Results[k]).Any())
-                {
-                    return false;
-                }
-            }
-        }
-        #endregion
+    
+        //셀이 금수bool에 따라 리턴
+        if(boardCellController.cells[Y,X].IsForbidden) return false;
         
         return true;
     }
 
+    public void CheckCellInRule(int Y, int X)
+    {
+        int firstScanRange = 5;
+
+        // 방향별로 BoardCell 배열을 생성하고 채우는 코드
+        BoardCell[][] lists = MakeLists(boardCellController.size, Y, X, firstScanRange);
+
+        List<BoardCell>[] rule33Results = new List<BoardCell>[4];
+        List<BoardCell>[] rule44Results = new List<BoardCell>[4];
+        BoardCell[] result44Cell = new BoardCell[4];
+        BoardCell[] result6Bools = new BoardCell[4];
+
+        for (int i = 0; i < 4; i++)
+        {
+            (rule33Results[i], rule44Results[i], result44Cell[i], result6Bools[i]) = RenjuRule(lists[i]);
+        }
+
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (result6Bools[i] != null)
+            {
+                result6Bools[i].IsForbidden = true;
+                return;
+            }
+
+            if (result44Cell[i] == boardCellController.cells[Y, X])
+            {
+                if (!FakeForbidden(result44Cell[i],lists[i],lists[i]))
+                {
+                    result44Cell[i].IsForbidden = true;
+                    return;
+                }
+                else
+                {
+                    result44Cell[i].IsForbidden = false;
+                }
+            }
+
+            for (int k = i + 1; k < 4; k++)
+            {
+                //금수 발생
+                if (rule33Results[i].Intersect(rule33Results[k]).Any())
+                {
+                    var forbiddenList = rule33Results[i].Intersect(rule33Results[k]).ToList();
+                    foreach (BoardCell cell in forbiddenList)
+                    {
+                        if (!FakeForbidden(cell,lists[i],lists[k]))
+                        {
+                            cell.IsForbidden = true;
+                            return;
+                        }
+                        else
+                        {
+                            cell.IsForbidden = false;
+                        }
+                    }
+                }
+
+                //금수 발생
+                if (rule44Results[i].Intersect(rule44Results[k]).Any())
+                {
+                    var forbiddenList = rule44Results[i].Intersect(rule44Results[k]).ToList();
+                    foreach (BoardCell cell in forbiddenList)
+                    {
+                        if (!FakeForbidden(cell,lists[i],lists[k]))
+                        {
+                            cell.IsForbidden = true;
+                            return;
+                        }
+                        else
+                        {
+                            cell.IsForbidden = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        boardCellController.cells[Y, X].IsForbidden = false;
+    }
+    
+    public bool ForbiddenSelf(BoardCell cell)
+    {
+        int X = cell.blockIndex % (boardCellController.size + 1);
+        int Y = cell.blockIndex / (boardCellController.size + 1);
+        return ForbiddenSelf(Y, X);
+    }
+    
+    //자신의 좌표가 금수라면 false를 반환하는 목적으로 만든 함수
+    public bool ForbiddenSelf(int Y, int X)
+    {
+        int firstScanRange = 5;
+        
+        // 방향별로 BoardCell 배열을 생성하고 채우는 코드
+        BoardCell[][] lists = MakeLists(boardCellController.size,Y,X,firstScanRange);
+
+        List<BoardCell>[] rule33Results = new List<BoardCell>[4];
+        List<BoardCell>[] rule44Results = new List<BoardCell>[4];
+        BoardCell[] result44Bools = new BoardCell[4];
+        BoardCell[] result6Bools = new BoardCell[4];
+
+        for (int i = 0; i < 4; i++)
+        {
+            (rule33Results[i], rule44Results[i], result44Bools[i],result6Bools[i]) = RenjuRule(lists[i]);
+        }
+        
+        for (int i = 0; i < 4; i++)
+        {
+            if (result6Bools[i] == boardCellController.cells[Y, X])
+            {
+                return false;
+            }
+
+            if (result44Bools[i] == boardCellController.cells[Y, X])
+            {
+                return false;
+            }
+            
+            //할당받은 좌표와
+            //좌표를 통해 서치된 금수 배열들중 하나가 일치해야
+            //첫번째 금수의 금수가됨, 따라서 첫번째 금수는 거짓금수가 될 수 있음
+            for (int k = i + 1; k < 4; k++)
+            {
+                //금수 발생
+                if (rule33Results[i].Intersect(rule33Results[k]).Any())
+                {
+                    var forbiddenList = rule33Results[i].Intersect(rule33Results[k]).ToList();
+                    foreach (var cell in forbiddenList)
+                    {
+                        if (cell == boardCellController.cells[Y, X])
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                //금수 발생
+                if (rule44Results[i].Intersect(rule44Results[k]).Any())
+                {
+                    var forbiddenList = rule44Results[i].Intersect(rule44Results[k]).ToList();
+                    foreach (var cell in forbiddenList)
+                    {
+                        if (cell == boardCellController.cells[Y, X])
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    //거짓금수
+    //금수가 될 위치 놓았을 때 금수가 되는 배열에 새로운 금수가 있다면 거짓금수
+    //false == 금수 , true == 거짓금수
+    public bool FakeForbidden(BoardCell cell, BoardCell[] firstList, BoardCell[] secondList)
+    {
+        //첫번째 금수가 되는 칸
+        cell.playerType = Enums.EPlayerType.Player_Black;
+
+        int scanRange = 2;
+        
+       
+        for (int i = 0; i < firstList.Length; i++)
+        {
+            if (firstList[i] == cell)
+            {
+                for (int r = i - scanRange; r < i + scanRange + 1; r++)
+                {
+                    if (firstList[r]?.playerType == Enums.EPlayerType.None)
+                    {
+                        //두번째 금수가 될 위치가 이미 금수라면 거짓금수가 아님
+                        if (firstList[r].IsForbidden == true)
+                        {
+                            cell.playerType = Enums.EPlayerType.None;
+                            return false;
+                        }
+                        else if (!ForbiddenSelf(firstList[r]))
+                        {
+                            cell.playerType = Enums.EPlayerType.None;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            if (secondList[i] == cell)
+            {
+                for (int r = i - scanRange; r < i + scanRange + 1; r++)
+                {
+                    if (secondList[r]?.playerType == Enums.EPlayerType.None)
+                    {
+                        //두번째 금수가 될 위치가 이미 금수라면 거짓금수가 아님
+                        if (secondList[r].IsForbidden == true)
+                        {
+                            cell.playerType = Enums.EPlayerType.None;
+                            return false;
+                        }
+                        else if (!ForbiddenSelf(secondList[r]))
+                        {
+                            cell.playerType = Enums.EPlayerType.None;
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        cell.playerType = Enums.EPlayerType.None;
+
+
+        return false;
+    }
+
     //렌주룰 (33 44 룰)
-    public (List<BoardCell>, List<BoardCell>, bool result44,bool rule6) RenjuRule(BoardCell[] list, Enums.EPlayerType opposite)
+    public (List<BoardCell>, List<BoardCell>, BoardCell result44, BoardCell rule6) RenjuRule(BoardCell[] list)
     {
         //33이 될 수 있는 최대길이는 4이다
         int rule33MaxLength = 4;
@@ -249,23 +466,31 @@ public class GameLogic : IDisposable
         List<BoardCell> rule33Result = new List<BoardCell>();
         List<BoardCell> rule44Result = new List<BoardCell>();
 
-        bool rule6Result = true;
-
-        //렌주룰에의해 한 줄에서 44가 안되는 경우도 있음
-        bool result44 = true;
+        BoardCell rule6Result = null;
 
         #region 33Rule
-        //백돌확인용 1, 놓는곳 위치의 왼쪽 흑돌 부터 확인
-        for (int i = 1; i < 5; i++)
+        
+        for (int i = 2; i < 7; i++)
         {
-            //왼쪽 끝 흰돌 확인
-            if (list[i - 1]?.playerType == opposite || list[i - 1] == null)
+            //예외 코드
+            if (list[i - 1]?.playerType != Enums.EPlayerType.None || list[i - 1] == null)
+            {
+                continue;
+            }
+            
+            if (list[i + rule33MaxLength]?.playerType != Enums.EPlayerType.None || (list[i + 4] == null))
             {
                 continue;
             }
 
-            //오른쪽 끝 흰돌 확인
-            if (list[i + 4]?.playerType == opposite || (list[i + 4] == null))
+            if (list[i - 2]?.playerType == Enums.EPlayerType.Player_Black ||
+                list[i + rule33MaxLength + 1]?.playerType == Enums.EPlayerType.Player_Black)
+            {
+                continue;
+            }
+            
+            if (list[i - 2]?.playerType == Enums.EPlayerType.Player_White &&
+                list[i + rule33MaxLength + 1]?.playerType == Enums.EPlayerType.Player_White)
             {
                 continue;
             }
@@ -273,11 +498,13 @@ public class GameLogic : IDisposable
             int rule33Stone = 0;
             //한 줄에 3x3이 아닌 3x4 경우를 만들 수 있으므로 흑돌이 이미 3개일 경우 break
             bool rulebreak = false;
-            
+
             //놓는곳으로부터 오른쪽으로 4칸 확인
             for (int t = 0; t < rule33MaxLength; t++)
             {
-                if (list[i + t].playerType != opposite && rule33Stone < 3)
+                if(list[i + t] == null) break;
+                
+                if (list[i + t].playerType != Enums.EPlayerType.Player_White && rule33Stone < 3)
                 {
                     rule33.Add(list[i + t]);
                     if (list[i + t] != null)
@@ -312,25 +539,34 @@ public class GameLogic : IDisposable
                     rule33Result.Clear();
                 }
             }
-            
-            if(rulebreak) break;
+
+            if (rulebreak) break;
             rule33Stone = 0;
             rule33.Clear();
         }
+
         #endregion
 
         #region 44Rule
-        for (int i = 0; i < 5; i++)
+
+        for (int i = 1; i <6; i++)
         {
+            //예외 코드
+            if (list[i - 1]?.playerType == Enums.EPlayerType.Player_Black ||
+                list[i + rule44MaxLenght]?.playerType == Enums.EPlayerType.Player_Black) continue;
+
+            if (list[i] == null) continue;
+            
             int rule44Stone = 0;
+            
             for (int f = 0; f < rule44MaxLenght; f++)
             {
-                if (list[i + f] == null) break;
-
-                if (list[i + f].playerType != opposite && rule44Stone < 4)
+                if(list[i + f] == null) break;
+                
+                if (list[i + f]?.playerType != Enums.EPlayerType.Player_White && rule44Stone < 4)
                 {
                     rule44.Add(list[i + f]);
-                    if (list[i + f].playerType != Enums.EPlayerType.None)
+                    if (list[i + f]?.playerType != Enums.EPlayerType.None)
                     {
                         rule44Stone++;
                     }
@@ -344,53 +580,65 @@ public class GameLogic : IDisposable
 
                 if (f == rule44MaxLenght - 1 && rule44Stone == 3)
                 {
+
                     foreach (BoardCell cell in rule44)
                     {
-                        if (cell.playerType == Enums.EPlayerType.None)
-                        {
-                            rule44Result.Add(cell);
-                        }
 
                         //한 줄에도 44가 가능하기 때문에 아래 코드들로 확인
-                        if (!result44 && rule44Result.Contains(cell))
+                        if (rule44Result.Contains(cell))
                         {
-                            return (rule33Result, rule44Result, result44, rule6Result);
+                            return (rule33Result, rule44Result, cell, rule6Result);
                         }
 
+                        if (cell?.playerType == Enums.EPlayerType.None)
+                        {
+                            rule44Result.Add(cell);
+
+                        }
                     }
-                    result44 = false;
-                    i = i + 2;
+
+                    i = i + 1;
                 }
             }
+
             rule44Stone = 0;
             rule44.Clear();
         }
+
         #endregion
 
         #region 6Rule
-        
+
         int playerStone = 0;
         for (int i = 0; i < 6; i++)
         {
-            for (int s = 0; s < 7; s++)
+            for (int s = 0; s < 6; s++)
             {
                 if (i + s >= list.Length || list[i + s] == null) continue;
-                if (list[i + s]?.playerType != opposite && list[i + s]?.playerType != Enums.EPlayerType.None)
+                
+                if (list[i + s]?.playerType != Enums.EPlayerType.Player_White &&
+                    list[i + s]?.playerType != Enums.EPlayerType.None)
                 {
                     playerStone++;
-                    if (playerStone == 5)
-                    {
-                        rule6Result = false;
-                        return (rule44Result, rule44Result, result44, rule6Result);
-                    }
+                }
+                else if (list[i + s]?.playerType == Enums.EPlayerType.None)
+                {
+                    rule6Result = list[i + s];
+                }
+                
+                if (playerStone == 5 && rule6Result != null)
+                {
+                    return (rule33Result, rule44Result, null, rule6Result);
                 }
             }
-                playerStone = 0;
+
+            rule6Result = null;
+            playerStone = 0;
         }
 
         #endregion
 
-        return (rule33Result, rule44Result, true, rule6Result);
+        return (rule33Result, rule44Result, null, null);
     }
 
     /// <summary>
@@ -402,7 +650,8 @@ public class GameLogic : IDisposable
     /// <returns></returns>
     public bool GameResult(Enums.EPlayerType player, int Y, int X)
     {
-        BoardCell[][] lists = MakeLists(boardCellController.size, Y, X);
+
+        BoardCell[][] lists = MakeLists(boardCellController.size, Y, X, 4);
 
         int counting = 0;
         for (int i = 0; i < lists.Length; i++)
@@ -429,17 +678,17 @@ public class GameLogic : IDisposable
         return false;
     }
 
-    /// <summary>
-    /// (Y, X) 좌표를 기준으로 주위를 탐색하는 메서드
-    /// </summary>
-    /// <param name="boardSize"></param>
-    /// <param name="Y"></param>
-    /// <param name="X"></param>
-    /// <returns></returns>
-    public BoardCell[][] MakeLists(int boardSize,int Y, int X)
+    public BoardCell[][] MakeLists(int boardSize, BoardCell cell, int checkLength)
     {
-        int endOfLeft = -4;
-        int endOfRight = 5;
+        int X = cell.blockIndex % (boardSize + 1);
+        int Y = cell.blockIndex / (boardSize + 1);
+        return MakeLists(boardSize, Y, X, checkLength);
+    }
+
+    public BoardCell[][] MakeLists(int boardSize,int Y, int X,int checkLenght)
+    {
+        int endOfLeft = checkLenght * -1;
+        int endOfRight = checkLenght + 1;
         int indexSize = Mathf.Abs(endOfRight) + Mathf.Abs(endOfLeft) + 1;
         
         BoardCell[][] lists = new BoardCell[4][];
@@ -483,6 +732,7 @@ public class GameLogic : IDisposable
         return lists;
     }
 
+    // 멀티 모드에서 룸 초기화하는 메서드
     public void Dispose()
     {
         mMultiplayManager?.LeaveRoom(mRoomId);

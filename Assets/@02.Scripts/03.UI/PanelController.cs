@@ -21,7 +21,7 @@ public class PanelController : MonoBehaviour
     /// <summary>
     /// Panel 표시 함수
     /// </summary>
-    public void Show()
+    public virtual void Show()
     {
         _backgroundCanvasGroup.alpha = 0;
         panelRectTransform.localScale = Vector3.zero;
@@ -33,7 +33,7 @@ public class PanelController : MonoBehaviour
     /// <summary>
     /// Panel 숨기기 함수
     /// </summary>
-    public void Hide(PanelControllerHideDelegate hideDelegate = null)
+    public virtual void Hide(PanelControllerHideDelegate hideDelegate = null)
     {
         _backgroundCanvasGroup.alpha = 1;
         panelRectTransform.localScale = Vector3.one;

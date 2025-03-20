@@ -27,6 +27,7 @@ public class Enums
     {
         PassAndPlay,    // 1개 폰 2인 플레이
         SinglePlay,     // 싱글 플레이
+        DualPlay,
         MultiPlay       // 멀티 플레이
     }
 
@@ -37,10 +38,26 @@ public class Enums
         Lose,           // 플레이어 패
         Draw,           // 무승부
     }
+    
+    public enum EItemType
+    {
+        NoAds,          //광고 제거
+        NoAds_Coin_2000, //광고제거 + 코인 2000개
+        Coin_1000,       //코인 1000개
+        Coin_2000,       //코인 2000개
+        Coin_4500,      //코인 4500개
+        Coin_10000,      //코인 10000개
+    }
+    
+    public enum EDifficultyLevel
+    {
+        Easy,
+        Medium,
+        Hard
+    }
 
     public enum EGameUIState
     {
-        Init,
         Turn_Black,
         Turn_White,
         Record
