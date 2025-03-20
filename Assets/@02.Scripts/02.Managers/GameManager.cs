@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 /// <summary>
 /// 게임의 전체적인 흐름을 관리하는 싱글톤 게임 매니저 클래스.
@@ -19,11 +18,16 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject waitingPanel;
     [SerializeField] private GameObject mSignupPanel;
     [SerializeField] private GameObject mSigninPanel;
+    [SerializeField] private GameObject mProfilePanel;
+    [SerializeField] private GameObject mSelectProfilePanel;
+    [SerializeField] private List<Sprite> mProfileSprites;
+    
     
     private Canvas mCanvas;
 
     private Enums.EGameType mGameType;
 
+    // GamePanelController, GameLogic 구현
     private GamePanelController mGamePanelController;
     private GameLogic mGameLogic;
     
@@ -139,6 +143,40 @@ public class GameManager : Singleton<GameManager>
             var signupPanelObj = Instantiate(mSignupPanel, mCanvas.transform);
             signupPanelObj.GetComponent<PanelController>().Show();
         }
+    }
+
+    public void OpenProfilePanel()
+    {
+        if (mCanvas != null)
+        {
+            var profilePanelObj = Instantiate(mProfilePanel, mCanvas.transform);
+            profilePanelObj.GetComponent<PanelController>().Show();
+        }
+    }
+
+    public PanelController OpenSelectProfilePanel()
+    {
+        if (mCanvas != null)
+        {
+            var selectProfilePanelObj = Instantiate(mSelectProfilePanel, mCanvas.transform);
+            selectProfilePanelObj.GetComponent<PanelController>().Show();
+            
+            return selectProfilePanelObj.GetComponent<PanelController>();
+        }
+        
+        Debug.Log("Canvas not open");
+        return null;
+    }
+
+    public Sprite GetProfileSprite(int profileIndex)
+    {
+        if (profileIndex >= 0 && profileIndex < mProfileSprites.Count)
+        {
+            return mProfileSprites[profileIndex];
+        }
+        
+        Debug.Log("out of index in ProfileSprites");
+        return null;
     }
     
     // 매칭 대기 패널 호출 메서드
