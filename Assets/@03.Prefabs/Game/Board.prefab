@@ -90,7 +90,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 14
-  mCellPrefab: {fileID: 1916682901195868644, guid: 6060f2f1fea43b240ac4a507b00df236, type: 3}
+  mCellPrefab: {fileID: 1916682901195868644, guid: 4c7193f0d35a35b4ea3fe15841038c38, type: 3}
 --- !u!1 &5677659501960848247
 GameObject:
   m_ObjectHideFlags: 0

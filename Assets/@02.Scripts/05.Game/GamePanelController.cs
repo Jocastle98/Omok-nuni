@@ -30,17 +30,6 @@ public class GamePanelController : MonoBehaviour
     {
         switch (gameUIState)
         {
-            case Enums.EGameUIState.Init:
-                timer.SetActive(true);
-                turnUI.SetActive(true);
-                resignButton.SetActive(true);
-                recordUI.SetActive(false);
-                backButton.SetActive(false);
-                
-                timer.GetComponent<Timer>().InitTimer();
-                blackTurnPanel.alpha = mDisableAlpha;
-                whiteTurnPanel.alpha = mDisableAlpha;
-                break;
             case Enums.EGameUIState.Turn_Black:
                 timer.SetActive(true);
                 turnUI.SetActive(true);
@@ -97,6 +86,7 @@ public class GamePanelController : MonoBehaviour
         GameManager.Instance.OpenConfirmPanel("기권하시겠습니까?", () =>
         {
             // 패배처리
+            
             
             // 임시기능: 메인 화면으로 전환(패배처리 구현 시 삭제)
             GameManager.Instance.ChangeToMainScene();
