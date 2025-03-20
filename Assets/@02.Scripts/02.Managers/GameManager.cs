@@ -17,6 +17,7 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject confirmPanel;
     [SerializeField] private GameObject mSignupPanel;
     [SerializeField] private GameObject mSigninPanel;
+    [SerializeField] private GameObject mProfilePanel;
 
 
     private Canvas mCanvas;
@@ -125,6 +126,15 @@ public class GameManager : Singleton<GameManager>
         {
             var signupPanelObj = Instantiate(mSignupPanel, mCanvas.transform);
             signupPanelObj.GetComponent<PanelController>().Show();
+        }
+    }
+
+    public void OpenProfilePanel()
+    {
+        if (mCanvas != null)
+        {
+            var profilePanelObj = Instantiate(mProfilePanel, mCanvas.transform);
+            profilePanelObj.GetComponent<PanelController>().Show();
         }
     }
 

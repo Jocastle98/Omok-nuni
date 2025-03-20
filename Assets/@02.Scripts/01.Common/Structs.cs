@@ -29,4 +29,19 @@ namespace UserDataStructs
         public int result;
         public string nickname;
     }
+
+    public struct UserInfoResult
+    {
+        public string username;
+        public string nickname;
+        public int profileimageindex;
+        public int coin;
+        public int wincount;
+        public int losecount;
+        public int drawcount;
+        public int rank;
+        public int rankuppoints;
+        public int winlosestreak;
+        public bool hasadremoval;
+    }
 }
