@@ -27,6 +27,11 @@ public class GamePanelController : MonoBehaviour
     private const float mDisableAlpha = 0.3f;
     private const float mEnableAlpha = 1.0f;
     
+    private void Awake()
+    {
+        GameManager.Instance.OnGamePanelUpdate += SetMyProfile;
+    }
+    
     /// <summary>
     /// Play하고 있을 때는 턴을 표시하는 turnUI를 보여주고
     /// Record(기보)하고 있을 때는 recordUI를 보여줌
@@ -67,8 +72,27 @@ public class GamePanelController : MonoBehaviour
                 break;
         }
     }
-    
-    
+
+    public async void SetMyProfile(Enums.EPlayerType playerType)
+    {
+        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
+
+        if (playerType == Enums.EPlayerType.Player_Black)
+        {
+            playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            playerBlackProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+        }
+        else if (playerType == Enums.EPlayerType.Player_White)
+        {
+            playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            playerWhiteProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+        }
+    }
+
+    public async void SetOpponentProfile()
+    {
+        
+    }
 
     public void InitClock()
     {

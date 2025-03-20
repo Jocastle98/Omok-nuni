@@ -80,19 +80,6 @@ public class MultiplayManager : IDisposable
         mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.EndGame, null);
     }
     
-    // 재대국 신청 메서드
-    public void RequestRematch(string roomId)
-    {
-        mSocket.Emit("requestRematch", new { roomId });
-    }
-    
-    // 새로운 방으로 이동 (서버에서 받은 새로운 방 정보 처리)
-    private void RematchStart(SocketIOResponse response)
-    {
-        var data = response.GetValue<RoomData>();
-        mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.StartGame, data.roomId);
-    }
-    
     // 서버로부터 상대방의 마커 정보를 받기 위한 메서드
     private void DoOpponent(SocketIOResponse response)
     {
@@ -106,7 +93,7 @@ public class MultiplayManager : IDisposable
             Debug.LogError($"Error in DoOpponent: {ex.Message}");
         }
     }
-
+    
     // 플레이어의 마커 위치를 서버로 전달하기 위한 메서드
     public void SendPlayerMove(string roomId, int position)
     {
@@ -116,6 +103,19 @@ public class MultiplayManager : IDisposable
     public void LeaveRoom(string roomId)
     {
         mSocket.Emit("leaveRoom", new { roomId });
+    }
+    
+    // 재대국 신청 메서드
+    public void RequestRematch(string roomId)
+    {
+        mSocket.Emit("requestRematch", new { roomId });
+    }
+    
+    // 새로운 방으로 이동 (서버에서 받은 새로운 방 정보 처리)
+    private void RematchStart(SocketIOResponse response)
+    {
+        var data = response.GetValue<RoomData>();
+        mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.StartGame, data.roomId);
     }
     
     public void Dispose()

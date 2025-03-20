@@ -32,6 +32,7 @@ public class GameManager : Singleton<GameManager>
     private bool mbIsStartGame = false;
     
     public Action OnMainPanelUpdate;
+    public Action<Enums.EPlayerType> OnGamePanelUpdate;
 
     private void Start()
     {
@@ -243,7 +244,7 @@ public class GameManager : Singleton<GameManager>
             }
 
             mGameLogic = new GameLogic();
-            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType);
+            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType, OnGamePanelUpdate);
         }
 
         mCanvas = GameObject.FindObjectOfType<Canvas>();
