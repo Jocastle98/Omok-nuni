@@ -19,14 +19,14 @@ public class Enums
     public enum EPlayerType 
     { 
         None,           // 텅 빈 상태
-        PlayerA,        // 흑돌
-        PlayerB         // 백돌
+        Player_Black,        // 흑돌
+        Player_White         // 백돌
     }
 
     public enum EGameType
     {
+        PassAndPlay,    // 1개 폰 2인 플레이
         SinglePlay,     // 싱글 플레이
-        DualPlay,
         MultiPlay       // 멀티 플레이
     }
 
@@ -36,5 +36,13 @@ public class Enums
         Win,            // 플레이어 승
         Lose,           // 플레이어 패
         Draw,           // 무승부
+    }
+
+    public enum EGameUIState
+    {
+        Init,
+        Turn_Black,
+        Turn_White,
+        Record
     }
 }
