@@ -103,9 +103,9 @@ public static class MinimaxAIController
 
         foreach (var (row,col) in possibleMoves)
         {
-            if(IsBlackForbiddenMove(board, row, col, Enums.EPlayerType.PlayerA)) continue; //만약 해당 위치가 흑돌이 금지되는 위치면 무시
+            if(IsBlackForbiddenMove(board, row, col, Enums.EPlayerType.Player_Black)) continue; //만약 해당 위치가 흑돌이 금지되는 위치면 무시
 
-            board[row, col] = Enums.EPlayerType.PlayerB;
+            board[row, col] = Enums.EPlayerType.Player_White;
             float score = DoMinimax(board, 0, depth, float.MinValue, float.MaxValue, false);
             board[row, col] = Enums.EPlayerType.None;
 
@@ -134,9 +134,9 @@ public static class MinimaxAIController
         bool isMaximizing)
     {
         //게임 종료 조건을 확인 TODO: AI 흑,백 경우 분기
-        if (CheckGameWin(Enums.EPlayerType.PlayerB, board)) //백돌이 이기면
+        if (CheckGameWin(Enums.EPlayerType.Player_White, board)) //백돌이 이기면
             return 1000 - currentDepth;
-        if (CheckGameWin(Enums.EPlayerType.PlayerA, board))
+        if (CheckGameWin(Enums.EPlayerType.Player_Black, board))
             return -1000 + currentDepth;
         if (IsAllBlocksPlaced(board) || currentDepth >= maxDepth)
             return EvaluateBoard(board);
@@ -151,8 +151,8 @@ public static class MinimaxAIController
 
         foreach (var (row, col) in possibleMoves)
         {
-            Enums.EPlayerType currentPlayer = isMaximizing ? Enums.EPlayerType.PlayerB : Enums.EPlayerType.PlayerA;
-            if(currentPlayer == Enums.EPlayerType.PlayerA && IsBlackForbiddenMove(board, row, col, currentPlayer)) continue; //흑돌이 금지된 위치면 무시
+            Enums.EPlayerType currentPlayer = isMaximizing ? Enums.EPlayerType.Player_White : Enums.EPlayerType.Player_Black;
+            if(currentPlayer == Enums.EPlayerType.Player_Black && IsBlackForbiddenMove(board, row, col, currentPlayer)) continue; //흑돌이 금지된 위치면 무시
 
             board[row, col] = currentPlayer;
             float score = DoMinimax(board, currentDepth + 1, maxDepth, alpha, beta, !isMaximizing);
@@ -233,7 +233,7 @@ public static class MinimaxAIController
                                 bool alreadyAdded = scoredMoves.Any(m => m.row == newRow && m.col == newCol);
                                 if (!alreadyAdded)
                                 {
-                                    if (IsBlackForbiddenMove(board, newRow, newCol, Enums.EPlayerType.PlayerA))
+                                    if (IsBlackForbiddenMove(board, newRow, newCol, Enums.EPlayerType.Player_Black))
                                         continue;
 
                                     float score = SimpleEvaluate(board, newRow, newCol); //모든 경우의 수를 고려하지 않고 중요한 경우만 빠르게 선택하게끔 휴리스틱함수 사용
@@ -277,7 +277,7 @@ public static class MinimaxAIController
                             if (newRow >= 0 && newRow < BOARD_SIZE && newCol >= 0 && newCol < BOARD_SIZE &&
                                 board[newRow, newCol] == Enums.EPlayerType.None && !moves.Contains((newRow, newCol)))
                             {
-                                if(IsBlackForbiddenMove(board, newRow, newCol, Enums.EPlayerType.PlayerA))
+                                if(IsBlackForbiddenMove(board, newRow, newCol, Enums.EPlayerType.Player_Black))
                                     continue;
                                 moves.Add((newRow, newCol));
                             }
@@ -302,12 +302,12 @@ public static class MinimaxAIController
         float score = 0;
         
         //공격
-        board[row, col] = Enums.EPlayerType.PlayerB;
-        score += GetPatternScore(board, row, col, Enums.EPlayerType.PlayerB) * 1.1f;
+        board[row, col] = Enums.EPlayerType.Player_White;
+        score += GetPatternScore(board, row, col, Enums.EPlayerType.Player_White) * 1.1f;
         
         //방어
-        board[row, col] = Enums.EPlayerType.PlayerA;
-        score += GetPatternScore(board, row, col, Enums.EPlayerType.PlayerA);
+        board[row, col] = Enums.EPlayerType.Player_Black;
+        score += GetPatternScore(board, row, col, Enums.EPlayerType.Player_Black);
 
         //되돌리기
         board[row, col] = Enums.EPlayerType.None;
@@ -327,10 +327,10 @@ public static class MinimaxAIController
         {
             for (int col = 0; col < BOARD_SIZE; col++)
             {
-                if (board[row, col] == Enums.EPlayerType.PlayerB)
-                    score += GetPatternScore(board, row, col, Enums.EPlayerType.PlayerB);
-                else if (board[row, col] == Enums.EPlayerType.PlayerA)
-                    score -= GetPatternScore(board, row, col, Enums.EPlayerType.PlayerA);
+                if (board[row, col] == Enums.EPlayerType.Player_White)
+                    score += GetPatternScore(board, row, col, Enums.EPlayerType.Player_White);
+                else if (board[row, col] == Enums.EPlayerType.Player_Black)
+                    score -= GetPatternScore(board, row, col, Enums.EPlayerType.Player_Black);
             }
         }
         return score;
@@ -415,7 +415,7 @@ public static class MinimaxAIController
     /// <returns></returns>
     public static bool CheckGameWin(Enums.EPlayerType playerType, Enums.EPlayerType[,] board)
     {
-        bool isBlack = playerType == Enums.EPlayerType.PlayerA;
+        bool isBlack = playerType == Enums.EPlayerType.Player_Black;
 
         int[] directionX = { 1, 0, 1, -1 };
         int[] directionY = { 0, 1, 1, 1 };
@@ -477,7 +477,7 @@ public static class MinimaxAIController
 
     private static bool IsBlackForbiddenMove(Enums.EPlayerType[,] board, int row, int col, Enums.EPlayerType playerType)
     {
-        if (playerType != Enums.EPlayerType.PlayerA) return false;
+        if (playerType != Enums.EPlayerType.Player_Black) return false;
 
         board[row, col] = playerType;
 
