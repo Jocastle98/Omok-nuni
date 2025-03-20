@@ -154,7 +154,7 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             GameObject waitingPanelObject = Instantiate(watingPanel, mCanvas.transform);
-            waitingPanelObject.GetComponent<WaitingPanelController>().OnClickCancelButton();
+            waitingPanelObject.GetComponent<WaitingPanelController>().Hide();
         }
     }
     

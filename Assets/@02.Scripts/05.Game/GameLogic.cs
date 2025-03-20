@@ -32,7 +32,7 @@ public class GameLogic : IDisposable
             case Enums.EGameType.PassAndPlay:
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new PlayerState(false);
-
+                
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.SinglePlay:
@@ -49,7 +49,9 @@ public class GameLogic : IDisposable
                     {
                         case Enums.EMultiplayManagerState.CreateRoom:
                             Debug.Log("## Create Room");
+                            
                             // todo: 대기화면 표시(제한시간 동안 급수에 맞는 상대 매칭 실패 시 싱글 플레이로 모드 전환)
+                            WaitingMatch();
                             break;
                         case Enums.EMultiplayManagerState.JoinRoom:
                             Debug.Log("## Join Room");
@@ -60,6 +62,8 @@ public class GameLogic : IDisposable
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
                             Debug.Log("## Start Game");
+                            CompleteMatch();
+                            
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
@@ -78,7 +82,7 @@ public class GameLogic : IDisposable
                 break;
         }
     }
-
+    
     /// <summary>
     /// 턴을 변경하는 메서드
     /// </summary>
@@ -108,8 +112,11 @@ public class GameLogic : IDisposable
         gamePanelController.StopClock();
         gamePanelController.InitClock();
         
-        // 점수 확인 패널 호출: 승자 점수 확인, 패자 점수 확인
-        GameManager.Instance.OpenScoreConfirmationPanel();
+        // 점수 확인 패널 호출: 멀티플레이이거나 AI플레이일 경우 -> 승자 점수 확인, 패자 점수 확인
+        if (mMultiplayManager != null /* && AI */)
+        {
+            GameManager.Instance.OpenScoreConfirmationPanel();
+        }
         //점수 랭킹 업데이트
         //씬 혹은 게임화면 위치 변경
     }
@@ -123,12 +130,27 @@ public class GameLogic : IDisposable
         mCurrentPlayer?.OnExit(this);
         mCurrentPlayer = newState;
         mCurrentPlayer?.OnEnter(this);
-
-        TurnUIUpdate();
         
+        TurnUIUpdate();
         gamePanelController.StartClock();
     }
 
+    private void WaitingMatch()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenWaitingPanel();
+        });
+    }
+
+    private void CompleteMatch()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.CloseWaitingPanel();
+        });
+    }
+    
     /// <summary>
     /// 게임 진행 중일 때 Turn UI 표시
     /// </summary>

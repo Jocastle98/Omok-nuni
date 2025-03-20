@@ -19,13 +19,21 @@ public class WaitingPanelController : PopupPanelController
         
         StartProgressBar();
     }
+
+    public void Hide()
+    {
+        StopProgressBar();
+        
+        base.Hide();
+    }
     
     public void OnClickCancelButton()
     {
         StopProgressBar();
+        
         Hide();
     }
-
+    
     private void StartProgressBar()
     {
         if (mProgressCoroutine != null)
