@@ -16,6 +16,7 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
     public delegate void OnCellClicked(int index);
     public OnCellClicked onCellClicked;
     public int blockIndex;
+    public bool IsForbidden = false;
     
     private Sprite mSprite;
     private Image mImage;
