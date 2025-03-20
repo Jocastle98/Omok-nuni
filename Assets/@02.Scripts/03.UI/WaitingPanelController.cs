@@ -33,6 +33,8 @@ public class WaitingPanelController : PopupPanelController
         StopProgressBar();
         
         Hide();
+        
+        GameManager.Instance.ChangeToMainScene();
     }
     
     private void StartProgressBar()

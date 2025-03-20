@@ -2627,6 +2627,9 @@ MonoBehaviour:
   waitingPanel: {fileID: 7863924506570574166, guid: 428fb6b400781c64bbd3e07ac3006cb2, type: 3}
   mSignupPanel: {fileID: 1745101191904556293, guid: dbfd93541137d4c4eb6f6bf778f894f4, type: 3}
   mSigninPanel: {fileID: 4950278473975370212, guid: 6d6115e9dafd6de4baa4552eb8dcbba4, type: 3}
+  mProfilePanel: {fileID: 7605418477416194584, guid: fb46fcceb92da3942a55addeb6ff542b, type: 3}
+  mSelectProfilePanel: {fileID: 7605418477416194584, guid: e19303ef510b376449988255278b975f, type: 3}
+  mProfileSprites: []
 --- !u!4 &2140132619
 Transform:
   m_ObjectHideFlags: 0
