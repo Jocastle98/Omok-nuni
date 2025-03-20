@@ -22,17 +22,16 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mSelectProfilePanel;
     [SerializeField] private List<Sprite> mProfileSprites;
     
-    
-    private Canvas mCanvas;
-
     private Enums.EGameType mGameType;
 
-    // GamePanelController, GameLogic 구현
-    private GamePanelController mGamePanelController;
+    private Canvas mCanvas;
+    
     private GameLogic mGameLogic;
     
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
+    
+    public Action OnMainPanelUpdate;
 
     private void Start()
     {
@@ -131,7 +130,7 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var signinPanelObj = Instantiate(mSigninPanel, mCanvas.transform);
-            signinPanelObj.GetComponent<PanelController>().Show();
+            signinPanelObj.GetComponent<SigninPanelController>().Show(OnMainPanelUpdate);
         }
     }
     
