@@ -62,7 +62,7 @@ public class GameLogic : IDisposable
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
                             Debug.Log("## Start Game");
-                            CompleteMatch();
+                            GameManager.Instance.mbIsStartGame = true;
                             
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
@@ -135,19 +135,14 @@ public class GameLogic : IDisposable
         gamePanelController.StartClock();
     }
 
+    /// <summary>
+    /// 매칭 대기 시간을 알려주는 팝업창을 호출하는 메서드
+    /// </summary>
     private void WaitingMatch()
     {
         UnityThread.executeInUpdate(() =>
         {
             GameManager.Instance.OpenWaitingPanel();
-        });
-    }
-
-    private void CompleteMatch()
-    {
-        UnityThread.executeInUpdate(() =>
-        {
-            GameManager.Instance.CloseWaitingPanel();
         });
     }
     

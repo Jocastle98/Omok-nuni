@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 게임의 전체적인 흐름을 관리하는 싱글톤 게임 매니저 클래스.
@@ -15,18 +16,19 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject shopPanel;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject confirmPanel;
-    [SerializeField] private GameObject watingPanel;
+    [SerializeField] private GameObject waitingPanel;
     [SerializeField] private GameObject mSignupPanel;
     [SerializeField] private GameObject mSigninPanel;
-
-
+    
     private Canvas mCanvas;
 
     private Enums.EGameType mGameType;
 
-    // GamePanelController, GameLogic 구현
     private GamePanelController mGamePanelController;
     private GameLogic mGameLogic;
+    
+    // waitingPanel의 대기종료 여부(게임이 시작했는지)
+    public bool mbIsStartGame = false;
 
     private void Start()
     {
@@ -144,18 +146,17 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            GameObject waitingPanelObject = Instantiate(watingPanel, mCanvas.transform);
+            GameObject waitingPanelObject = Instantiate(waitingPanel, mCanvas.transform);
             waitingPanelObject.GetComponent<WaitingPanelController>().Show();
+            mbIsStartGame = false;
         }
     }
 
-    public void CloseWaitingPanel()
-    {
-        if (mCanvas != null)
-        {
-            GameObject waitingPanelObject = Instantiate(watingPanel, mCanvas.transform);
-            waitingPanelObject.GetComponent<WaitingPanelController>().Hide();
-        }
+    // waitingPanel의 종료 여부(게임 시작)를 waitingPanel로 전달(반환)해주는 메서드
+    public bool IsStartGame()
+    {   
+        // GameLogic에서 StartGame 여부를 mbIsStartGame로 전달 받음
+        return mbIsStartGame;
     }
     
     // 승점 확인 패널 호출 메서드

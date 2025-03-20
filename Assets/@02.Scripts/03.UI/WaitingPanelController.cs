@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -69,6 +70,12 @@ public class WaitingPanelController : PopupPanelController
             // 남은시간 표시
             float remainingTime = duration - time;
             progressText.text = string.Format("{0:0}초", remainingTime);
+
+            if (StartGameSuccessful())
+            {
+                this.Hide();
+            }
+            
             yield return null;
         }
         
@@ -76,6 +83,11 @@ public class WaitingPanelController : PopupPanelController
         OnMatchingTimeout();
     }
 
+    public bool StartGameSuccessful()
+    {
+        return GameManager.Instance.IsStartGame();
+    }
+    
     private void OnMatchingTimeout()
     {
         Hide();
