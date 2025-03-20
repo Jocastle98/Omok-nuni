@@ -119,6 +119,9 @@ public class GameLogic : IDisposable
         }
         //점수 랭킹 업데이트
         //씬 혹은 게임화면 위치 변경
+        
+        //TODO: 게임 진행 로직 완성되면 ScorePanel을 띄워 승점 관리
+        
     }
 
     /// <summary>

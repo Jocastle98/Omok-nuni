@@ -20,6 +20,7 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mSigninPanel;
     [SerializeField] private GameObject mProfilePanel;
     [SerializeField] private GameObject mSelectProfilePanel;
+    [SerializeField] private GameObject mScorePanel;
     [SerializeField] private List<Sprite> mProfileSprites;
     
     
@@ -38,6 +39,50 @@ public class GameManager : Singleton<GameManager>
     {
         OpenSigninPanel();
     }
+    
+    #region  Score
+
+    // TODO: 스코어 급수에 맞게 조정 현재는(-30~30)
+    
+    private int currentScore = 0;
+    /// <summary>
+    /// 승리 시
+    /// </summary>
+    public void WinGame()
+    {
+        currentScore += 1;
+        if (currentScore > 30) currentScore = 30;
+    }
+
+    /// <summary>
+    /// 패배 시
+    /// </summary>
+    public void LoseGame()
+    {
+        currentScore -= 1;
+        if (currentScore < -30) currentScore = -30;
+    }
+
+    /// <summary>
+    /// 승점 패널 오픈
+    /// </summary>
+    /// <param name="isWin">승패</param>
+    /// <param name="addDelete">점수획득 1/-1</param>
+    public void OpenScorePanel(bool isWin, int addDelete)
+    {
+        if (mCanvas != null)
+        {
+            var scorePanelObject = Instantiate(mScorePanel, mCanvas.transform);
+            var scoreController = scorePanelObject.GetComponent<ScorePanelController>();
+            if (scoreController != null)
+            {
+                // 현재 누적 점수와 이번 게임 증감 전달
+                scoreController.InitializePanel(currentScore, isWin, addDelete);
+            }
+        }
+    }
+
+    #endregion
     
     // 게임 화면으로 씬 전환하는 메서드
     public void ChangeToGameScene(Enums.EGameType gameType)
@@ -71,6 +116,8 @@ public class GameManager : Singleton<GameManager>
             gameTypeSelectPanelObject.GetComponent<GameTypeSelectPanelController>().Show();
         }
     }
+
+   
     
     // 내 기보(확인하기) 패널 호출 메서드
     public void OpenRecordPanel()
