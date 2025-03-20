@@ -28,7 +28,7 @@ public class GameManager : Singleton<GameManager>
     private GameLogic mGameLogic;
     
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
-    public bool mbIsStartGame = false;
+    private bool mbIsStartGame = false;
 
     private void Start()
     {
@@ -153,10 +153,15 @@ public class GameManager : Singleton<GameManager>
     }
 
     // waitingPanel의 종료 여부(게임 시작)를 waitingPanel로 전달(반환)해주는 메서드
-    public bool IsStartGame()
+    public bool GetIsStartGame()
     {   
-        // GameLogic에서 StartGame 여부를 mbIsStartGame로 전달 받음
         return mbIsStartGame;
+    }
+
+    // GameLogic에서 StartGame 여부를 설정(Set)해주는 메서드
+    public void SetIsStartGame(bool isStartGame)
+    {
+        mbIsStartGame = isStartGame;
     }
     
     // 승점 확인 패널 호출 메서드

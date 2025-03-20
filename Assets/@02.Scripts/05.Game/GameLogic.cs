@@ -62,7 +62,7 @@ public class GameLogic : IDisposable
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
                             Debug.Log("## Start Game");
-                            GameManager.Instance.mbIsStartGame = true;
+                            GameManager.Instance.SetIsStartGame(true);
                             
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);

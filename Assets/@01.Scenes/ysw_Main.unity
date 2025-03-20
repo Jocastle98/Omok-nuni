@@ -2624,7 +2624,7 @@ MonoBehaviour:
   shopPanel: {fileID: 3951547453037586069, guid: a8edaccfc2a2de6498cf49f20d66a96d, type: 3}
   settingsPanel: {fileID: 7897142229442210262, guid: b486f0b2ed780684e907956a923fe03e, type: 3}
   confirmPanel: {fileID: 7605418477416194584, guid: c48e38e28098ae94eab72cd6f36dbc3d, type: 3}
-  watingPanel: {fileID: 7863924506570574166, guid: 428fb6b400781c64bbd3e07ac3006cb2, type: 3}
+  waitingPanel: {fileID: 7863924506570574166, guid: 428fb6b400781c64bbd3e07ac3006cb2, type: 3}
   mSignupPanel: {fileID: 1745101191904556293, guid: dbfd93541137d4c4eb6f6bf778f894f4, type: 3}
   mSigninPanel: {fileID: 4950278473975370212, guid: 6d6115e9dafd6de4baa4552eb8dcbba4, type: 3}
 --- !u!4 &2140132619

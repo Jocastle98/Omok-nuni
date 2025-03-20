@@ -71,7 +71,7 @@ public class WaitingPanelController : PopupPanelController
             float remainingTime = duration - time;
             progressText.text = string.Format("{0:0}초", remainingTime);
 
-            if (StartGameSuccessful())
+            if (GameManager.Instance.GetIsStartGame())
             {
                 this.Hide();
             }
@@ -81,11 +81,6 @@ public class WaitingPanelController : PopupPanelController
         
         // 제한시간이 지나면
         OnMatchingTimeout();
-    }
-
-    public bool StartGameSuccessful()
-    {
-        return GameManager.Instance.IsStartGame();
     }
     
     private void OnMatchingTimeout()
