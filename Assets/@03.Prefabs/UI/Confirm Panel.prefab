@@ -793,7 +793,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.5882353}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -834,8 +834,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 985e52a185c4b0d4399554e952c6b8ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panelRectTransform: {fileID: 1718061619809884596}
+  panelRectTransform: {fileID: 7732528905802323671}
   messageText: {fileID: 47884890434684246}
+  cancelButton: {fileID: 1922933594994577746}
 --- !u!1 &8014654237565254238
 GameObject:
   m_ObjectHideFlags: 0
