@@ -27,6 +27,7 @@ public class Enums
     {
         PassAndPlay,    // 1개 폰 2인 플레이
         SinglePlay,     // 싱글 플레이
+        DualPlay,
         MultiPlay       // 멀티 플레이
     }
 
