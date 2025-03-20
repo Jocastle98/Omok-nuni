@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using UserDataStructs;
 
 public class GamePanelController : MonoBehaviour
 {
@@ -18,6 +19,11 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] private CanvasGroup blackTurnPanel;
     [SerializeField] private CanvasGroup whiteTurnPanel;
 
+    [SerializeField] private Image playerBlackProfileImage;
+    [SerializeField] private TMP_Text playerBlackProfileText;
+    [SerializeField] private Image playerWhiteProfileImage;
+    [SerializeField] private TMP_Text playerWhiteProfileText;
+    
     private const float mDisableAlpha = 0.3f;
     private const float mEnableAlpha = 1.0f;
     
@@ -61,6 +67,8 @@ public class GamePanelController : MonoBehaviour
                 break;
         }
     }
+    
+    
 
     public void InitClock()
     {

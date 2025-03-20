@@ -22,7 +22,8 @@ public class GameLogic : IDisposable
     /// </summary>
     /// <param name="boardCellController"></param>
     /// <param name="playMode"></param>
-    public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController,Enums.EGameType playMode)
+    public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController, 
+        Enums.EGameType playMode)
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;

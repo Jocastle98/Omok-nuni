@@ -216,6 +216,7 @@ public class GameManager : Singleton<GameManager>
         if (scene.name == "ysw_Main")
             //if (scene.name == "Main")   
         {
+            OnMainPanelUpdate = null;
             AudioManager.Instance.PlayIntroBgm();
         }
 
