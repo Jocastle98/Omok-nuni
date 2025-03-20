@@ -21,17 +21,52 @@ public class ProfilePanelController : PanelController
     [SerializeField] private Image mWinLoseStreakImageObj;
     [SerializeField] private Sprite mWinStreakImage;
     [SerializeField] private Sprite mLoseStreakImage;
+    [SerializeField] private Image mProfileImage;
+    
+    private List<PanelController> mChildPanels = new List<PanelController>();
 
     public override async void Show()
     {
+        mChildPanels.Clear();
         UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
         setProfileInfo(userInfo);
         base.Show();
     }
 
+    public override void Hide(PanelControllerHideDelegate hideDelegate = null)
+    {
+        foreach (var panel in mChildPanels)
+        {
+            if (panel != null)
+            {
+                panel.Hide();
+            }
+        }
+        mChildPanels.Clear();
+        
+        base.Hide(hideDelegate);
+    }
+
+    public void OnClickProfileButton()
+    {
+        var childPanel = GameManager.Instance.OpenSelectProfilePanel();
+        SelectProfilePanelController selectPanel = childPanel as SelectProfilePanelController;
+        if (selectPanel != null)
+        {
+            selectPanel.OnProfileSelected = UpdateProfileInfo;
+        }
+        mChildPanels.Add(childPanel);
+    }
+
     public void OnClickBackButton()
     {
-        Destroy(gameObject);
+        Hide();
+    }
+
+    public async void UpdateProfileInfo()
+    {
+        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
+        setProfileInfo(userInfo);
     }
 
     private void setProfileInfo(UserInfoResult userInfo)
@@ -66,5 +101,6 @@ public class ProfilePanelController : PanelController
 
         mWinLoseStreakText.text = Mathf.Abs(userInfo.winlosestreak).ToString();
         mADBlockText.text = userInfo.hasadremoval ? "O" : "X";
+        mProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
     }
 }

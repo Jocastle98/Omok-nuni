@@ -44,4 +44,14 @@ namespace UserDataStructs
         public int winlosestreak;
         public bool hasadremoval;
     }
+
+    public struct ProfileImageData
+    {
+        public int profileimageindex;
+
+        public ProfileImageData(int profileimageindex)
+        {
+            this.profileimageindex = profileimageindex;
+        }
+    }
 }

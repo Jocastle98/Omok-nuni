@@ -18,8 +18,9 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mSignupPanel;
     [SerializeField] private GameObject mSigninPanel;
     [SerializeField] private GameObject mProfilePanel;
-
-
+    [SerializeField] private GameObject mSelectProfilePanel;
+    [SerializeField] private List<Sprite> mProfileSprites;
+    
     private Canvas mCanvas;
 
     private Enums.EGameType mGameType;
@@ -136,6 +137,31 @@ public class GameManager : Singleton<GameManager>
             var profilePanelObj = Instantiate(mProfilePanel, mCanvas.transform);
             profilePanelObj.GetComponent<PanelController>().Show();
         }
+    }
+
+    public PanelController OpenSelectProfilePanel()
+    {
+        if (mCanvas != null)
+        {
+            var selectProfilePanelObj = Instantiate(mSelectProfilePanel, mCanvas.transform);
+            selectProfilePanelObj.GetComponent<PanelController>().Show();
+            
+            return selectProfilePanelObj.GetComponent<PanelController>();
+        }
+        
+        Debug.Log("Canvas not open");
+        return null;
+    }
+
+    public Sprite GetProfileSprite(int profileIndex)
+    {
+        if (profileIndex >= 0 && profileIndex < mProfileSprites.Count)
+        {
+            return mProfileSprites[profileIndex];
+        }
+        
+        Debug.Log("out of index in ProfileSprites");
+        return null;
     }
 
     public void OpenGameOverPanel()
