@@ -164,10 +164,10 @@ public class GameLogic : IDisposable
     {
         if (SetableStone(playerType, Y, X))
         {
-            board.cells[Y, X].SetMark(playerType);
-            board.cells[Y, X].playerType = playerType;
+            boardCellController.cells[Y, X].SetMark(playerType);
+            boardCellController.cells[Y, X].playerType = playerType;
             
-            BoardCell[][] lists = MakeLists(board.size,Y,X,4);
+            BoardCell[][] lists = MakeLists(boardCellController.size,Y,X,4);
             
             for (int i = 0; i < 4; i++)
             {
@@ -175,8 +175,8 @@ public class GameLogic : IDisposable
                 {
                     //금수 최신화
                     if(lists[i][k] == null) continue;
-                    int x = lists[i][k].blockIndex % (board.size + 1);
-                    int y = lists[i][k].blockIndex / (board.size + 1);
+                    int x = lists[i][k].blockIndex % (boardCellController.size + 1);
+                    int y = lists[i][k].blockIndex / (boardCellController.size + 1);
                     CheckCellInRule(y,x);
                 }
             }
@@ -205,7 +205,7 @@ public class GameLogic : IDisposable
         if (player == Enums.EPlayerType.Player_White) return true;
     
         //셀이 금수bool에 따라 리턴
-        if(board.cells[Y,X].IsForbidden) return false;
+        if(boardCellController.cells[Y,X].IsForbidden) return false;
         
         return true;
     }
@@ -215,7 +215,7 @@ public class GameLogic : IDisposable
         int firstScanRange = 5;
 
         // 방향별로 BoardCell 배열을 생성하고 채우는 코드
-        BoardCell[][] lists = MakeLists(board.size, Y, X, firstScanRange);
+        BoardCell[][] lists = MakeLists(boardCellController.size, Y, X, firstScanRange);
 
         List<BoardCell>[] rule33Results = new List<BoardCell>[4];
         List<BoardCell>[] rule44Results = new List<BoardCell>[4];
@@ -236,7 +236,7 @@ public class GameLogic : IDisposable
                 return;
             }
 
-            if (result44Cell[i] == board.cells[Y, X])
+            if (result44Cell[i] == boardCellController.cells[Y, X])
             {
                 if (!FakeForbidden(result44Cell[i],lists[i],lists[i]))
                 {
@@ -289,13 +289,13 @@ public class GameLogic : IDisposable
             }
         }
 
-        board.cells[Y, X].IsForbidden = false;
+        boardCellController.cells[Y, X].IsForbidden = false;
     }
     
     public bool ForbiddenSelf(BoardCell cell)
     {
-        int X = cell.blockIndex % (board.size + 1);
-        int Y = cell.blockIndex / (board.size + 1);
+        int X = cell.blockIndex % (boardCellController.size + 1);
+        int Y = cell.blockIndex / (boardCellController.size + 1);
         return ForbiddenSelf(Y, X);
     }
     
@@ -305,7 +305,7 @@ public class GameLogic : IDisposable
         int firstScanRange = 5;
         
         // 방향별로 BoardCell 배열을 생성하고 채우는 코드
-        BoardCell[][] lists = MakeLists(board.size,Y,X,firstScanRange);
+        BoardCell[][] lists = MakeLists(boardCellController.size,Y,X,firstScanRange);
 
         List<BoardCell>[] rule33Results = new List<BoardCell>[4];
         List<BoardCell>[] rule44Results = new List<BoardCell>[4];
@@ -319,12 +319,12 @@ public class GameLogic : IDisposable
         
         for (int i = 0; i < 4; i++)
         {
-            if (result6Bools[i] == board.cells[Y, X])
+            if (result6Bools[i] == boardCellController.cells[Y, X])
             {
                 return false;
             }
 
-            if (result44Bools[i] == board.cells[Y, X])
+            if (result44Bools[i] == boardCellController.cells[Y, X])
             {
                 return false;
             }
@@ -340,7 +340,7 @@ public class GameLogic : IDisposable
                     var forbiddenList = rule33Results[i].Intersect(rule33Results[k]).ToList();
                     foreach (var cell in forbiddenList)
                     {
-                        if (cell == board.cells[Y, X])
+                        if (cell == boardCellController.cells[Y, X])
                         {
                             return false;
                         }
@@ -353,7 +353,7 @@ public class GameLogic : IDisposable
                     var forbiddenList = rule44Results[i].Intersect(rule44Results[k]).ToList();
                     foreach (var cell in forbiddenList)
                     {
-                        if (cell == board.cells[Y, X])
+                        if (cell == boardCellController.cells[Y, X])
                         {
                             return false;
                         }
@@ -371,7 +371,7 @@ public class GameLogic : IDisposable
     public bool FakeForbidden(BoardCell cell, BoardCell[] firstList, BoardCell[] secondList)
     {
         //첫번째 금수가 되는 칸
-        cell.playerType = Enums.EPlayerType.PlayerA;
+        cell.playerType = Enums.EPlayerType.Player_Black;
 
         int scanRange = 2;
         
@@ -456,14 +456,14 @@ public class GameLogic : IDisposable
                 continue;
             }
 
-            if (list[i - 2]?.playerType == Enums.EPlayerType.PlayerA ||
-                list[i + rule33MaxLength + 1]?.playerType == Enums.EPlayerType.PlayerA)
+            if (list[i - 2]?.playerType == Enums.EPlayerType.Player_Black ||
+                list[i + rule33MaxLength + 1]?.playerType == Enums.EPlayerType.Player_Black)
             {
                 continue;
             }
             
-            if (list[i - 2]?.playerType == Enums.EPlayerType.PlayerB &&
-                list[i + rule33MaxLength + 1]?.playerType == Enums.EPlayerType.PlayerB)
+            if (list[i - 2]?.playerType == Enums.EPlayerType.Player_White &&
+                list[i + rule33MaxLength + 1]?.playerType == Enums.EPlayerType.Player_White)
             {
                 continue;
             }
@@ -477,7 +477,7 @@ public class GameLogic : IDisposable
             {
                 if(list[i + t] == null) break;
                 
-                if (list[i + t].playerType != Enums.EPlayerType.PlayerB && rule33Stone < 3)
+                if (list[i + t].playerType != Enums.EPlayerType.Player_White && rule33Stone < 3)
                 {
                     rule33.Add(list[i + t]);
                     if (list[i + t] != null)
@@ -525,8 +525,8 @@ public class GameLogic : IDisposable
         for (int i = 1; i <6; i++)
         {
             //예외 코드
-            if (list[i - 1]?.playerType == Enums.EPlayerType.PlayerA ||
-                list[i + rule44MaxLenght]?.playerType == Enums.EPlayerType.PlayerA) continue;
+            if (list[i - 1]?.playerType == Enums.EPlayerType.Player_Black ||
+                list[i + rule44MaxLenght]?.playerType == Enums.EPlayerType.Player_Black) continue;
 
             if (list[i] == null) continue;
             
@@ -536,7 +536,7 @@ public class GameLogic : IDisposable
             {
                 if(list[i + f] == null) break;
                 
-                if (list[i + f]?.playerType != Enums.EPlayerType.PlayerB && rule44Stone < 4)
+                if (list[i + f]?.playerType != Enums.EPlayerType.Player_White && rule44Stone < 4)
                 {
                     rule44.Add(list[i + f]);
                     if (list[i + f]?.playerType != Enums.EPlayerType.None)
@@ -589,7 +589,7 @@ public class GameLogic : IDisposable
             {
                 if (i + s >= list.Length || list[i + s] == null) continue;
                 
-                if (list[i + s]?.playerType != Enums.EPlayerType.PlayerB &&
+                if (list[i + s]?.playerType != Enums.EPlayerType.Player_White &&
                     list[i + s]?.playerType != Enums.EPlayerType.None)
                 {
                     playerStone++;
@@ -624,7 +624,7 @@ public class GameLogic : IDisposable
     public bool GameResult(Enums.EPlayerType player, int Y, int X)
     {
 
-        BoardCell[][] lists = MakeLists(board.size, Y, X, 4);
+        BoardCell[][] lists = MakeLists(boardCellController.size, Y, X, 4);
 
         int counting = 0;
         for (int i = 0; i < lists.Length; i++)
