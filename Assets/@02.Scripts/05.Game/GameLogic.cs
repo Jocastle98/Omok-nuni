@@ -19,6 +19,9 @@ public class GameLogic : IDisposable
     private MultiplayManager mMultiplayManager;
     private string mRoomId;
     
+    //승점 패널
+    public Enums.EPlayerType localPlayerType = Enums.EPlayerType.Player_Black;
+    public bool isGameOver = false;
     private Action<Enums.EPlayerType> OnMyGameProfileUpdate;
     private Action<UsersInfoData> OnOpponentGameProfileUpdate;
     
@@ -68,7 +71,10 @@ public class GameLogic : IDisposable
                             Debug.Log("## Join Room");
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                             mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId);
-
+                            
+                            // 방들어온 플레이어는 백
+                            localPlayerType = mPlayer_White.playerType; 
+                            OpponentGameProfileUpdate(Enums.EPlayerType.Player_Black, mMultiplayManager);
                             MyGameProfileUpdate(Enums.EPlayerType.Player_White);
                             SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_White);
                             SetState(mPlayer_Black);
@@ -80,6 +86,8 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, mRoomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
+                            // 첫 수 두는 플레이어 흑
+                            localPlayerType = mPlayer_Black.playerType;
                             MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
                             SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_Black);
                             SetState(mPlayer_Black);
@@ -121,8 +129,10 @@ public class GameLogic : IDisposable
     /// <summary>
     /// 게임 종료 처리를 해주는 메서드
     /// </summary>
-    public void EndGame()
+    public void EndGame(Enums.EPlayerType winnerType)
     {
+        if (isGameOver) return; 
+        isGameOver = true;
         SetState(null);
         mPlayer_Black = null;
         mPlayer_White = null;
@@ -130,6 +140,24 @@ public class GameLogic : IDisposable
         gamePanelController.StopClock();
         gamePanelController.InitClock();
         
+        if (winnerType == Enums.EPlayerType.None)
+        {
+            // 무승부
+            Debug.Log("무승부!");
+        }
+        else if (winnerType == localPlayerType)
+        {
+            // 내가 이긴 경우
+            Debug.Log("내가 승리했습니다!");
+            GameManager.Instance.WinGame();
+        }
+        else
+        {
+            // 상대가 이긴 경우 => 나는 패배
+            Debug.Log("상대가 승리");
+            GameManager.Instance.LoseGame();
+        }
+
         // 점수 확인 패널 호출: 멀티플레이이거나 AI플레이일 경우 -> 승자 점수 확인, 패자 점수 확인
         if (mMultiplayManager != null /* && AI */)
         {
@@ -137,6 +165,10 @@ public class GameLogic : IDisposable
         }
         //점수 랭킹 업데이트
         //씬 혹은 게임화면 위치 변경
+        
+        //TODO: 게임 진행 로직 완성되면 ScorePanel을 띄워 승점 관리
+        
+        
     }
 
     /// <summary>
@@ -265,6 +297,20 @@ public class GameLogic : IDisposable
             GameManager.Instance.OpenConfirmPanel("그 곳에 둘 수 없습니다.", null, false);
             return false;
         }
+        
+        //승점 패널
+        bool isWin = GameResult(playerType, Y, X);
+        if (isWin)
+        {
+            // 승리 플레이어 엔드게임
+            EndGame(playerType);
+        }
+        else
+        {
+            // 5목 아니면 다음 턴
+            NextTurn(playerType);
+        }
+        
 
         return true;
     }
