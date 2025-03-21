@@ -29,6 +29,7 @@ public class ProfilePanelController : PopupPanelController
     public override async void Show()
     {
         mChildPanels.Clear();
+        
         UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
         setProfileInfo(userInfo);
         base.Show();
@@ -50,7 +51,7 @@ public class ProfilePanelController : PopupPanelController
 
     public void OnClickProfileButton()
     {
-        var childPanel = GameManager.Instance.OpenSelectProfilePanel();
+        var childPanel = GameManager.Instance.OpenSelectProfilePanelFromProfilePanel();
         SelectProfilePanelController selectPanel = childPanel as SelectProfilePanelController;
         if (selectPanel != null)
         {

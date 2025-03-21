@@ -11,6 +11,7 @@ namespace UserDataStructs
         public string username;
         public string nickname;
         public string password;
+        public int profileimageindex;
     }
     
     public struct SigninData
