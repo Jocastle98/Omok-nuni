@@ -74,7 +74,6 @@ public class GameLogic : IDisposable
                             
                             // 방들어온 플레이어는 백
                             localPlayerType = mPlayer_White.playerType; 
-                            OpponentGameProfileUpdate(Enums.EPlayerType.Player_Black, mMultiplayManager);
                             MyGameProfileUpdate(Enums.EPlayerType.Player_White);
                             SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_White);
                             SetState(mPlayer_Black);
@@ -255,9 +254,9 @@ public class GameLogic : IDisposable
         UsersInfoData usersInfoData = new UsersInfoData
         {
             roomId = roomId,
-            nickname = userInfo.nickname,  // 실제 닉네임
-            profileimageindex = userInfo.profileimageindex,  // 실제 이미지 인덱스
-            rank = userInfo.rank,  // 실제 랭크
+            nickname = userInfo.nickname,
+            profileimageindex = userInfo.profileimageindex,
+            rank = userInfo.rank,
             playerType = playerType
         };
 

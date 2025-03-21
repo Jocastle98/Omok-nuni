@@ -83,31 +83,28 @@ public class GamePanelController : MonoBehaviour
         }
     }
 
-    public void SetMyProfile(Enums.EPlayerType playerType)
+    public async void SetMyProfile(Enums.EPlayerType playerType)
     {
-        UnityThread.executeInUpdate(() =>
+        // 객체가 유효한지 확인
+        if (playerBlackProfileImage == null || playerBlackProfileText == null ||
+            playerWhiteProfileImage == null || playerWhiteProfileText == null)
         {
-            // 객체가 유효한지 확인
-            if (playerBlackProfileImage == null || playerBlackProfileText == null ||
-                playerWhiteProfileImage == null || playerWhiteProfileText == null)
-            {
-                Debug.LogWarning("프로필 UI 객체가 유효하지 않습니다.");
-                return;
-            }
-            
-            UserInfoResult userInfo = NetworkManager.Instance.GetUserInfoSync(() => { }, () => { });
-            
-            if (playerType == Enums.EPlayerType.Player_Black)
-            {
-                playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
-                playerBlackProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
-            }
-            else if (playerType == Enums.EPlayerType.Player_White)
-            {
-                playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
-                playerWhiteProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
-            }
-        });
+            Debug.LogWarning("프로필 UI 객체가 유효하지 않습니다.");
+            return;
+        }
+        
+        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
+        
+        if (playerType == Enums.EPlayerType.Player_Black)
+        {
+            playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            playerBlackProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+        }
+        else if (playerType == Enums.EPlayerType.Player_White)
+        {
+            playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            playerWhiteProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+        }
     }
 
     public void SetOpponentProfile(UsersInfoData opponentInfo)

@@ -311,7 +311,7 @@ public class GameManager : Singleton<GameManager>
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 인트로 BGM 재생
-        if (scene.name == "Main")   
+        if (scene.name == "Main")
         {
             AudioManager.Instance.PlayIntroBgm();
         }
