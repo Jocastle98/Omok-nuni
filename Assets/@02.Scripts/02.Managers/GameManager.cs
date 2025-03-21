@@ -27,6 +27,8 @@ public class GameManager : Singleton<GameManager>
     private Canvas mCanvas;
 
     private Enums.EGameType mGameType;
+    
+
 
     // GamePanelController, GameLogic 구현
     private GamePanelController mGamePanelController;
@@ -45,22 +47,22 @@ public class GameManager : Singleton<GameManager>
     // TODO: 스코어 급수에 맞게 조정 현재는(-30~30)
     
     private int currentScore = 0;
-    /// <summary>
-    /// 승리 시
-    /// </summary>
     public void WinGame()
     {
         currentScore += 1;
         if (currentScore > 30) currentScore = 30;
+
+        // 서버에 wincount 증가 요청도 가능
+         NetworkManager.Instance.AddWinCount();
     }
 
-    /// <summary>
-    /// 패배 시
-    /// </summary>
     public void LoseGame()
     {
         currentScore -= 1;
         if (currentScore < -30) currentScore = -30;
+
+        //  서버에 losecount 증가 요청도 가능
+         NetworkManager.Instance.AddLoseCount();
     }
 
     /// <summary>

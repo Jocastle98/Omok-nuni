@@ -17,6 +17,9 @@ public class GameLogic : IDisposable
     private MultiplayManager mMultiplayManager;
     private string mRoomId;
     
+    //승점 패널
+    public Enums.EPlayerType localPlayerType = Enums.EPlayerType.Player_Black;
+    
     /// <summary>
     /// 게임 시작 메서드
     /// </summary>
@@ -103,7 +106,7 @@ public class GameLogic : IDisposable
     /// <summary>
     /// 게임 종료 처리를 해주는 메서드
     /// </summary>
-    public void EndGame()
+    public void EndGame(Enums.EPlayerType winnerType)
     {
         SetState(null);
         mPlayer_Black = null;
@@ -112,6 +115,25 @@ public class GameLogic : IDisposable
         gamePanelController.StopClock();
         gamePanelController.InitClock();
         
+        if (winnerType == Enums.EPlayerType.None)
+        {
+            // 무승부
+            Debug.Log("무승부!");
+        }
+        else if (winnerType == localPlayerType)
+        {
+            // 내가 이긴 경우
+            Debug.Log("내가 승리했습니다!");
+            GameManager.Instance.OpenScorePanel(true, +1);
+        }
+        else
+        {
+            // 상대가 이긴 경우 => 나는 패배
+            Debug.Log("상대가 승리");
+            GameManager.Instance.LoseGame();      
+            GameManager.Instance.OpenScorePanel(false, -1);
+        }
+
         // 점수 확인 패널 호출: 멀티플레이이거나 AI플레이일 경우 -> 승자 점수 확인, 패자 점수 확인
         if (mMultiplayManager != null /* && AI */)
         {
@@ -121,6 +143,7 @@ public class GameLogic : IDisposable
         //씬 혹은 게임화면 위치 변경
         
         //TODO: 게임 진행 로직 완성되면 ScorePanel을 띄워 승점 관리
+        
         
     }
 
@@ -216,6 +239,20 @@ public class GameLogic : IDisposable
             GameManager.Instance.OpenConfirmPanel("그 곳에 둘 수 없습니다.", null, false);
             return false;
         }
+        
+        //승점 패널
+        bool isWin = GameResult(playerType, Y, X);
+        if (isWin)
+        {
+            // 승리 플레이어 엔드게임
+            EndGame(playerType);
+        }
+        else
+        {
+            // 5목 아니면 다음 턴
+            NextTurn(playerType);
+        }
+        
 
         return true;
     }
