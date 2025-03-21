@@ -1,7 +1,29 @@
-﻿using UnityEngine;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using TMPro;
+using UnityEngine;
 
 public class ShopPanelController : PopupPanelController
 {
+    public TMP_Text coinText;
+
+    private void OnEnable()
+    {
+        NetworkManager.Instance.GetUserInfo(() =>
+        {
+            Debug.Log("코인 로드 완료");
+        }, () =>
+        {
+            Debug.Log("코인 로드 실패");
+            
+        }).ContinueWith(userInfo =>
+        {
+            int coin = userInfo.coin;
+            coinText.text = coin.ToString();
+
+        });
+    }
+
     public void OnClickCloseButton()
     {
         Hide();

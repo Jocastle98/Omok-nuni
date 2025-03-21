@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -39,7 +40,31 @@ public class GameLogic : IDisposable
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new AIState(false);
 
-                SetState(mPlayer_Black);
+                NetworkManager.Instance.GetUserInfo(() =>
+                {
+                    Debug.Log("랭크 로드 완료");
+                }, () =>
+                {
+                    Debug.Log("랭크 로드 실패");
+                    //랭크 로드 실패시 기본난이도 중간으로 설정
+                    MinimaxAIController.SetLevel(Enums.EDifficultyLevel.Medium);
+                    SetState(mPlayer_Black);
+                }).ContinueWith(userInfo =>
+                {
+                    if (string.IsNullOrEmpty(userInfo.nickname) && userInfo.rank == 0) return;
+                    int rank = userInfo.rank;
+                    Enums.EDifficultyLevel level;
+                    if (rank >= 10 && rank <= 18)
+                        level = Enums.EDifficultyLevel.Easy;
+                    else if (rank >= 5 && rank <= 9)
+                        level = Enums.EDifficultyLevel.Medium;
+                    else
+                        level = Enums.EDifficultyLevel.Hard;
+
+                    MinimaxAIController.SetLevel(level);
+                    SetState(mPlayer_Black);
+                });
+                
                 break;
             case Enums.EGameType.MultiPlay:
                 mMultiplayManager = new MultiplayManager((state, roomId) =>
