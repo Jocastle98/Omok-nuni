@@ -255,7 +255,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2059256439128077442}
         m_TargetAssemblyTypeName: SelectProfilePanelController, Assembly-CSharp
-        m_MethodName: OnClickSelectProfileButton
+        m_MethodName: OnClickSelectProfileButtonFromProfilePanel
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -387,7 +387,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2059256439128077442}
         m_TargetAssemblyTypeName: SelectProfilePanelController, Assembly-CSharp
-        m_MethodName: OnClickSelectProfileButton
+        m_MethodName: OnClickSelectProfileButtonFromProfilePanel
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -609,7 +609,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2059256439128077442}
         m_TargetAssemblyTypeName: SelectProfilePanelController, Assembly-CSharp
-        m_MethodName: OnClickSelectProfileButton
+        m_MethodName: OnClickSelectProfileButtonFromProfilePanel
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -939,7 +939,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2059256439128077442}
         m_TargetAssemblyTypeName: SelectProfilePanelController, Assembly-CSharp
-        m_MethodName: OnClickSelectProfileButton
+        m_MethodName: OnClickSelectProfileButtonFromProfilePanel
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1053,7 +1053,7 @@ GameObject:
   - component: {fileID: 4923443518841225249}
   - component: {fileID: 2059256439128077442}
   m_Layer: 5
-  m_Name: Select Profile Panel
+  m_Name: Select Profile For Profile Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

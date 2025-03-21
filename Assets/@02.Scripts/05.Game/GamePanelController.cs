@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using UserDataStructs;
 
 public class GamePanelController : MonoBehaviour
 {
@@ -18,8 +19,21 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] private CanvasGroup blackTurnPanel;
     [SerializeField] private CanvasGroup whiteTurnPanel;
 
+    [SerializeField] private Image playerBlackProfileImage;
+    [SerializeField] private TMP_Text playerBlackProfileText;
+    [SerializeField] private Image playerWhiteProfileImage;
+    [SerializeField] private TMP_Text playerWhiteProfileText;
+    
     private const float mDisableAlpha = 0.3f;
     private const float mEnableAlpha = 1.0f;
+    
+    private MultiplayManager mMultiplayManager;
+    
+    private void Awake()
+    {
+        GameManager.Instance.OnMyGameProfileUpdate += SetMyProfile;
+        GameManager.Instance.OnOpponentGameProfileUpdate += SetOpponentProfile;
+    }
     
     /// <summary>
     /// Play하고 있을 때는 턴을 표시하는 turnUI를 보여주고
@@ -60,6 +74,45 @@ public class GamePanelController : MonoBehaviour
                 backButton.SetActive(true);
                 break;
         }
+    }
+
+    public async void SetMyProfile(Enums.EPlayerType playerType)
+    {
+        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
+
+        if (playerType == Enums.EPlayerType.Player_Black)
+        {
+            playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            playerBlackProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+        }
+        else if (playerType == Enums.EPlayerType.Player_White)
+        {
+            playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            playerWhiteProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+        }
+    }
+
+    public void SetOpponentProfile(Enums.EPlayerType playerType, MultiplayManager multiplayManager)
+    {
+        mMultiplayManager = multiplayManager;
+        
+        UnityThread.executeInUpdate(() =>
+        {
+            mMultiplayManager.OnOpponentInfoReceived = opponentInfo =>
+            {
+                Debug.Log($"{opponentInfo.opponentNickname}/{opponentInfo.opponentProfileImageIndex}/{opponentInfo.opponentRank}");
+                if (playerType == Enums.EPlayerType.Player_Black)
+                {
+                    playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);
+                    playerBlackProfileText.text = $"{opponentInfo.opponentRank}급 {opponentInfo.opponentNickname}";
+                }
+                else if (playerType == Enums.EPlayerType.Player_White)
+                {
+                    playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);
+                    playerWhiteProfileText.text = $"{opponentInfo.opponentRank}급 {opponentInfo.opponentNickname}";
+                }
+            };
+        });
     }
 
     public void InitClock()
