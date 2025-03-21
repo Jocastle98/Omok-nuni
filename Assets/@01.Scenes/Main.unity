@@ -2873,6 +2873,7 @@ MonoBehaviour:
   mSigninPanel: {fileID: 4950278473975370212, guid: 6d6115e9dafd6de4baa4552eb8dcbba4, type: 3}
   mProfilePanel: {fileID: 7605418477416194584, guid: fb46fcceb92da3942a55addeb6ff542b, type: 3}
   mSelectProfilePanel: {fileID: 7605418477416194584, guid: e19303ef510b376449988255278b975f, type: 3}
+  mRankingPanel: {fileID: 7605418477416194584, guid: a121c9f75992ecf47b30dee1ad79ab29, type: 3}
   mProfileSprites:
   - {fileID: 21300000, guid: 7bc4ff9572b702740a2148f9e88b72ac, type: 3}
   - {fileID: 21300000, guid: 5b35ab6160271d04a8ff9c2707cf5517, type: 3}

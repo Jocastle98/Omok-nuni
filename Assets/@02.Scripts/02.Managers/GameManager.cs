@@ -80,6 +80,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
+            var rankingPanelObj = Instantiate(mRankingPanel, mCanvas.transform);
+            rankingPanelObj.GetComponent<PanelController>().Show();
         }
     }
 
@@ -161,15 +163,6 @@ public class GameManager : Singleton<GameManager>
 
         Debug.Log("Canvas not open");
         return null;
-    }
-
-    public void OpenRankingPanel()
-    {
-        if (mCanvas != null)
-        {
-            var rankingPanelObj = Instantiate(mRankingPanel, mCanvas.transform);
-            rankingPanelObj.GetComponent<PanelController>().Show();
-        }
     }
 
     public Sprite GetProfileSprite(int profileIndex)
