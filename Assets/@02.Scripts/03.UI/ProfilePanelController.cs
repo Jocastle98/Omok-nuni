@@ -83,11 +83,11 @@ public class ProfilePanelController : PopupPanelController
         if (userInfo.wincount > 0)
         {
             float winRateValue = (float)userInfo.wincount / (userInfo.wincount + userInfo.losecount) * 100f;
-            mWinRateText.text = winRateValue.ToString("F2") + "%";
+            mWinRateText.text = "Win Rate: "+winRateValue.ToString("F2") + "%";
         }
         else
         {
-            mWinRateText.text = "0%";
+            mWinRateText.text = "Win Rate: "+"0%";
         }
         mRankText.text = userInfo.rank.ToString();
         mRankupPoinText.text = userInfo.rankuppoints.ToString() + " / "+Constants.RankChangeThreshold.ToString();
