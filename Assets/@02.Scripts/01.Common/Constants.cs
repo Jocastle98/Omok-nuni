@@ -8,7 +8,7 @@ using UnityEngine;
 public static class Constants
 {
     public const string ServerURL = "http://localhost:3000"; // for local test
-    //public const string ServerURL = "https://golden-hologram-453916-a2.du.r.appspot.com"; // google cloud server
+    //public const string ServerURL = "http://34.64.121.247:3000"; // google cloud server
     public const string GameSeverURL = "ws://localhost:3000";
     
     public const string BGMVolumeKey = "BGMVolume";

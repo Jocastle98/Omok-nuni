@@ -20,9 +20,10 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mSigninPanel;
     [SerializeField] private GameObject mProfilePanel;
     [SerializeField] private GameObject mSelectProfilePanel;
+    [SerializeField] private GameObject mRankingPanel;
     [SerializeField] private List<Sprite> mProfileSprites;
-
-
+    
+    
     private Canvas mCanvas;
 
     private Enums.EGameType mGameType;
@@ -79,6 +80,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
+            var rankingPanelObj = Instantiate(mRankingPanel, mCanvas.transform);
+            rankingPanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
@@ -125,7 +128,7 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var signinPanelObj = Instantiate(mSigninPanel, mCanvas.transform);
-            signinPanelObj.GetComponent<PanelController>().Show();
+            signinPanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
@@ -135,7 +138,7 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var signupPanelObj = Instantiate(mSignupPanel, mCanvas.transform);
-            signupPanelObj.GetComponent<PanelController>().Show();
+            signupPanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
@@ -144,18 +147,18 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var profilePanelObj = Instantiate(mProfilePanel, mCanvas.transform);
-            profilePanelObj.GetComponent<PanelController>().Show();
+            profilePanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
-    public PanelController OpenSelectProfilePanel()
+    public PopupPanelController OpenSelectProfilePanel()
     {
         if (mCanvas != null)
         {
             var selectProfilePanelObj = Instantiate(mSelectProfilePanel, mCanvas.transform);
-            selectProfilePanelObj.GetComponent<PanelController>().Show();
+            selectProfilePanelObj.GetComponent<PopupPanelController>().Show();
 
-            return selectProfilePanelObj.GetComponent<PanelController>();
+            return selectProfilePanelObj.GetComponent<PopupPanelController>();
         }
 
         Debug.Log("Canvas not open");
@@ -201,6 +204,7 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
+
         }
     }
 
