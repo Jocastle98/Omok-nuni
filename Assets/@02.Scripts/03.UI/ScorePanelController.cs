@@ -24,9 +24,9 @@ public class ScorePanelController : PopupPanelController
    
        // 메시지
        if (isWin)
-           messageText.text = $"오목에서 승리했습니다.\n{addDelete * 10}점을 획득!";
+           messageText.text = $"오목에서 승리했습니다. {addDelete * 10}점을 획득!";
        else
-           messageText.text = $"오목에서 패배했습니다.\n{Mathf.Abs(addDelete * 10)}점이 차감되었습니다.";
+           messageText.text = $"오목에서 패배했습니다. {Mathf.Abs(addDelete * 10)}점이 차감되었습니다.";
    
        // 아이콘 표시
        RefreshIcons(currentScore);
@@ -43,7 +43,7 @@ public class ScorePanelController : PopupPanelController
        else
        {
            int remainToMax = 30 - currentScore * 10;
-           upgradeText.text = $"현재 점수: {currentScore * 10}\n"
+           upgradeText.text = $"현재 점수: {currentScore * 10}\n\n "
                               + $"{remainToMax}점 더 얻으면 승급";
        }
    }

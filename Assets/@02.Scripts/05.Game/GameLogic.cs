@@ -19,7 +19,7 @@ public class GameLogic : IDisposable
     
     //승점 패널
     public Enums.EPlayerType localPlayerType = Enums.EPlayerType.Player_Black;
-    
+    public bool isGameOver = false;
     /// <summary>
     /// 게임 시작 메서드
     /// </summary>
@@ -61,6 +61,8 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                             mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
                             
+                            // 방들어온 플레이어는 백
+                            localPlayerType = mPlayer_White.playerType; 
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
@@ -70,6 +72,8 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
+                            // 첫 수 두는 플레이어 흑
+                            localPlayerType = mPlayer_Black.playerType;
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
@@ -111,6 +115,8 @@ public class GameLogic : IDisposable
     /// </summary>
     public void EndGame(Enums.EPlayerType winnerType)
     {
+        if (isGameOver) return; 
+        isGameOver = true;
         SetState(null);
         mPlayer_Black = null;
         mPlayer_White = null;
@@ -118,13 +124,6 @@ public class GameLogic : IDisposable
         gamePanelController.StopClock();
         gamePanelController.InitClock();
         
-        SetState(null);
-        mPlayer_Black = null;
-        mPlayer_White = null;
-
-        gamePanelController.StopClock();
-        gamePanelController.InitClock();
-
         if (winnerType == Enums.EPlayerType.None)
         {
             // 무승부
