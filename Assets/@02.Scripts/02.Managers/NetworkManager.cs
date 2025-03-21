@@ -247,4 +247,82 @@ public class NetworkManager : Singleton<NetworkManager>
             return userInfo;
         }
     }
+
+    // 승리 카운트 업데이트
+    public async UniTask AddWinCount(Action successCallback = null, Action failureCallback = null)
+    {
+        string sid = PlayerPrefs.GetString("sid"); 
+        if (string.IsNullOrEmpty(sid))
+        {
+            Debug.LogWarning("세션 쿠키가 없습니다. 승리 카운트 업데이트 불가.");
+            failureCallback?.Invoke();
+            return;
+        }
+    
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/addwincount", UnityWebRequest.kHttpVerbPOST))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+    
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                    Debug.Log("서버 승리 카운트 업데이트 성공");
+                    successCallback?.Invoke();
+                }
+                else
+                {
+                    Debug.LogWarning("승리 카운트 업데이트 실패: " + www.error);
+                    failureCallback?.Invoke();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("승리 카운트 업데이트 중 예외 발생: " + ex.Message);
+                failureCallback?.Invoke();
+            }
+        }
+    }
+    
+    // 패배 카운트 업데이트
+    public async UniTask AddLoseCount(Action successCallback = null, Action failureCallback = null)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (string.IsNullOrEmpty(sid))
+        {
+            Debug.LogWarning("세션 쿠키가 없습니다. 패배 카운트 업데이트 불가.");
+            failureCallback?.Invoke();
+            return;
+        }
+    
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/addlosecount", UnityWebRequest.kHttpVerbPOST))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+    
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                    Debug.Log("서버 패배 카운트 업데이트 성공");
+                    successCallback?.Invoke();
+                }
+                else
+                {
+                    Debug.LogWarning("패배 카운트 업데이트 실패: " + www.error);
+                    failureCallback?.Invoke();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("패배 카운트 업데이트 중 예외 발생: " + ex.Message);
+                failureCallback?.Invoke();
+            }
+        }
+    }
 }

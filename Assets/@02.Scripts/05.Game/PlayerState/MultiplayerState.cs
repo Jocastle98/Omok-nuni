@@ -40,6 +40,7 @@ public class MultiplayerState : BasePlayerState
 
     public override void HandleMove(GameLogic gameLogic, int y, int x)
     {
+        if (gameLogic.isGameOver) return;
         ProcessMove(gameLogic, playerType, y, x);
     }
 }
