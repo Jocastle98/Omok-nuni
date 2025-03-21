@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UserDataStructs;
 
-public class RankingPanelController : PanelController
+public class RankingPanelController : PopupPanelController
 {
     [SerializeField] private GameObject mContentsBoard;
     [SerializeField] private GameObject mUserProfileBlockPrefab;

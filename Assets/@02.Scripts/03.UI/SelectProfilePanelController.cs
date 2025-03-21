@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UserDataStructs;
 
-public class SelectProfilePanelController : PanelController
+public class SelectProfilePanelController : PopupPanelController
 {
     [SerializeField] private List<Image> mProfileImages;
     public Action OnProfileSelected;
