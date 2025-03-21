@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UserDataStructs;
 
 public class GameLogic : IDisposable
 {
@@ -17,15 +18,21 @@ public class GameLogic : IDisposable
     private MultiplayManager mMultiplayManager;
     private string mRoomId;
     
+    private Action<Enums.EPlayerType> OnMyGameProfileUpdate;
+    private Action<Enums.EPlayerType, MultiplayManager> OnOpponentGameProfileUpdate;
+    
     /// <summary>
     /// 게임 시작 메서드
     /// </summary>
     /// <param name="boardCellController"></param>
     /// <param name="playMode"></param>
-    public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController,Enums.EGameType playMode)
+    public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController, Enums.EGameType playMode, 
+        Action<Enums.EPlayerType> onMyGameProfileUpdate, Action<Enums.EPlayerType, MultiplayManager> onOpponentGameProfileUpdate)
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;
+        OnMyGameProfileUpdate = onMyGameProfileUpdate;
+        OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
         
         switch (playMode)
         {
@@ -33,18 +40,21 @@ public class GameLogic : IDisposable
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new PlayerState(false);
                 
+                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.SinglePlay:
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new AIState(false);
 
+                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.MultiPlay:
                 mMultiplayManager = new MultiplayManager((state, roomId) =>
                 {
                     mRoomId = roomId;
+                    SendUserInfo(roomId);
                     switch (state)
                     {
                         case Enums.EMultiplayManagerState.CreateRoom:
@@ -58,6 +68,8 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                             mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
                             
+                            OpponentGameProfileUpdate(Enums.EPlayerType.Player_Black, mMultiplayManager);
+                            MyGameProfileUpdate(Enums.EPlayerType.Player_White);
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
@@ -67,6 +79,8 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
+                            MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
+                            OpponentGameProfileUpdate(Enums.EPlayerType.Player_White, mMultiplayManager);
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
@@ -137,17 +151,6 @@ public class GameLogic : IDisposable
         TurnUIUpdate();
         gamePanelController.StartClock();
     }
-
-    /// <summary>
-    /// 매칭 대기 시간을 알려주는 팝업창을 호출하는 메서드
-    /// </summary>
-    private void WaitingMatch()
-    {
-        UnityThread.executeInUpdate(() =>
-        {
-            GameManager.Instance.OpenWaitingPanel();
-        });
-    }
     
     /// <summary>
     /// 게임 진행 중일 때 Turn UI 표시
@@ -181,6 +184,43 @@ public class GameLogic : IDisposable
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_White);
             }
         }
+    }
+    
+    /// <summary>
+    /// 매칭 대기 시간을 알려주는 팝업창을 호출하는 메서드
+    /// </summary>
+    private void WaitingMatch()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenWaitingPanel();
+        });
+    }
+
+    private async void SendUserInfo(string roomId)
+    {
+        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
+        Debug.Log(userInfo.nickname);
+        UnityThread.executeInUpdate(() =>
+        {
+            mMultiplayManager.SendOpponentInfo(roomId, userInfo.nickname, userInfo.profileimageindex, userInfo.rank);
+        });
+    }
+    
+    private void MyGameProfileUpdate(Enums.EPlayerType playerType)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            OnMyGameProfileUpdate?.Invoke(playerType);
+        });
+    }
+
+    private void OpponentGameProfileUpdate(Enums.EPlayerType playerType, MultiplayManager multiplayManager)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            OnOpponentGameProfileUpdate?.Invoke(playerType, multiplayManager);
+        });
     }
     
     /// <summary>

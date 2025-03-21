@@ -25,17 +25,18 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mRankingPanel;
     [SerializeField] private List<Sprite> mProfileSprites;
     
-    
-    private Canvas mCanvas;
-
     private Enums.EGameType mGameType;
 
-    // GamePanelController, GameLogic 구현
-    private GamePanelController mGamePanelController;
+    private Canvas mCanvas;
+    
     private GameLogic mGameLogic;
 
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
+    
+    public Action OnMainPanelUpdate;
+    public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
+    public Action<Enums.EPlayerType, MultiplayManager> OnOpponentGameProfileUpdate;
 
     private void Start()
     {
@@ -130,7 +131,7 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var signinPanelObj = Instantiate(mSigninPanel, mCanvas.transform);
-            signinPanelObj.GetComponent<PopupPanelController>().Show();
+            signinPanelObj.GetComponent<SigninPanelController>().Show(OnMainPanelUpdate);
         }
     }
 
@@ -226,15 +227,21 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
+    // 콜백 초기화 메서드
+    private void ClearAllCallbacks()
+    {
+        OnMainPanelUpdate = null;
+        OnMyGameProfileUpdate = null;
+        OnOpponentGameProfileUpdate = null;
+    }
+    
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 인트로 BGM 재생
         if (scene.name == "Main")
         {
             AudioManager.Instance.PlayIntroBgm();
         }
-
-        // 임시기능: 테스트용
+        
         if (scene.name == "Game")
         {
             AudioManager.Instance.PlayGameBgm();
@@ -256,7 +263,8 @@ public class GameManager : Singleton<GameManager>
             }
 
             mGameLogic = new GameLogic();
-            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType);
+            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType, 
+                OnMyGameProfileUpdate, OnOpponentGameProfileUpdate);
         }
 
         mCanvas = GameObject.FindObjectOfType<Canvas>();
@@ -264,6 +272,8 @@ public class GameManager : Singleton<GameManager>
 
     private void OnApplicationQuit()
     {
+        ClearAllCallbacks();
+        
         mGameLogic?.Dispose();
         mGameLogic = null;
     }

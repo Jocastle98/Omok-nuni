@@ -1932,6 +1932,10 @@ MonoBehaviour:
   backButton: {fileID: 124728524}
   blackTurnPanel: {fileID: 1723151621}
   whiteTurnPanel: {fileID: 319161075}
+  playerBlackProfileImage: {fileID: 1179087789}
+  playerBlackProfileText: {fileID: 1570006903}
+  playerWhiteProfileImage: {fileID: 1262691486}
+  playerWhiteProfileText: {fileID: 926261165}
 --- !u!114 &1078191890
 MonoBehaviour:
   m_ObjectHideFlags: 0
