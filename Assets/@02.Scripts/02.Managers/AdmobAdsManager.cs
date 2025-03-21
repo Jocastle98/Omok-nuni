@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GoogleMobileAds.Api;
+using UnityEngine.SceneManagement;
 
 
 /// <summary>
@@ -10,7 +11,7 @@ using GoogleMobileAds.Api;
 /// TODO: 테스트 광고 ID 변경
 /// 사용방법 : ShowRewardedAd 호출
 /// </summary>
-public class AdmobAdsManager : MonoBehaviour
+public class AdmobAdsManager : Singleton<AdmobAdsManager>
 {
 #if UNITY_ANDROID
     private string mRewardedAdUnitID = "ca-app-pub-3940256099942544/5224354917";// 보상형 광고 Test ID
@@ -38,9 +39,6 @@ public class AdmobAdsManager : MonoBehaviour
             mRewardedAd.Destroy();
             mRewardedAd = null;
         }
-
-        Debug.Log("보상형광고 로딩중");
-
         var adRequest = new AdRequest();
         RewardedAd.Load(mRewardedAdUnitID, adRequest, (ad, error) =>
         {
@@ -50,7 +48,6 @@ public class AdmobAdsManager : MonoBehaviour
                 return;
             }
 
-            Debug.Log("보상형 광고 로드:" + ad.GetResponseInfo());
             mRewardedAd = ad;
 
             RegisterRewardedAdEventHandlers(mRewardedAd);
@@ -76,6 +73,7 @@ public class AdmobAdsManager : MonoBehaviour
             {
                 Debug.Log(string.Format(REWARD_MESSAGE, reward.Type, reward.Amount));
                 //TODO: 코인 지급
+                
             });
         }
     }
@@ -107,8 +105,6 @@ public class AdmobAdsManager : MonoBehaviour
         // Raised when the ad closed full screen content.
         ad.OnAdFullScreenContentClosed += () =>
         {
-            Debug.Log("Rewarded ad full screen content closed.");
-            
             // Reload the ad so that we can show another as soon as possible.
             LoadRewardedAd();
         };
@@ -124,4 +120,6 @@ public class AdmobAdsManager : MonoBehaviour
     }
 
     #endregion
+
+    protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode) { }
 }

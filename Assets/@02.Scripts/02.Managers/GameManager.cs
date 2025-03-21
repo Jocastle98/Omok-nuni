@@ -87,8 +87,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            GameObject shopPanelObject = Instantiate(shopPanel, mCanvas.transform);
-            // shopPanelController 컴포넌트 연결 및 창 띄우는 메서드
+            var shopPanelObject = Instantiate(shopPanel, mCanvas.transform);
+            shopPanelObject.GetComponent<PopupPanelController>().Show();
         }
     }
 
