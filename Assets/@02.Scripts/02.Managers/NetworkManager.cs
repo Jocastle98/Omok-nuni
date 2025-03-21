@@ -91,7 +91,7 @@ public class NetworkManager : Singleton<NetworkManager>
             catch (Exception ex)
             {
                 Debug.Log("Exception caught: " + ex.Message);
-                
+
                 return;
             }
 
@@ -127,6 +127,83 @@ public class NetworkManager : Singleton<NetworkManager>
                 // 로그인 성공
                 GameManager.Instance.OpenConfirmPanel("로그인에 성공하였습니다.",
                     () => { successCallback?.Invoke(result.nickname); }, false);
+            }
+        }
+    }
+
+    public async UniTask<UserInfoResult> GetUserInfo(Action successCallback, Action failureCallback)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (sid == null)
+        {
+            Debug.Log("유저 데이터 불러오기에 실패했습니다. \n" +
+                      "세션 데이터가 없습니다.");
+            failureCallback?.Invoke();
+            return new UserInfoResult();
+        }
+
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/userinfo", UnityWebRequest.kHttpVerbGET))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("Exception caught: " + ex.Message);
+                if (www.responseCode == 400)
+                {
+                    GameManager.Instance.OpenConfirmPanel("사용자 검증 실패", () => { failureCallback?.Invoke(); },
+                        false);
+                }
+                failureCallback?.Invoke();
+            }
+
+            var resultStr = www.downloadHandler.text;
+            UserInfoResult userInfo = JsonUtility.FromJson<UserInfoResult>(resultStr);
+            
+            successCallback?.Invoke();
+            
+            return userInfo;
+        }
+    }
+    
+    public async UniTask ChangeProfileImage(ProfileImageData profileImageData, Action successCallback, Action failureCallback)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (sid == null)
+        {
+            Debug.Log("유저 데이터 불러오기에 실패했습니다. \n" +
+                      "세션 데이터가 없습니다.");
+            return;
+        }
+
+        string jsonString = JsonUtility.ToJson(profileImageData);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonString);
+        
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/changeprofileimage", UnityWebRequest.kHttpVerbPOST))
+        {
+            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+            www.SetRequestHeader("Content-Type", "application/json");
+            
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("Exception caught: " + ex.Message);
+                if (www.responseCode == 400)
+                {
+                    GameManager.Instance.OpenConfirmPanel("사용자 검증 실패", () => { failureCallback?.Invoke(); },
+                        false);
+                }
             }
         }
     }

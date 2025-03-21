@@ -58,7 +58,6 @@ public class Enums
 
     public enum EGameUIState
     {
-        Init,
         Turn_Black,
         Turn_White,
         Record

@@ -26,14 +26,13 @@ public class GameLogic : IDisposable
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;
-        this.gamePanelController.StartClock();
-
+        
         switch (playMode)
         {
             case Enums.EGameType.PassAndPlay:
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new PlayerState(false);
-
+                
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.SinglePlay:
@@ -49,15 +48,22 @@ public class GameLogic : IDisposable
                     switch (state)
                     {
                         case Enums.EMultiplayManagerState.CreateRoom:
+                            Debug.Log("## Create Room");
+                            
                             // todo: 대기화면 표시(제한시간 동안 급수에 맞는 상대 매칭 실패 시 싱글 플레이로 모드 전환)
+                            WaitingMatch();
                             break;
                         case Enums.EMultiplayManagerState.JoinRoom:
+                            Debug.Log("## Join Room");
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                             mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
                             
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
+                            Debug.Log("## Start Game");
+                            GameManager.Instance.SetIsStartGame(true);
+                            
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
@@ -107,25 +113,47 @@ public class GameLogic : IDisposable
         mPlayer_White = null;
         
         gamePanelController.StopClock();
+        gamePanelController.InitClock();
         
-        // GamePanel의 GameOver 표시 UI 업데이트
-        GameManager.Instance.OpenGameOverPanel();
+        // 점수 확인 패널 호출: 멀티플레이이거나 AI플레이일 경우 -> 승자 점수 확인, 패자 점수 확인
+        if (mMultiplayManager != null /* && AI */)
+        {
+            GameManager.Instance.OpenScoreConfirmationPanel();
+        }
         //점수 랭킹 업데이트
         //씬 혹은 게임화면 위치 변경
     }
 
     /// <summary>
-    /// 현재 플레이어의 상태(자신, AI, 멀티플레이어)를 변경하는 메서드
+    /// 현재 턴의 플레이어 상태(자신, AI, 멀티플레이어)를 변경하는 메서드
     /// </summary>
     /// <param name="newState"></param>
     public void SetState(BasePlayerState newState)
     {
-        gamePanelController.InitClock();
-        
         mCurrentPlayer?.OnExit(this);
         mCurrentPlayer = newState;
         mCurrentPlayer?.OnEnter(this);
         
+        TurnUIUpdate();
+        gamePanelController.StartClock();
+    }
+
+    /// <summary>
+    /// 매칭 대기 시간을 알려주는 팝업창을 호출하는 메서드
+    /// </summary>
+    private void WaitingMatch()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenWaitingPanel();
+        });
+    }
+    
+    /// <summary>
+    /// 게임 진행 중일 때 Turn UI 표시
+    /// </summary>
+    private void TurnUIUpdate()
+    {
         // 상태 변경 후 GamePanel의 Turn 표시 UI 업데이트
         if (mCurrentPlayer is PlayerState playerState)
         {
@@ -153,11 +181,8 @@ public class GameLogic : IDisposable
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_White);
             }
         }
-        
-        
-        gamePanelController.StartClock();
     }
-
+    
     /// <summary>
     /// (Y, X) 좌표에 해당 플레이어의 돌을 놓는 메서드
     /// </summary>
@@ -726,6 +751,7 @@ public class GameLogic : IDisposable
         return board;
     }
 
+    // 멀티 모드에서 룸 초기화하는 메서드
     public void Dispose()
     {
         mMultiplayManager?.LeaveRoom(mRoomId);
