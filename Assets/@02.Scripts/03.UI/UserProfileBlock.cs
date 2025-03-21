@@ -17,4 +17,9 @@ public class UserProfileBlock : MonoBehaviour
         mWinLoseText.text = userInfo.wincount.ToString() + "승 " + userInfo.losecount.ToString() + "패";
         mProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
     }
+
+    public void SetColor(Color color)
+    {
+        GetComponent<Image>().color = color;
+    }
 }

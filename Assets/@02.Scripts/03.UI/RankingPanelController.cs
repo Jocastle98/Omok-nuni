@@ -26,6 +26,7 @@ public class RankingPanelController : PanelController
         }
         
         mPlayerProfileBlock.SetProfileBlock(usersRankInfo.playerrankprofile, playerRank);
+        mPlayerProfileBlock.SetColor(Color.yellow);
         
         base.Show();
     }

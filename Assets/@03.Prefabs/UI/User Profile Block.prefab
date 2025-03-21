@@ -294,7 +294,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -316,6 +316,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 929bd53d994340c1ac745fbb023e804f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mUserRankText: {fileID: 7939079019016192295}
   mNicknameRankText: {fileID: 8940152410705891896}
   mWinLoseText: {fileID: 5942088729434172640}
   mProfileImage: {fileID: 8994550095545672928}
