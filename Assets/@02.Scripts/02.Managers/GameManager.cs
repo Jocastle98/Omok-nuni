@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 게임의 전체적인 흐름을 관리하는 싱글톤 게임 매니저 클래스.
@@ -21,21 +22,26 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mProfilePanel;
     [SerializeField] private GameObject mSelectProfilePanel;
     [SerializeField] private GameObject mScorePanel;
+    [SerializeField] private GameObject mSelectProfileForProfilePanel;
+    [SerializeField] private GameObject mSelectProfileForSignupPanel;
+    [SerializeField] private GameObject mRankingPanel;
     [SerializeField] private List<Sprite> mProfileSprites;
-    
-    
+
+
     private Canvas mCanvas;
 
     private Enums.EGameType mGameType;
-    
-
 
     // GamePanelController, GameLogic 구현
     private GamePanelController mGamePanelController;
     private GameLogic mGameLogic;
-    
+
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
+    
+    public Action OnMainPanelUpdate;
+    public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
+    public Action<Enums.EPlayerType, MultiplayManager> OnOpponentGameProfileUpdate;
 
     private void Start()
     {
@@ -116,8 +122,6 @@ public class GameManager : Singleton<GameManager>
     {
         mGameType = gameType;
         SceneManager.LoadScene("Game");
-
-        
     }
 
     // 메인 화면으로 씬 전환하는 메서드
@@ -128,8 +132,6 @@ public class GameManager : Singleton<GameManager>
         mGameLogic = null;
 
         SceneManager.LoadScene("Main");
-
-        
     }
 
     // 대국 시작 시 모드선택 패널 호출 메서드
@@ -142,8 +144,6 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-   
-    
     // 내 기보(확인하기) 패널 호출 메서드
     public void OpenRecordPanel()
     {
@@ -151,12 +151,14 @@ public class GameManager : Singleton<GameManager>
         {
         }
     }
-    
+
     // 랭킹(리더보드) 패널 호출 메서드
     public void OpenLeaderboardPanel()
     {
         if (mCanvas != null)
         {
+            var rankingPanelObj = Instantiate(mRankingPanel, mCanvas.transform);
+            rankingPanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
@@ -169,7 +171,7 @@ public class GameManager : Singleton<GameManager>
             shopPanelObject.GetComponent<PopupPanelController>().Show();
         }
     }
-    
+
     // 세팅 패널 호출 메서드
     public void OpenSettingsPanel()
     {
@@ -179,7 +181,7 @@ public class GameManager : Singleton<GameManager>
             settingPanelObject.GetComponent<PopupPanelController>().Show();
         }
     }
-    
+
     // 확인(and 취소) 패널 호출 메서드
     public void OpenConfirmPanel(string message, Action OnConfirmButtonClick, bool activeCancelButton = true)
     {
@@ -190,7 +192,7 @@ public class GameManager : Singleton<GameManager>
                 .Show(message, OnConfirmButtonClick, activeCancelButton);
         }
     }
-    
+
     // 로그인 패널 호출 메서드
     public void OpenSigninPanel()
     {
@@ -199,21 +201,21 @@ public class GameManager : Singleton<GameManager>
         {
             return;
         }
-        
+
         if (mCanvas != null)
         {
             var signinPanelObj = Instantiate(mSigninPanel, mCanvas.transform);
-            signinPanelObj.GetComponent<PanelController>().Show();
+            signinPanelObj.GetComponent<SigninPanelController>().Show(OnMainPanelUpdate);
         }
     }
-    
+
     // 회원가입 패널 호출 메서드
     public void OpenSignupPanel()
     {
         if (mCanvas != null)
         {
             var signupPanelObj = Instantiate(mSignupPanel, mCanvas.transform);
-            signupPanelObj.GetComponent<PanelController>().Show();
+            signupPanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
@@ -222,35 +224,51 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var profilePanelObj = Instantiate(mProfilePanel, mCanvas.transform);
-            profilePanelObj.GetComponent<PanelController>().Show();
+            profilePanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
-    public PanelController OpenSelectProfilePanel()
+    // 프로필 패널에서 프로필 수정 시 호출
+    public PopupPanelController OpenSelectProfilePanelFromProfilePanel()
     {
         if (mCanvas != null)
         {
-            var selectProfilePanelObj = Instantiate(mSelectProfilePanel, mCanvas.transform);
-            selectProfilePanelObj.GetComponent<PanelController>().Show();
-            
-            return selectProfilePanelObj.GetComponent<PanelController>();
+            var selectProfilePanelObj = Instantiate(mSelectProfileForProfilePanel, mCanvas.transform);
+            selectProfilePanelObj.GetComponent<PopupPanelController>().Show();
+
+            return selectProfilePanelObj.GetComponent<PopupPanelController>();
         }
-        
+
         Debug.Log("Canvas not open");
         return null;
     }
 
+    // 회원가입 패널에서 프로필 수정 시 호출
+    public PopupPanelController OpenSelectProfilePanelFromSignupPanel()
+    {
+        if (mCanvas != null)
+        {
+            var selectProfilePanelObj = Instantiate(mSelectProfileForSignupPanel, mCanvas.transform);
+            selectProfilePanelObj.GetComponent<PopupPanelController>().Show();
+
+            return selectProfilePanelObj.GetComponent<PopupPanelController>();
+        }
+
+        Debug.Log("Canvas not open");
+        return null;
+    }
+    
     public Sprite GetProfileSprite(int profileIndex)
     {
         if (profileIndex >= 0 && profileIndex < mProfileSprites.Count)
         {
             return mProfileSprites[profileIndex];
         }
-        
+
         Debug.Log("out of index in ProfileSprites");
         return null;
     }
-    
+
     // 매칭 대기 패널 호출 메서드
     public void OpenWaitingPanel()
     {
@@ -264,7 +282,7 @@ public class GameManager : Singleton<GameManager>
 
     // waitingPanel의 종료 여부(게임 시작)를 waitingPanel로 전달(반환)해주는 메서드
     public bool GetIsStartGame()
-    {   
+    {
         return mbIsStartGame;
     }
 
@@ -273,16 +291,23 @@ public class GameManager : Singleton<GameManager>
     {
         mbIsStartGame = isStartGame;
     }
-    
+
     // 승점 확인 패널 호출 메서드
     public void OpenScoreConfirmationPanel()
     {
         if (mCanvas != null)
         {
-
         }
     }
 
+    // 콜백 초기화 메서드
+    private void ClearAllCallbacks()
+    {
+        OnMainPanelUpdate = null;
+        OnMyGameProfileUpdate = null;
+        OnOpponentGameProfileUpdate = null;
+    }
+    
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 인트로 BGM 재생
@@ -290,8 +315,7 @@ public class GameManager : Singleton<GameManager>
         {
             AudioManager.Instance.PlayIntroBgm();
         }
-
-        // 임시기능: 테스트용
+        
         if (scene.name == "Game")
         {
             AudioManager.Instance.PlayGameBgm();
@@ -313,7 +337,8 @@ public class GameManager : Singleton<GameManager>
             }
 
             mGameLogic = new GameLogic();
-            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType);
+            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType, 
+                OnMyGameProfileUpdate, OnOpponentGameProfileUpdate);
         }
 
         mCanvas = GameObject.FindObjectOfType<Canvas>();
@@ -321,6 +346,8 @@ public class GameManager : Singleton<GameManager>
 
     private void OnApplicationQuit()
     {
+        ClearAllCallbacks();
+        
         mGameLogic?.Dispose();
         mGameLogic = null;
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -5,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UserDataStructs;
 
-public class ProfilePanelController : PanelController
+public class ProfilePanelController : PopupPanelController
 {
     [SerializeField] private TextMeshProUGUI mNicknameText;
     [SerializeField] private TextMeshProUGUI mEmailText;
@@ -23,17 +24,18 @@ public class ProfilePanelController : PanelController
     [SerializeField] private Sprite mLoseStreakImage;
     [SerializeField] private Image mProfileImage;
     
-    private List<PanelController> mChildPanels = new List<PanelController>();
+    private List<PopupPanelController> mChildPanels = new List<PopupPanelController>();
 
     public override async void Show()
     {
         mChildPanels.Clear();
+        
         UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
         setProfileInfo(userInfo);
         base.Show();
     }
 
-    public override void Hide(PanelControllerHideDelegate hideDelegate = null)
+    public override void Hide(Action hideDelegate = null)
     {
         foreach (var panel in mChildPanels)
         {
@@ -49,7 +51,7 @@ public class ProfilePanelController : PanelController
 
     public void OnClickProfileButton()
     {
-        var childPanel = GameManager.Instance.OpenSelectProfilePanel();
+        var childPanel = GameManager.Instance.OpenSelectProfilePanelFromProfilePanel();
         SelectProfilePanelController selectPanel = childPanel as SelectProfilePanelController;
         if (selectPanel != null)
         {

@@ -207,6 +207,46 @@ public class NetworkManager : Singleton<NetworkManager>
             }
         }
     }
+    
+    public async UniTask<UsersRankInfo> GetUsersRank(Action successCallback, Action failureCallback)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (sid == null)
+        {
+            Debug.Log("유저 데이터 불러오기에 실패했습니다. \n" +
+                      "세션 데이터가 없습니다.");
+            failureCallback?.Invoke();
+            return new UsersRankInfo();
+        }
+
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/leaderboard", UnityWebRequest.kHttpVerbGET))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("Exception caught: " + ex.Message);
+                if (www.responseCode == 400)
+                {
+                    GameManager.Instance.OpenConfirmPanel("사용자 검증 실패", () => { failureCallback?.Invoke(); },
+                        false);
+                }
+                failureCallback?.Invoke();
+            }
+
+            var resultStr = www.downloadHandler.text;
+            UsersRankInfo userInfo = JsonUtility.FromJson<UsersRankInfo>(resultStr);
+            
+            successCallback?.Invoke();
+            
+            return userInfo;
+        }
+    }
 
     // 승리 카운트 업데이트
     public async UniTask AddWinCount(Action successCallback = null, Action failureCallback = null)
