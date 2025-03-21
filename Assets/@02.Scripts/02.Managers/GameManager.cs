@@ -46,14 +46,11 @@ public class GameManager : Singleton<GameManager>
 
     // TODO: 스코어 급수에 맞게 조정 현재는(-30~30)
     
-    private int currentScore = 0;
     public async void WinGame()
     {
-        // <주석> 기존 local currentScore 사용
-        currentScore += 1;
-        if (currentScore > 30) currentScore = 30;
+       
     
-        // <수정/추가> 서버에 wincount 증가 요청
+        // 서버에 wincount 증가 요청
         await NetworkManager.Instance.AddWinCount(
             successCallback: async () =>
             {
@@ -64,32 +61,25 @@ public class GameManager : Singleton<GameManager>
                 );
     
                 // userInfo.wincount, userInfo.losecount 등을 이용해 현재 점수 계산
-                // 예: (승수 - 패수) 혹은 원하는 로직
                 int totalScore = userInfo.wincount - userInfo.losecount;
     
-                // 이제 ScorePanel을 열 때 서버 값 반영
                 OpenScorePanel(true, 1, totalScore);
             },
             failureCallback: () =>
             {
-                // 실패 처리 (원하는 UI 표시 가능)
                 Debug.LogWarning("승리 카운트 업데이트 실패");
-                // 그래도 로컬 currentScore를 쓰거나, 재시도 로직을 넣을 수도 있음
             }
         );
     }
     
     public async void LoseGame()
     {
-        // <주석> 기존 local currentScore 사용
-        currentScore -= 1;
-        if (currentScore < -30) currentScore = -30;
+        
     
         //  서버에 losecount 증가 요청
         await NetworkManager.Instance.AddLoseCount(
             successCallback: async () =>
             {
-                // 성공 시 최신 사용자 정보 가져오기
                 var userInfo = await NetworkManager.Instance.GetUserInfo(
                     successCallback: () => { Debug.Log("유저 정보 갱신 성공"); },
                     failureCallback: () => { Debug.LogWarning("유저 정보 갱신 실패"); }
@@ -98,7 +88,6 @@ public class GameManager : Singleton<GameManager>
                 // userInfo.wincount, userInfo.losecount로 현재 점수 계산
                 int totalScore = userInfo.wincount - userInfo.losecount;
     
-                // ScorePanel에 서버 값 반영
                 OpenScorePanel(false, -1, totalScore);
             },
             failureCallback: () =>
@@ -133,10 +122,9 @@ public class GameManager : Singleton<GameManager>
     public void ChangeToGameScene(Enums.EGameType gameType)
     {
         mGameType = gameType;
-        //SceneManager.LoadScene("Game");
+        SceneManager.LoadScene("Game");
 
-        // 임시기능: 테스트용
-        SceneManager.LoadScene("ysw_Game");
+        
     }
 
     // 메인 화면으로 씬 전환하는 메서드
@@ -146,10 +134,9 @@ public class GameManager : Singleton<GameManager>
         mGameLogic?.Dispose();
         mGameLogic = null;
 
-        //SceneManager.LoadScene("Main");
+        SceneManager.LoadScene("Main");
 
-        // 임시기능: 테스트용
-        SceneManager.LoadScene("ysw_Main");
+        
     }
 
     // 대국 시작 시 모드선택 패널 호출 메서드

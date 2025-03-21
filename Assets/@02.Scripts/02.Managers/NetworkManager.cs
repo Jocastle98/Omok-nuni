@@ -211,7 +211,7 @@ public class NetworkManager : Singleton<NetworkManager>
     // 승리 카운트 업데이트
     public async UniTask AddWinCount(Action successCallback = null, Action failureCallback = null)
     {
-        string sid = PlayerPrefs.GetString("sid"); // 로그인 후 저장된 세션 쿠키
+        string sid = PlayerPrefs.GetString("sid"); 
         if (string.IsNullOrEmpty(sid))
         {
             Debug.LogWarning("세션 쿠키가 없습니다. 승리 카운트 업데이트 불가.");
@@ -223,7 +223,6 @@ public class NetworkManager : Singleton<NetworkManager>
                new UnityWebRequest(Constants.ServerURL + "/users/addwincount", UnityWebRequest.kHttpVerbPOST))
         {
             www.downloadHandler = new DownloadHandlerBuffer();
-            // 세션 쿠키 설정
             www.SetRequestHeader("Cookie", sid);
     
             try
