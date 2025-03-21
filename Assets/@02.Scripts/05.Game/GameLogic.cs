@@ -44,7 +44,7 @@ public class GameLogic : IDisposable
                 break;
             case Enums.EGameType.SinglePlay:
                 mPlayer_Black = new PlayerState(true);
-                // mPlayer_White = new AIState(false)
+                mPlayer_White = new AIState(false);
 
                 OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
@@ -84,11 +84,9 @@ public class GameLogic : IDisposable
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
-                            Debug.Log("## Exit Room");
                             // todo: 퇴장 처리
                             break;
                         case Enums.EMultiplayManagerState.EndGame:
-                            Debug.Log("## End Game");
                             // todo: 게임 종료 처리
                             break;
                     }
@@ -96,9 +94,9 @@ public class GameLogic : IDisposable
                 break;
         }
     }
-    
+
     /// <summary>
-    /// 턴을 변경하는 메서드
+    /// 턴을 변경하면 메서드
     /// </summary>
     /// <param name="player"></param>
     public void NextTurn(Enums.EPlayerType player)
@@ -111,6 +109,11 @@ public class GameLogic : IDisposable
             case Enums.EPlayerType.Player_White:
                 SetState(mPlayer_Black);
                 break;
+        }
+
+        if (mCurrentPlayer is AIState aiPlayer)
+        {
+            aiPlayer.OnEnter(this);
         }
     }
 
@@ -760,6 +763,22 @@ public class GameLogic : IDisposable
         }
 
         return lists;
+    }
+
+    public Enums.EPlayerType[,] GetBoard()
+    {
+        int size = boardCellController.size;
+        Enums.EPlayerType[,] board = new Enums.EPlayerType[size, size];
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                board[y, x] = boardCellController.cells[y, x].playerType;
+            }
+        }
+
+        return board;
     }
 
     // 멀티 모드에서 룸 초기화하는 메서드
