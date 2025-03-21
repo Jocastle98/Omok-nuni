@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 게임의 전체적인 흐름을 관리하는 싱글톤 게임 매니저 클래스.
@@ -20,7 +21,9 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mSigninPanel;
     [SerializeField] private GameObject mProfilePanel;
     [SerializeField] private GameObject mSelectProfilePanel;
+    [SerializeField] private GameObject mRankingPanel;
     [SerializeField] private List<Sprite> mProfileSprites;
+    
     
     
     private Canvas mCanvas;
@@ -166,6 +169,15 @@ public class GameManager : Singleton<GameManager>
         
         Debug.Log("Canvas not open");
         return null;
+    }
+
+    public void OpenRankingPanel()
+    {
+        if (mCanvas != null)
+        {
+            var rankingPanelObj = Instantiate(mRankingPanel, mCanvas.transform);
+            rankingPanelObj.GetComponent<PanelController>().Show();
+        }
     }
 
     public Sprite GetProfileSprite(int profileIndex)
