@@ -205,12 +205,19 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
+    // 콜백 초기화 메서드
+    private void ClearAllCallbacks()
+    {
+        OnMainPanelUpdate = null;
+        OnMyGameProfileUpdate = null;
+        OnOpponentGameProfileUpdate = null;
+    }
+    
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 인트로 BGM 재생
         if (scene.name == "Main")
         {
-            OnMainPanelUpdate = null;
             AudioManager.Instance.PlayIntroBgm();
         }
 
@@ -245,6 +252,8 @@ public class GameManager : Singleton<GameManager>
 
     private void OnApplicationQuit()
     {
+        ClearAllCallbacks();
+        
         mGameLogic?.Dispose();
         mGameLogic = null;
     }

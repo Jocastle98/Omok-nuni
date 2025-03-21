@@ -19,6 +19,9 @@ public class MoveData
 
 public class OpponentInfoResult
 {
+    [JsonProperty("roomId")]
+    public string roomId { get; set; }
+    
     [JsonProperty("opponentId")]
     public string opponentId;
     
@@ -99,6 +102,7 @@ public class MultiplayManager : IDisposable
     private void ReceiveOpponentInfo(SocketIOResponse response)
     {
         var data = response.GetValue<OpponentInfoResult>();
+        Debug.Log($"opponentId: {data.opponentId}, opponentNickname: {data.opponentNickname}");
         OnOpponentInfoReceived?.Invoke(data);
     }
     

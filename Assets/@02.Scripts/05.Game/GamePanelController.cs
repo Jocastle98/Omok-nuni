@@ -94,20 +94,23 @@ public class GamePanelController : MonoBehaviour
 
     public void SetOpponentProfile(Enums.EPlayerType playerType, MultiplayManager multiplayManager)
     {
-        mMultiplayManager = multiplayManager;
-        mMultiplayManager.OnOpponentInfoReceived = opponentInfo =>
+        UnityThread.executeInUpdate(() =>
         {
-            if (playerType == Enums.EPlayerType.Player_Black)
+            mMultiplayManager = multiplayManager;
+            mMultiplayManager.OnOpponentInfoReceived = opponentInfo =>
             {
-                playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);
-                playerBlackProfileText.text = $"{opponentInfo.opponentRank}급 {opponentInfo.opponentNickname}";
-            }
-            else if (playerType == Enums.EPlayerType.Player_White)
-            {
-                playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);
-                playerWhiteProfileText.text = $"{opponentInfo.opponentRank}급 {opponentInfo.opponentNickname}";
-            }
-        };
+                if (playerType == Enums.EPlayerType.Player_Black)
+                {
+                    playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);
+                    playerBlackProfileText.text = $"{opponentInfo.opponentRank}급 {opponentInfo.opponentNickname}";
+                }
+                else if (playerType == Enums.EPlayerType.Player_White)
+                {
+                    playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);
+                    playerWhiteProfileText.text = $"{opponentInfo.opponentRank}급 {opponentInfo.opponentNickname}";
+                }
+            };
+        });
     }
 
     public void InitClock()

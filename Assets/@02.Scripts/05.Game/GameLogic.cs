@@ -66,7 +66,8 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                             mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
                             
-                            OpponentGameProfileUpdate(roomId, Enums.EPlayerType.Player_Black, mMultiplayManager);
+                            mMultiplayManager.RequestOpponentInfo(roomId);
+                            OpponentGameProfileUpdate(Enums.EPlayerType.Player_Black, mMultiplayManager);
                             MyGameProfileUpdate(Enums.EPlayerType.Player_White);
                             SetState(mPlayer_Black);
                             break;
@@ -77,8 +78,9 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
+                            mMultiplayManager.RequestOpponentInfo(roomId);
                             MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
-                            OpponentGameProfileUpdate(roomId, Enums.EPlayerType.Player_White, mMultiplayManager);
+                            OpponentGameProfileUpdate(Enums.EPlayerType.Player_White, mMultiplayManager);
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
@@ -200,11 +202,10 @@ public class GameLogic : IDisposable
         });
     }
 
-    private void OpponentGameProfileUpdate(string roomId, Enums.EPlayerType playerType, MultiplayManager multiplayManager)
+    private void OpponentGameProfileUpdate(Enums.EPlayerType playerType, MultiplayManager multiplayManager)
     {
         UnityThread.executeInUpdate(() =>
         {
-            mMultiplayManager.RequestOpponentInfo(roomId);
             OnOpponentGameProfileUpdate?.Invoke(playerType, multiplayManager);
         });
     }

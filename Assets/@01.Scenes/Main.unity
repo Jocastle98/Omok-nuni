@@ -1474,6 +1474,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99986556600525e4f9d4243e4a671c90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  profileImage: {fileID: 1003777833}
+  userInfoText: {fileID: 38072146}
+  coinText: {fileID: 1831509113}
 --- !u!114 &954880502
 MonoBehaviour:
   m_ObjectHideFlags: 0

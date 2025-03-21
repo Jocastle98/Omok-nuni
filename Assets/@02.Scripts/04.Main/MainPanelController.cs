@@ -19,6 +19,7 @@ public class MainPanelController : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.OnMainPanelUpdate += SetProfileInfo;
+        GameManager.Instance.OnMainPanelUpdate?.Invoke();
     }
     
     public async void SetProfileInfo()
