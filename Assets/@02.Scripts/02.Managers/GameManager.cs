@@ -48,8 +48,6 @@ public class GameManager : Singleton<GameManager>
     
     public async void WinGame()
     {
-       
-    
         // 서버에 wincount 증가 요청
         await NetworkManager.Instance.AddWinCount(
             successCallback: async () =>
@@ -59,11 +57,11 @@ public class GameManager : Singleton<GameManager>
                     successCallback: () => { Debug.Log("유저 정보 갱신 성공"); },
                     failureCallback: () => { Debug.LogWarning("유저 정보 갱신 실패"); }
                 );
-    
-                // userInfo.wincount, userInfo.losecount 등을 이용해 현재 점수 계산
+
+                // 승패 점수는 wincount - losecount, 추가로 등급과 승급 포인트도 가져옴
                 int totalScore = userInfo.wincount - userInfo.losecount;
-    
-                OpenScorePanel(true, 1, totalScore);
+                // 수정: OpenScorePanel에 등급과 승급 포인트 정보를 추가로 전달
+                OpenScorePanel(true, 1, totalScore, userInfo.rank, userInfo.rankuppoints);
             },
             failureCallback: () =>
             {
@@ -71,12 +69,10 @@ public class GameManager : Singleton<GameManager>
             }
         );
     }
-    
+
     public async void LoseGame()
     {
-        
-    
-        //  서버에 losecount 증가 요청
+        // 서버에 losecount 증가 요청
         await NetworkManager.Instance.AddLoseCount(
             successCallback: async () =>
             {
@@ -84,11 +80,10 @@ public class GameManager : Singleton<GameManager>
                     successCallback: () => { Debug.Log("유저 정보 갱신 성공"); },
                     failureCallback: () => { Debug.LogWarning("유저 정보 갱신 실패"); }
                 );
-    
-                // userInfo.wincount, userInfo.losecount로 현재 점수 계산
+
                 int totalScore = userInfo.wincount - userInfo.losecount;
-    
-                OpenScorePanel(false, -1, totalScore);
+                // 수정: 등급과 승급 포인트도 전달
+                OpenScorePanel(false, -1, totalScore, userInfo.rank, userInfo.rankuppoints);
             },
             failureCallback: () =>
             {
@@ -96,13 +91,12 @@ public class GameManager : Singleton<GameManager>
             }
         );
     }
-
     /// <summary>
     /// 승점 패널 오픈
     /// </summary>
     /// <param name="isWin">승패</param>
     /// <param name="addDelete">점수획득 1/-1</param>
-    public void OpenScorePanel(bool isWin, int addDelete, int totalScore)
+    public void OpenScorePanel(bool isWin, int addDelete, int totalScore, int rank, int rankuppoints)
     {
         if (mCanvas != null)
         {
@@ -110,12 +104,11 @@ public class GameManager : Singleton<GameManager>
             var scoreController = scorePanelObject.GetComponent<ScorePanelController>();
             if (scoreController != null)
             {
-                // 점수 패널에 서버 최신 점ㅅ, 이번 게임 승패, 이번 증감 전달
-                scoreController.InitializePanel(totalScore, isWin, addDelete);
+                //  서버에서 가져온 총점, 승패, 증감값과 함께 등급, 승급 포인트를 전달
+                scoreController.InitializePanel(totalScore, isWin, addDelete, rank, rankuppoints);
             }
         }
     }
-
     #endregion
     
     // 게임 화면으로 씬 전환하는 메서드
