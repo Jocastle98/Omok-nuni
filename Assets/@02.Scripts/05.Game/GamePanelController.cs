@@ -35,6 +35,13 @@ public class GamePanelController : MonoBehaviour
         GameManager.Instance.OnOpponentGameProfileUpdate += SetOpponentProfile;
     }
     
+    private void OnDestroy()
+    {
+        // 이벤트 구독 해제
+        GameManager.Instance.OnMyGameProfileUpdate -= SetMyProfile;
+        GameManager.Instance.OnOpponentGameProfileUpdate -= SetOpponentProfile;
+    }
+    
     /// <summary>
     /// Play하고 있을 때는 턴을 표시하는 turnUI를 보여주고
     /// Record(기보)하고 있을 때는 recordUI를 보여줌
@@ -76,42 +83,57 @@ public class GamePanelController : MonoBehaviour
         }
     }
 
-    public async void SetMyProfile(Enums.EPlayerType playerType)
+    public void SetMyProfile(Enums.EPlayerType playerType)
     {
-        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
-
-        if (playerType == Enums.EPlayerType.Player_Black)
-        {
-            playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
-            playerBlackProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
-        }
-        else if (playerType == Enums.EPlayerType.Player_White)
-        {
-            playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
-            playerWhiteProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
-        }
-    }
-
-    public void SetOpponentProfile(Enums.EPlayerType playerType, MultiplayManager multiplayManager)
-    {
-        mMultiplayManager = multiplayManager;
-        
         UnityThread.executeInUpdate(() =>
         {
-            mMultiplayManager.OnOpponentInfoReceived = opponentInfo =>
+            // 객체가 유효한지 확인
+            if (playerBlackProfileImage == null || playerBlackProfileText == null ||
+                playerWhiteProfileImage == null || playerWhiteProfileText == null)
             {
-                Debug.Log($"{opponentInfo.opponentNickname}/{opponentInfo.opponentProfileImageIndex}/{opponentInfo.opponentRank}");
-                if (playerType == Enums.EPlayerType.Player_Black)
-                {
-                    playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);
-                    playerBlackProfileText.text = $"{opponentInfo.opponentRank}급 {opponentInfo.opponentNickname}";
-                }
-                else if (playerType == Enums.EPlayerType.Player_White)
-                {
-                    playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);
-                    playerWhiteProfileText.text = $"{opponentInfo.opponentRank}급 {opponentInfo.opponentNickname}";
-                }
-            };
+                Debug.LogWarning("프로필 UI 객체가 유효하지 않습니다.");
+                return;
+            }
+            
+            UserInfoResult userInfo = NetworkManager.Instance.GetUserInfoSync(() => { }, () => { });
+            
+            if (playerType == Enums.EPlayerType.Player_Black)
+            {
+                playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+                playerBlackProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+            }
+            else if (playerType == Enums.EPlayerType.Player_White)
+            {
+                playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+                playerWhiteProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+            }
+        });
+    }
+
+    public void SetOpponentProfile(UsersInfoData opponentInfo)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            // 객체가 유효한지 확인
+            if (playerBlackProfileImage == null || playerBlackProfileText == null ||
+                playerWhiteProfileImage == null || playerWhiteProfileText == null)
+            {
+                Debug.LogWarning("프로필 UI 객체가 유효하지 않습니다.");
+                return;
+            }
+            
+            if (opponentInfo == null) return;
+        
+            if (opponentInfo.playerType == Enums.EPlayerType.Player_Black)
+            {
+                playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.profileimageindex);
+                playerBlackProfileText.text = $"{opponentInfo.rank}급 {opponentInfo.nickname}";
+            }
+            else if (opponentInfo.playerType == Enums.EPlayerType.Player_White)
+            {
+                playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.profileimageindex);
+                playerWhiteProfileText.text = $"{opponentInfo.rank}급 {opponentInfo.nickname}";
+            }
         });
     }
 

@@ -36,7 +36,7 @@ public class GameManager : Singleton<GameManager>
     
     public Action OnMainPanelUpdate;
     public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
-    public Action<Enums.EPlayerType, MultiplayManager> OnOpponentGameProfileUpdate;
+    public Action<UsersInfoData> OnOpponentGameProfileUpdate;
 
     private void Start()
     {
@@ -200,9 +200,9 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
+            mbIsStartGame = false;
             GameObject waitingPanelObject = Instantiate(waitingPanel, mCanvas.transform);
             waitingPanelObject.GetComponent<WaitingPanelController>().Show();
-            mbIsStartGame = false;
         }
     }
 

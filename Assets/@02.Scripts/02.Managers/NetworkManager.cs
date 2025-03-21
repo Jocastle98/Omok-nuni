@@ -131,6 +131,7 @@ public class NetworkManager : Singleton<NetworkManager>
         }
     }
 
+    // 비동기 방식
     public async UniTask<UserInfoResult> GetUserInfo(Action successCallback, Action failureCallback)
     {
         string sid = PlayerPrefs.GetString("sid");
@@ -167,6 +168,52 @@ public class NetworkManager : Singleton<NetworkManager>
             
             successCallback?.Invoke();
             
+            return userInfo;
+        }
+    }
+    
+    // 동기적 방식 GetUserInfo 버전
+    public UserInfoResult GetUserInfoSync(Action successCallback, Action failureCallback)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (string.IsNullOrEmpty(sid))
+        {
+            Debug.Log("유저 데이터 불러오기에 실패했습니다. \n" +
+                      "세션 데이터가 없습니다.");
+            failureCallback?.Invoke();
+            return new UserInfoResult();
+        }
+
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/userinfo", UnityWebRequest.kHttpVerbGET))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+
+            // 동기적으로 요청 보내기
+            www.SendWebRequest();
+
+            // 요청이 완료될 때까지 대기
+            while (!www.isDone) { }
+
+            // 요청 결과 처리
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("유저 데이터 불러오기에 실패했습니다. \n" +
+                          $"에러: {www.error}");
+                if (www.responseCode == 400)
+                {
+                    GameManager.Instance.OpenConfirmPanel("사용자 검증 실패", () => { failureCallback?.Invoke(); },
+                        false);
+                }
+                failureCallback?.Invoke();
+                return new UserInfoResult();
+            }
+
+            var resultStr = www.downloadHandler.text;
+            UserInfoResult userInfo = JsonUtility.FromJson<UserInfoResult>(resultStr);
+
+            successCallback?.Invoke();
             return userInfo;
         }
     }
