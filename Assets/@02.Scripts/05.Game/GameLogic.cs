@@ -38,7 +38,7 @@ public class GameLogic : IDisposable
                 break;
             case Enums.EGameType.SinglePlay:
                 mPlayer_Black = new PlayerState(true);
-                // mPlayer_White = new AIState(false)
+                mPlayer_White = new AIState(false);
 
                 SetState(mPlayer_Black);
                 break;
@@ -89,6 +89,11 @@ public class GameLogic : IDisposable
             case Enums.EPlayerType.Player_White:
                 SetState(mPlayer_Black);
                 break;
+        }
+
+        if (mCurrentPlayer is AIState aiPlayer)
+        {
+            aiPlayer.OnEnter(this);
         }
     }
 
@@ -703,6 +708,22 @@ public class GameLogic : IDisposable
         }
 
         return lists;
+    }
+
+    public Enums.EPlayerType[,] GetBoard()
+    {
+        int size = boardCellController.size;
+        Enums.EPlayerType[,] board = new Enums.EPlayerType[size, size];
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                board[y, x] = boardCellController.cells[y, x].playerType;
+            }
+        }
+
+        return board;
     }
 
     public void Dispose()

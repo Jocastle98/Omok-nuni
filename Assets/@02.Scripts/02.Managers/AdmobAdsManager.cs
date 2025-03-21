@@ -38,9 +38,6 @@ public class AdmobAdsManager : MonoBehaviour
             mRewardedAd.Destroy();
             mRewardedAd = null;
         }
-
-        Debug.Log("보상형광고 로딩중");
-
         var adRequest = new AdRequest();
         RewardedAd.Load(mRewardedAdUnitID, adRequest, (ad, error) =>
         {
@@ -50,7 +47,7 @@ public class AdmobAdsManager : MonoBehaviour
                 return;
             }
 
-            Debug.Log("보상형 광고 로드:" + ad.GetResponseInfo());
+            Debug.Log("보상형 광고 로딩완료:" + ad.GetResponseInfo());
             mRewardedAd = ad;
 
             RegisterRewardedAdEventHandlers(mRewardedAd);
@@ -76,6 +73,7 @@ public class AdmobAdsManager : MonoBehaviour
             {
                 Debug.Log(string.Format(REWARD_MESSAGE, reward.Type, reward.Amount));
                 //TODO: 코인 지급
+                
             });
         }
     }

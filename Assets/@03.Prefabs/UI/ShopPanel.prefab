@@ -1127,7 +1127,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uAD11\uACE0\uC81C\uAC70 + 2,000\uCF54\uC778"
+  m_text: "\uAD11\uACE0\uC81C\uAC70 + 2,000 \uCF54\uC778"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
   m_sharedMaterial: {fileID: -145588187229913381, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
@@ -1342,7 +1342,6 @@ GameObject:
   - component: {fileID: 6563747780387982808}
   - component: {fileID: 8973774270015903772}
   - component: {fileID: 3012016651107429315}
-  - component: {fileID: 6696108505210998145}
   m_Layer: 5
   m_Name: Item4(2,000Coin)Button
   m_TagString: Untagged
@@ -1453,7 +1452,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6696108505210998145}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: TestPurchaseButton, Assembly-CSharp
         m_MethodName: OnClickShopItem
         m_Mode: 3
@@ -1465,18 +1464,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &6696108505210998145
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3860173275479917260}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8773a1d4633fa04e917c4d98edc4a77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3951547453037586069
 GameObject:
   m_ObjectHideFlags: 0
@@ -1507,7 +1494,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7050959948885788926}
   - {fileID: 801301119356108963}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1537,7 +1523,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.7137255, g: 0.7019608, b: 0.7019608, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1566,7 +1552,6 @@ GameObject:
   - component: {fileID: 482772626180590213}
   - component: {fileID: 587024991558549523}
   - component: {fileID: 4542532484845545148}
-  - component: {fileID: 152320414830824823}
   m_Layer: 5
   m_Name: Item5(4,500Coin)Button
   m_TagString: Untagged
@@ -1677,7 +1662,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 152320414830824823}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: TestPurchaseButton, Assembly-CSharp
         m_MethodName: OnClickShopItem
         m_Mode: 3
@@ -1689,18 +1674,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &152320414830824823
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4694341086344955042}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8773a1d4633fa04e917c4d98edc4a77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4903482636178495929
 GameObject:
   m_ObjectHideFlags: 0
@@ -1801,140 +1774,6 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 512
-  m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_wordSpacing: 0
-  m_lineSpacing: 0
-  m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
-  m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
-  m_linkedTextComponent: {fileID: 0}
-  parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 1
-  m_enableExtraPadding: 0
-  checkPaddingRequired: 0
-  m_isRichText: 1
-  m_parseCtrlCharacters: 1
-  m_isOrthographic: 1
-  m_isCullingEnabled: 0
-  m_horizontalMapping: 0
-  m_verticalMapping: 0
-  m_uvLineOffset: 0
-  m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 0
-  m_useMaxVisibleDescender: 1
-  m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
-  m_isUsingLegacyAnimationComponent: 0
-  m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_baseMaterial: {fileID: 0}
-  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1 &5045952365453692446
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7050959948885788926}
-  - component: {fileID: 3943406763394464633}
-  - component: {fileID: 6431662962709669709}
-  m_Layer: 5
-  m_Name: ShopTitleText (TMP)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &7050959948885788926
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5045952365453692446}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2518308762236240476}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -100}
-  m_SizeDelta: {x: 0, y: 100}
-  m_Pivot: {x: 0.5, y: 1}
---- !u!222 &3943406763394464633
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5045952365453692446}
-  m_CullTransparentMesh: 1
---- !u!114 &6431662962709669709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5045952365453692446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_text: "\uC0C1\uC810"
-  m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
-  m_sharedMaterial: {fileID: -145588187229913381, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
-  m_fontSharedMaterials: []
-  m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
-  m_fontColor32:
-    serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
-  m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
-  m_tintAllSprites: 0
-  m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: -1183493901
-  m_overrideHtmlColors: 0
-  m_faceColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontSize: 70
-  m_fontSizeBase: 70
-  m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 0
-  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -2115,7 +1954,6 @@ GameObject:
   - component: {fileID: 7219232498261334825}
   - component: {fileID: 6148400119472105156}
   - component: {fileID: 6395702215920372389}
-  - component: {fileID: 903761106535507749}
   m_Layer: 5
   m_Name: Item6(10,000Coin)Button
   m_TagString: Untagged
@@ -2226,7 +2064,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 903761106535507749}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: TestPurchaseButton, Assembly-CSharp
         m_MethodName: OnClickShopItem
         m_Mode: 3
@@ -2238,18 +2076,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &903761106535507749
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5519109959487113867}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8773a1d4633fa04e917c4d98edc4a77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5785312354389560368
 GameObject:
   m_ObjectHideFlags: 0
@@ -2396,7 +2222,6 @@ GameObject:
   - component: {fileID: 253734842261639456}
   - component: {fileID: 5301368381796926012}
   - component: {fileID: 4341685885178244854}
-  - component: {fileID: 6478272277549092664}
   m_Layer: 5
   m_Name: Item1(NoAds)Button
   m_TagString: Untagged
@@ -2507,7 +2332,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6478272277549092664}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: TestPurchaseButton, Assembly-CSharp
         m_MethodName: OnClickShopItem
         m_Mode: 3
@@ -2519,18 +2344,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &6478272277549092664
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6561757651748074570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8773a1d4633fa04e917c4d98edc4a77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &6619749706702491099
 GameObject:
   m_ObjectHideFlags: 0
@@ -2543,7 +2368,6 @@ GameObject:
   - component: {fileID: 8542269672079812445}
   - component: {fileID: 3195079667060954872}
   - component: {fileID: 9209459713213223035}
-  - component: {fileID: 7407118536002004542}
   m_Layer: 5
   m_Name: Item3(1,000Coin)Button
   m_TagString: Untagged
@@ -2654,7 +2478,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7407118536002004542}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: TestPurchaseButton, Assembly-CSharp
         m_MethodName: OnClickShopItem
         m_Mode: 3
@@ -2666,18 +2490,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &7407118536002004542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6619749706702491099}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8773a1d4633fa04e917c4d98edc4a77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6676116615534434051
 GameObject:
   m_ObjectHideFlags: 0
@@ -2690,7 +2502,6 @@ GameObject:
   - component: {fileID: 5669742239085692191}
   - component: {fileID: 306918857923592730}
   - component: {fileID: 302911022063110556}
-  - component: {fileID: 2302184624863631417}
   m_Layer: 5
   m_Name: Item2(NoAds+Coin)Button
   m_TagString: Untagged
@@ -2801,7 +2612,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2302184624863631417}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: TestPurchaseButton, Assembly-CSharp
         m_MethodName: OnClickShopItem
         m_Mode: 3
@@ -2813,18 +2624,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &2302184624863631417
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6676116615534434051}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8773a1d4633fa04e917c4d98edc4a77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &7432403551212824585
 GameObject:
   m_ObjectHideFlags: 0
@@ -3418,7 +3217,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uAD11\uACE0\uBCF4\uACE0 \uBB34\uB8CC 500\uCF54\uC778 \uBC1B\uAE30"
+  m_text: "\uAD11\uACE0 \uBCF4\uACE0 500\uCF54\uC778 \uBC1B\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
   m_sharedMaterial: {fileID: -145588187229913381, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
