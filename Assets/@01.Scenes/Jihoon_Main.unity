@@ -805,10 +805,13 @@ MonoBehaviour:
   shopPanel: {fileID: 0}
   settingsPanel: {fileID: 0}
   confirmPanel: {fileID: 7605418477416194584, guid: c48e38e28098ae94eab72cd6f36dbc3d, type: 3}
+  waitingPanel: {fileID: 0}
   mSignupPanel: {fileID: 1745101191904556293, guid: dbfd93541137d4c4eb6f6bf778f894f4, type: 3}
   mSigninPanel: {fileID: 4950278473975370212, guid: 6d6115e9dafd6de4baa4552eb8dcbba4, type: 3}
   mProfilePanel: {fileID: 7605418477416194584, guid: fb46fcceb92da3942a55addeb6ff542b, type: 3}
-  mSelectProfilePanel: {fileID: 7605418477416194584, guid: e19303ef510b376449988255278b975f, type: 3}
+  mSelectProfileForProfilePanel: {fileID: 7605418477416194584, guid: e19303ef510b376449988255278b975f, type: 3}
+  mSelectProfileForSignupPanel: {fileID: 7605418477416194584, guid: 1d29a5a1acd3dcf4cbc68b172de34fc3, type: 3}
+  mRankingPanel: {fileID: 7605418477416194584, guid: a121c9f75992ecf47b30dee1ad79ab29, type: 3}
   mProfileSprites:
   - {fileID: 21300000, guid: 7bc4ff9572b702740a2148f9e88b72ac, type: 3}
   - {fileID: 21300000, guid: 5b35ab6160271d04a8ff9c2707cf5517, type: 3}

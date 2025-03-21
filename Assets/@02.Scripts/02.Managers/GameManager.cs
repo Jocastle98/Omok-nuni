@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 게임의 전체적인 흐름을 관리하는 싱글톤 게임 매니저 클래스.
@@ -19,7 +20,9 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mSignupPanel;
     [SerializeField] private GameObject mSigninPanel;
     [SerializeField] private GameObject mProfilePanel;
-    [SerializeField] private GameObject mSelectProfilePanel;
+    [SerializeField] private GameObject mSelectProfileForProfilePanel;
+    [SerializeField] private GameObject mSelectProfileForSignupPanel;
+    [SerializeField] private GameObject mRankingPanel;
     [SerializeField] private List<Sprite> mProfileSprites;
     
     private Enums.EGameType mGameType;
@@ -80,6 +83,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
+            var rankingPanelObj = Instantiate(mRankingPanel, mCanvas.transform);
+            rankingPanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
@@ -136,7 +141,7 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var signupPanelObj = Instantiate(mSignupPanel, mCanvas.transform);
-            signupPanelObj.GetComponent<PanelController>().Show();
+            signupPanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
@@ -145,24 +150,40 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var profilePanelObj = Instantiate(mProfilePanel, mCanvas.transform);
-            profilePanelObj.GetComponent<PanelController>().Show();
+            profilePanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
-    public PanelController OpenSelectProfilePanel()
+    // 프로필 패널에서 프로필 수정 시 호출
+    public PopupPanelController OpenSelectProfilePanelFromProfilePanel()
     {
         if (mCanvas != null)
         {
-            var selectProfilePanelObj = Instantiate(mSelectProfilePanel, mCanvas.transform);
-            selectProfilePanelObj.GetComponent<PanelController>().Show();
+            var selectProfilePanelObj = Instantiate(mSelectProfileForProfilePanel, mCanvas.transform);
+            selectProfilePanelObj.GetComponent<PopupPanelController>().Show();
 
-            return selectProfilePanelObj.GetComponent<PanelController>();
+            return selectProfilePanelObj.GetComponent<PopupPanelController>();
         }
 
         Debug.Log("Canvas not open");
         return null;
     }
 
+    // 회원가입 패널에서 프로필 수정 시 호출
+    public PopupPanelController OpenSelectProfilePanelFromSignupPanel()
+    {
+        if (mCanvas != null)
+        {
+            var selectProfilePanelObj = Instantiate(mSelectProfileForSignupPanel, mCanvas.transform);
+            selectProfilePanelObj.GetComponent<PopupPanelController>().Show();
+
+            return selectProfilePanelObj.GetComponent<PopupPanelController>();
+        }
+
+        Debug.Log("Canvas not open");
+        return null;
+    }
+    
     public Sprite GetProfileSprite(int profileIndex)
     {
         if (profileIndex >= 0 && profileIndex < mProfileSprites.Count)
@@ -202,6 +223,7 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
+
         }
     }
 
