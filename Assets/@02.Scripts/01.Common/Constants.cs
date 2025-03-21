@@ -13,7 +13,4 @@ public static class Constants
     
     public const string BGMVolumeKey = "BGMVolume";
     public const string SFXVolumeKey = "SFXVolume";
-
-    //TODO: 급수시스템에서 사용하는 변수와 연결
-    public const int RankChangeThreshold = 30;
 }
