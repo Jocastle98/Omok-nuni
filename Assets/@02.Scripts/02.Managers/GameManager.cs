@@ -47,22 +47,65 @@ public class GameManager : Singleton<GameManager>
     // TODO: 스코어 급수에 맞게 조정 현재는(-30~30)
     
     private int currentScore = 0;
-    public void WinGame()
+    public async void WinGame()
     {
+        // <주석> 기존 local currentScore 사용
         currentScore += 1;
         if (currentScore > 30) currentScore = 30;
-
-        // 서버에 wincount 증가 요청도 가능
-         NetworkManager.Instance.AddWinCount();
+    
+        // <수정/추가> 서버에 wincount 증가 요청
+        await NetworkManager.Instance.AddWinCount(
+            successCallback: async () =>
+            {
+                // 성공 시 최신 사용자 정보 가져오기
+                var userInfo = await NetworkManager.Instance.GetUserInfo(
+                    successCallback: () => { Debug.Log("유저 정보 갱신 성공"); },
+                    failureCallback: () => { Debug.LogWarning("유저 정보 갱신 실패"); }
+                );
+    
+                // userInfo.wincount, userInfo.losecount 등을 이용해 현재 점수 계산
+                // 예: (승수 - 패수) 혹은 원하는 로직
+                int totalScore = userInfo.wincount - userInfo.losecount;
+    
+                // 이제 ScorePanel을 열 때 서버 값 반영
+                OpenScorePanel(true, 1, totalScore);
+            },
+            failureCallback: () =>
+            {
+                // 실패 처리 (원하는 UI 표시 가능)
+                Debug.LogWarning("승리 카운트 업데이트 실패");
+                // 그래도 로컬 currentScore를 쓰거나, 재시도 로직을 넣을 수도 있음
+            }
+        );
     }
-
-    public void LoseGame()
+    
+    public async void LoseGame()
     {
+        // <주석> 기존 local currentScore 사용
         currentScore -= 1;
         if (currentScore < -30) currentScore = -30;
-
-        //  서버에 losecount 증가 요청도 가능
-         NetworkManager.Instance.AddLoseCount();
+    
+        //  서버에 losecount 증가 요청
+        await NetworkManager.Instance.AddLoseCount(
+            successCallback: async () =>
+            {
+                // 성공 시 최신 사용자 정보 가져오기
+                var userInfo = await NetworkManager.Instance.GetUserInfo(
+                    successCallback: () => { Debug.Log("유저 정보 갱신 성공"); },
+                    failureCallback: () => { Debug.LogWarning("유저 정보 갱신 실패"); }
+                );
+    
+                // userInfo.wincount, userInfo.losecount로 현재 점수 계산
+                int totalScore = userInfo.wincount - userInfo.losecount;
+    
+                // ScorePanel에 서버 값 반영
+                OpenScorePanel(false, -1, totalScore);
+            },
+            failureCallback: () =>
+            {
+                Debug.LogWarning("패배 카운트 업데이트 실패");
+            }
+        );
     }
 
     /// <summary>
@@ -70,7 +113,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     /// <param name="isWin">승패</param>
     /// <param name="addDelete">점수획득 1/-1</param>
-    public void OpenScorePanel(bool isWin, int addDelete)
+    public void OpenScorePanel(bool isWin, int addDelete, int totalScore)
     {
         if (mCanvas != null)
         {
@@ -78,8 +121,8 @@ public class GameManager : Singleton<GameManager>
             var scoreController = scorePanelObject.GetComponent<ScorePanelController>();
             if (scoreController != null)
             {
-                // 현재 누적 점수와 이번 게임 증감 전달
-                scoreController.InitializePanel(currentScore, isWin, addDelete);
+                // 점수 패널에 서버 최신 점ㅅ, 이번 게임 승패, 이번 증감 전달
+                scoreController.InitializePanel(totalScore, isWin, addDelete);
             }
         }
     }

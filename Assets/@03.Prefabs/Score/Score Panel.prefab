@@ -71,8 +71,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4041981392381801163}
+  - component: {fileID: 4297471315770769618}
   - component: {fileID: 5917750801524751905}
   - component: {fileID: 7083925292258475949}
+  - component: {fileID: 7447913271713932705}
   m_Layer: 5
   m_Name: Score Panel
   m_TagString: Untagged
@@ -100,6 +102,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &4297471315770769618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332821903473915344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80cbd1f33fd84deb876c195c4ac8d9ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panelRectTransform: {fileID: 7246493909884664121}
+  addScoreObjects: {fileID: 5398944599191537742}
+  deleteScoreObjects: {fileID: 2051573231549419785}
+  scoreImagePrefab: {fileID: 588675935411653125, guid: 236373ccb42213045bb097b0d8a9dee2, type: 3}
+  messageText: {fileID: 6420732901047790155}
+  upgradeText: {fileID: 6519377385308096293}
 --- !u!222 &5917750801524751905
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -138,6 +158,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &7447913271713932705
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332821903473915344}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2189098216612362538
 GameObject:
   m_ObjectHideFlags: 0

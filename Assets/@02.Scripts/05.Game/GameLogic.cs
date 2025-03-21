@@ -115,6 +115,13 @@ public class GameLogic : IDisposable
         gamePanelController.StopClock();
         gamePanelController.InitClock();
         
+        SetState(null);
+        mPlayer_Black = null;
+        mPlayer_White = null;
+
+        gamePanelController.StopClock();
+        gamePanelController.InitClock();
+
         if (winnerType == Enums.EPlayerType.None)
         {
             // 무승부
@@ -124,14 +131,13 @@ public class GameLogic : IDisposable
         {
             // 내가 이긴 경우
             Debug.Log("내가 승리했습니다!");
-            GameManager.Instance.OpenScorePanel(true, +1);
+            GameManager.Instance.WinGame();
         }
         else
         {
             // 상대가 이긴 경우 => 나는 패배
             Debug.Log("상대가 승리");
-            GameManager.Instance.LoseGame();      
-            GameManager.Instance.OpenScorePanel(false, -1);
+            GameManager.Instance.LoseGame();
         }
 
         // 점수 확인 패널 호출: 멀티플레이이거나 AI플레이일 경우 -> 승자 점수 확인, 패자 점수 확인
