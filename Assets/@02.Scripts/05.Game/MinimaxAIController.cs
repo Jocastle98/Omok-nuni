@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 public static class MinimaxAIController
 {
-    private const int BOARD_SIZE = 15;      //Board의 size를 받아서 사용 (현재 임시로 상수 설정 후 사용 중)
+    private const int BOARD_SIZE = 14;      //Board의 size를 받아서 사용 (현재 임시로 상수 설정 후 사용 중)
     private static int mSearchRadius;       //착수된 돌들에서 몇칸 이내를 고려할 것인지
     private static int mMinimaxDepth;       //깊이 설정(몇 수 앞을 볼건지)
     private static float mMistakeChance;    //실수할 수 있는 확률

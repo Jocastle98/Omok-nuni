@@ -42,12 +42,11 @@ public class GameLogic : IDisposable
 
                 NetworkManager.Instance.GetUserInfo(() =>
                 {
-                    Debug.Log("랭크 로드 완료");
                 }, () =>
                 {
-                    Debug.Log("랭크 로드 실패");
                     //랭크 로드 실패시 기본난이도 중간으로 설정
                     MinimaxAIController.SetLevel(Enums.EDifficultyLevel.Medium);
+                    Debug.Log("난이도 기본 중 설정");
                     SetState(mPlayer_Black);
                 }).ContinueWith(userInfo =>
                 {
@@ -55,11 +54,20 @@ public class GameLogic : IDisposable
                     int rank = userInfo.rank;
                     Enums.EDifficultyLevel level;
                     if (rank >= 10 && rank <= 18)
+                    {
                         level = Enums.EDifficultyLevel.Easy;
+                        Debug.Log("난이도 하 설정");
+                    }
                     else if (rank >= 5 && rank <= 9)
+                    {
                         level = Enums.EDifficultyLevel.Medium;
+                        Debug.Log("난이도 중 설정");
+                    }
                     else
+                    {
                         level = Enums.EDifficultyLevel.Hard;
+                        Debug.Log("난이도 상 설정");
+                    }
 
                     MinimaxAIController.SetLevel(level);
                     SetState(mPlayer_Black);
@@ -133,6 +141,7 @@ public class GameLogic : IDisposable
     /// </summary>
     public void EndGame()
     {
+        Debug.Log(" EndGame called!");
         SetState(null);
         mPlayer_Black = null;
         mPlayer_White = null;
@@ -678,6 +687,7 @@ public class GameLogic : IDisposable
     /// <returns></returns>
     public bool GameResult(Enums.EPlayerType player, int Y, int X)
     {
+        
 
         BoardCell[][] lists = MakeLists(boardCellController.size, Y, X, 4);
 

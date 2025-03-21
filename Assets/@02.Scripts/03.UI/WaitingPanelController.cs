@@ -91,8 +91,6 @@ public class WaitingPanelController : PopupPanelController
         {
             // todo: AI와 매칭 기능 구현
             GameManager.Instance.ChangeToGameScene(Enums.EGameType.SinglePlay);
-            //임시기능: 메인화면으로 전환
-            //GameManager.Instance.ChangeToMainScene();
         }, false);
     }
 }
