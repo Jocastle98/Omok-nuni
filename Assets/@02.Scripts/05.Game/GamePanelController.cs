@@ -94,11 +94,13 @@ public class GamePanelController : MonoBehaviour
 
     public void SetOpponentProfile(Enums.EPlayerType playerType, MultiplayManager multiplayManager)
     {
+        mMultiplayManager = multiplayManager;
+        
         UnityThread.executeInUpdate(() =>
         {
-            mMultiplayManager = multiplayManager;
             mMultiplayManager.OnOpponentInfoReceived = opponentInfo =>
             {
+                Debug.Log($"{opponentInfo.opponentNickname}/{opponentInfo.opponentProfileImageIndex}/{opponentInfo.opponentRank}");
                 if (playerType == Enums.EPlayerType.Player_Black)
                 {
                     playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);

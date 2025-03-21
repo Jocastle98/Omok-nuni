@@ -19,20 +19,14 @@ public class MoveData
 
 public class OpponentInfoResult
 {
-    [JsonProperty("roomId")]
-    public string roomId { get; set; }
-    
-    [JsonProperty("opponentId")]
-    public string opponentId;
-    
     [JsonProperty("opponentNickname")]
-    public string opponentNickname;
+    public string opponentNickname { get; set; }
     
     [JsonProperty("opponentProfileImageIndex")]
-    public int opponentProfileImageIndex;
+    public int opponentProfileImageIndex { get; set; }
     
     [JsonProperty("opponentRank")]
-    public int opponentRank;
+    public int opponentRank { get; set; }
 }
 
 public class MultiplayManager : IDisposable
@@ -40,8 +34,8 @@ public class MultiplayManager : IDisposable
     private SocketIOUnity mSocket;
     
     private event Action<Enums.EMultiplayManagerState, string> mOnMultiplayStateChange;
-    public Action<MoveData> OnOpponentMove;
     public Action<OpponentInfoResult> OnOpponentInfoReceived;
+    public Action<MoveData> OnOpponentMove;
 
     public MultiplayManager(Action<Enums.EMultiplayManagerState, string> onMultiplayStateChange)
     {
@@ -58,7 +52,7 @@ public class MultiplayManager : IDisposable
         mSocket.On("startGame", StartGame);
         mSocket.On("exitRoom", ExitRoom);
         mSocket.On("endGame", EndGame);
-        mSocket.On("roomInfo", ReceiveOpponentInfo);
+        mSocket.On("receiveOpponentInfo", ReceiveOpponentInfo);
         mSocket.On("doOpponent", DoOpponent);
         mSocket.On("rematchStart", RematchStart);
         
@@ -102,14 +96,14 @@ public class MultiplayManager : IDisposable
     private void ReceiveOpponentInfo(SocketIOResponse response)
     {
         var data = response.GetValue<OpponentInfoResult>();
-        Debug.Log($"opponentId: {data.opponentId}, opponentNickname: {data.opponentNickname}");
         OnOpponentInfoReceived?.Invoke(data);
+        Debug.Log(OnOpponentInfoReceived);
     }
     
-    // 방에 있는 상대방 정보 요청
-    public void RequestOpponentInfo(string roomId)
+    // 플레이어의 정보를 서버로 전달하기 위한 메서드
+    public void SendOpponentInfo(string roomId, string nickname, int profileImageIndex, int rank)
     {
-        mSocket.Emit("getRoomUsersInfo", roomId);
+        mSocket.Emit("opponentInfo", new { roomId, nickname, profileImageIndex, rank });
     } 
     
     // 서버로부터 상대방의 마커 정보를 받기 위한 메서드

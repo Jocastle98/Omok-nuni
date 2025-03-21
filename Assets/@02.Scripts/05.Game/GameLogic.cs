@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UserDataStructs;
 
 public class GameLogic : IDisposable
 {
@@ -53,6 +54,7 @@ public class GameLogic : IDisposable
                 mMultiplayManager = new MultiplayManager((state, roomId) =>
                 {
                     mRoomId = roomId;
+                    SendUserInfo(roomId);
                     switch (state)
                     {
                         case Enums.EMultiplayManagerState.CreateRoom:
@@ -66,7 +68,6 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                             mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
                             
-                            mMultiplayManager.RequestOpponentInfo(roomId);
                             OpponentGameProfileUpdate(Enums.EPlayerType.Player_Black, mMultiplayManager);
                             MyGameProfileUpdate(Enums.EPlayerType.Player_White);
                             SetState(mPlayer_Black);
@@ -78,7 +79,6 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
-                            mMultiplayManager.RequestOpponentInfo(roomId);
                             MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
                             OpponentGameProfileUpdate(Enums.EPlayerType.Player_White, mMultiplayManager);
                             SetState(mPlayer_Black);
@@ -197,6 +197,16 @@ public class GameLogic : IDisposable
         });
     }
 
+    private async void SendUserInfo(string roomId)
+    {
+        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
+        Debug.Log(userInfo.nickname);
+        UnityThread.executeInUpdate(() =>
+        {
+            mMultiplayManager.SendOpponentInfo(roomId, userInfo.nickname, userInfo.profileimageindex, userInfo.rank);
+        });
+    }
+    
     private void MyGameProfileUpdate(Enums.EPlayerType playerType)
     {
         UnityThread.executeInUpdate(() =>
