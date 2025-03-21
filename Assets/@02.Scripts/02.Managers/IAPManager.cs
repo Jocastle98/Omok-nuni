@@ -100,7 +100,6 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
             Product product = mStoreController.products.WithID(productId);
             if (product != null && product.availableToPurchase)
             {
-                Debug.Log(string.Format("Purchasing product asychronously: '{0}'", product.definition.id));
                 mStoreController.InitiatePurchase(product);
             }
             else
@@ -151,7 +150,7 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
     {
         if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_COIN_1000, StringComparison.Ordinal))
         {
-            Debug.Log("ProcessPurchase: PASS. Product: '" + purchaseEvent.purchasedProduct.definition.id + "'");
+            Debug.Log("코인 1000개 지급");
             
             //TODO: 코인 1000개 지급
             
