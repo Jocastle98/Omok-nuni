@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UserDataStructs;
 
-public class SignupPanelController : PanelController
+public class SignupPanelController : PopupPanelController
 {
     [SerializeField] private TMP_InputField mUsernameInputField;
     [SerializeField] private TMP_InputField mNicknameInputField;
