@@ -27,7 +27,7 @@ public class GameManager : Singleton<GameManager>
     private Canvas mCanvas;
     
     private GameLogic mGameLogic;
-    
+
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
     
@@ -39,15 +39,12 @@ public class GameManager : Singleton<GameManager>
     {
         OpenSigninPanel();
     }
-    
+
     // 게임 화면으로 씬 전환하는 메서드
     public void ChangeToGameScene(Enums.EGameType gameType)
     {
         mGameType = gameType;
-        //SceneManager.LoadScene("Game");
-
-        // 임시기능: 테스트용
-        SceneManager.LoadScene("ysw_Game");
+        SceneManager.LoadScene("Game");
     }
 
     // 메인 화면으로 씬 전환하는 메서드
@@ -57,10 +54,7 @@ public class GameManager : Singleton<GameManager>
         mGameLogic?.Dispose();
         mGameLogic = null;
 
-        //SceneManager.LoadScene("Main");
-
-        // 임시기능: 테스트용
-        SceneManager.LoadScene("ysw_Main");
+        SceneManager.LoadScene("Main");
     }
 
     // 대국 시작 시 모드선택 패널 호출 메서드
@@ -72,7 +66,7 @@ public class GameManager : Singleton<GameManager>
             gameTypeSelectPanelObject.GetComponent<GameTypeSelectPanelController>().Show();
         }
     }
-    
+
     // 내 기보(확인하기) 패널 호출 메서드
     public void OpenRecordPanel()
     {
@@ -80,7 +74,7 @@ public class GameManager : Singleton<GameManager>
         {
         }
     }
-    
+
     // 랭킹(리더보드) 패널 호출 메서드
     public void OpenLeaderboardPanel()
     {
@@ -98,7 +92,7 @@ public class GameManager : Singleton<GameManager>
             // shopPanelController 컴포넌트 연결 및 창 띄우는 메서드
         }
     }
-    
+
     // 세팅 패널 호출 메서드
     public void OpenSettingsPanel()
     {
@@ -108,7 +102,7 @@ public class GameManager : Singleton<GameManager>
             settingPanelObject.GetComponent<PopupPanelController>().Show();
         }
     }
-    
+
     // 확인(and 취소) 패널 호출 메서드
     public void OpenConfirmPanel(string message, Action OnConfirmButtonClick, bool activeCancelButton = true)
     {
@@ -119,7 +113,7 @@ public class GameManager : Singleton<GameManager>
                 .Show(message, OnConfirmButtonClick, activeCancelButton);
         }
     }
-    
+
     // 로그인 패널 호출 메서드
     public void OpenSigninPanel()
     {
@@ -128,14 +122,14 @@ public class GameManager : Singleton<GameManager>
         {
             return;
         }
-        
+
         if (mCanvas != null)
         {
             var signinPanelObj = Instantiate(mSigninPanel, mCanvas.transform);
             signinPanelObj.GetComponent<SigninPanelController>().Show(OnMainPanelUpdate);
         }
     }
-    
+
     // 회원가입 패널 호출 메서드
     public void OpenSignupPanel()
     {
@@ -161,10 +155,10 @@ public class GameManager : Singleton<GameManager>
         {
             var selectProfilePanelObj = Instantiate(mSelectProfilePanel, mCanvas.transform);
             selectProfilePanelObj.GetComponent<PanelController>().Show();
-            
+
             return selectProfilePanelObj.GetComponent<PanelController>();
         }
-        
+
         Debug.Log("Canvas not open");
         return null;
     }
@@ -175,11 +169,11 @@ public class GameManager : Singleton<GameManager>
         {
             return mProfileSprites[profileIndex];
         }
-        
+
         Debug.Log("out of index in ProfileSprites");
         return null;
     }
-    
+
     // 매칭 대기 패널 호출 메서드
     public void OpenWaitingPanel()
     {
@@ -193,7 +187,7 @@ public class GameManager : Singleton<GameManager>
 
     // waitingPanel의 종료 여부(게임 시작)를 waitingPanel로 전달(반환)해주는 메서드
     public bool GetIsStartGame()
-    {   
+    {
         return mbIsStartGame;
     }
 
@@ -202,29 +196,26 @@ public class GameManager : Singleton<GameManager>
     {
         mbIsStartGame = isStartGame;
     }
-    
+
     // 승점 확인 패널 호출 메서드
     public void OpenScoreConfirmationPanel()
     {
         if (mCanvas != null)
         {
-
         }
     }
 
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 인트로 BGM 재생
-        if (scene.name == "ysw_Main")
-            //if (scene.name == "Main")   
+        if (scene.name == "Main")
         {
             OnMainPanelUpdate = null;
             AudioManager.Instance.PlayIntroBgm();
         }
 
         // 임시기능: 테스트용
-        if (scene.name == "ysw_Game")
-            //if (scene.name == "Game")
+        if (scene.name == "Game")
         {
             AudioManager.Instance.PlayGameBgm();
 

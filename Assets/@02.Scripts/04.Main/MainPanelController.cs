@@ -53,6 +53,11 @@ public class MainPanelController : MonoBehaviour
     {
         GameManager.Instance.OpenSettingsPanel();
     }
+
+    public void OnClickProfileButton()
+    {
+        GameManager.Instance.OpenProfilePanel();
+    }
     
     // 로그아웃 클릭 시 호출되는 메서드 구현
 }
