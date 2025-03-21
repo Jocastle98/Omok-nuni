@@ -27,9 +27,12 @@ public class GamePanelController : MonoBehaviour
     private const float mDisableAlpha = 0.3f;
     private const float mEnableAlpha = 1.0f;
     
+    private MultiplayManager mMultiplayManager;
+    
     private void Awake()
     {
-        GameManager.Instance.OnGamePanelUpdate += SetMyProfile;
+        GameManager.Instance.OnMyGameProfileUpdate += SetMyProfile;
+        GameManager.Instance.OnOpponentGameProfileUpdate += SetOpponentProfile;
     }
     
     /// <summary>
@@ -89,9 +92,22 @@ public class GamePanelController : MonoBehaviour
         }
     }
 
-    public async void SetOpponentProfile()
+    public void SetOpponentProfile(Enums.EPlayerType playerType, MultiplayManager multiplayManager)
     {
-        
+        mMultiplayManager = multiplayManager;
+        mMultiplayManager.OnOpponentInfoReceived = opponentInfo =>
+        {
+            if (playerType == Enums.EPlayerType.Player_Black)
+            {
+                playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);
+                playerBlackProfileText.text = $"{opponentInfo.opponentRank}급 {opponentInfo.opponentNickname}";
+            }
+            else if (playerType == Enums.EPlayerType.Player_White)
+            {
+                playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.opponentProfileImageIndex);
+                playerWhiteProfileText.text = $"{opponentInfo.opponentRank}급 {opponentInfo.opponentNickname}";
+            }
+        };
     }
 
     public void InitClock()

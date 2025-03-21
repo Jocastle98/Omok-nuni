@@ -3,9 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using SocketIOClient;
-using Unity.Burst.CompilerServices;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class RoomData
 {
@@ -19,12 +17,28 @@ public class MoveData
     public int position { get; set; }
 }
 
+public class OpponentInfoResult
+{
+    [JsonProperty("opponentId")]
+    public string opponentId;
+    
+    [JsonProperty("opponentNickname")]
+    public string opponentNickname;
+    
+    [JsonProperty("opponentProfileImageIndex")]
+    public int opponentProfileImageIndex;
+    
+    [JsonProperty("opponentRank")]
+    public int opponentRank;
+}
+
 public class MultiplayManager : IDisposable
 {
     private SocketIOUnity mSocket;
     
     private event Action<Enums.EMultiplayManagerState, string> mOnMultiplayStateChange;
     public Action<MoveData> OnOpponentMove;
+    public Action<OpponentInfoResult> OnOpponentInfoReceived;
 
     public MultiplayManager(Action<Enums.EMultiplayManagerState, string> onMultiplayStateChange)
     {
@@ -41,6 +55,7 @@ public class MultiplayManager : IDisposable
         mSocket.On("startGame", StartGame);
         mSocket.On("exitRoom", ExitRoom);
         mSocket.On("endGame", EndGame);
+        mSocket.On("roomInfo", ReceiveOpponentInfo);
         mSocket.On("doOpponent", DoOpponent);
         mSocket.On("rematchStart", RematchStart);
         
@@ -79,6 +94,19 @@ public class MultiplayManager : IDisposable
     {
         mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.EndGame, null);
     }
+    
+    // 상대방 정보 수신
+    private void ReceiveOpponentInfo(SocketIOResponse response)
+    {
+        var data = response.GetValue<OpponentInfoResult>();
+        OnOpponentInfoReceived?.Invoke(data);
+    }
+    
+    // 방에 있는 상대방 정보 요청
+    public void RequestOpponentInfo(string roomId)
+    {
+        mSocket.Emit("getRoomUsersInfo", roomId);
+    } 
     
     // 서버로부터 상대방의 마커 정보를 받기 위한 메서드
     private void DoOpponent(SocketIOResponse response)

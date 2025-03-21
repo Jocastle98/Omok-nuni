@@ -17,19 +17,21 @@ public class GameLogic : IDisposable
     private MultiplayManager mMultiplayManager;
     private string mRoomId;
     
-    private Action<Enums.EPlayerType> OnGamePanelUpdate;
+    private Action<Enums.EPlayerType> OnMyGameProfileUpdate;
+    private Action<Enums.EPlayerType, MultiplayManager> OnOpponentGameProfileUpdate;
     
     /// <summary>
     /// 게임 시작 메서드
     /// </summary>
     /// <param name="boardCellController"></param>
     /// <param name="playMode"></param>
-    public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController, 
-        Enums.EGameType playMode, Action<Enums.EPlayerType> onGamePanelUpdate)
+    public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController, Enums.EGameType playMode, 
+        Action<Enums.EPlayerType> onMyGameProfileUpdate, Action<Enums.EPlayerType, MultiplayManager> onOpponentGameProfileUpdate)
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;
-        OnGamePanelUpdate = onGamePanelUpdate;
+        OnMyGameProfileUpdate = onMyGameProfileUpdate;
+        OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
         
         switch (playMode)
         {
@@ -37,14 +39,14 @@ public class GameLogic : IDisposable
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new PlayerState(false);
                 
-                OnGamePanelUpdate?.Invoke(Enums.EPlayerType.Player_Black);
+                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.SinglePlay:
                 mPlayer_Black = new PlayerState(true);
                 // mPlayer_White = new AIState(false)
 
-                OnGamePanelUpdate?.Invoke(Enums.EPlayerType.Player_Black);
+                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.MultiPlay:
@@ -64,7 +66,8 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                             mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
                             
-                            GamePanelUpdate(Enums.EPlayerType.Player_White);
+                            OpponentGameProfileUpdate(roomId, Enums.EPlayerType.Player_Black, mMultiplayManager);
+                            MyGameProfileUpdate(Enums.EPlayerType.Player_White);
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
@@ -74,7 +77,8 @@ public class GameLogic : IDisposable
                             mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
-                            GamePanelUpdate(Enums.EPlayerType.Player_Black);
+                            MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
+                            OpponentGameProfileUpdate(roomId, Enums.EPlayerType.Player_White, mMultiplayManager);
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
@@ -188,11 +192,20 @@ public class GameLogic : IDisposable
         });
     }
 
-    private void GamePanelUpdate(Enums.EPlayerType playerType)
+    private void MyGameProfileUpdate(Enums.EPlayerType playerType)
     {
         UnityThread.executeInUpdate(() =>
         {
-            OnGamePanelUpdate?.Invoke(playerType);
+            OnMyGameProfileUpdate?.Invoke(playerType);
+        });
+    }
+
+    private void OpponentGameProfileUpdate(string roomId, Enums.EPlayerType playerType, MultiplayManager multiplayManager)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            mMultiplayManager.RequestOpponentInfo(roomId);
+            OnOpponentGameProfileUpdate?.Invoke(playerType, multiplayManager);
         });
     }
     
