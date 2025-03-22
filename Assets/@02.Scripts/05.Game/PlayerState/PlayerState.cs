@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Burst.Intrinsics;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class PlayerState : BasePlayerState
@@ -29,6 +29,7 @@ public class PlayerState : BasePlayerState
         mRoomId = roomId;
         mbIsMultiplay = true;
     }
+    
 
     public override void OnEnter(GameLogic gameLogic)
     {

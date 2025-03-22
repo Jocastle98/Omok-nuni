@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using UserDataStructs;
 
 public class GamePanelController : MonoBehaviour
 {
@@ -18,8 +19,28 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] private CanvasGroup blackTurnPanel;
     [SerializeField] private CanvasGroup whiteTurnPanel;
 
+    [SerializeField] private Image playerBlackProfileImage;
+    [SerializeField] private TMP_Text playerBlackProfileText;
+    [SerializeField] private Image playerWhiteProfileImage;
+    [SerializeField] private TMP_Text playerWhiteProfileText;
+    
     private const float mDisableAlpha = 0.3f;
     private const float mEnableAlpha = 1.0f;
+    
+    private MultiplayManager mMultiplayManager;
+    
+    private void Awake()
+    {
+        GameManager.Instance.OnMyGameProfileUpdate += SetMyProfile;
+        GameManager.Instance.OnOpponentGameProfileUpdate += SetOpponentProfile;
+    }
+    
+    private void OnDestroy()
+    {
+        // 이벤트 구독 해제
+        GameManager.Instance.OnMyGameProfileUpdate -= SetMyProfile;
+        GameManager.Instance.OnOpponentGameProfileUpdate -= SetOpponentProfile;
+    }
     
     /// <summary>
     /// Play하고 있을 때는 턴을 표시하는 turnUI를 보여주고
@@ -60,6 +81,57 @@ public class GamePanelController : MonoBehaviour
                 backButton.SetActive(true);
                 break;
         }
+    }
+
+    public async void SetMyProfile(Enums.EPlayerType playerType)
+    {
+        // 객체가 유효한지 확인
+        if (playerBlackProfileImage == null || playerBlackProfileText == null ||
+            playerWhiteProfileImage == null || playerWhiteProfileText == null)
+        {
+            Debug.LogWarning("프로필 UI 객체가 유효하지 않습니다.");
+            return;
+        }
+        
+        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
+        
+        if (playerType == Enums.EPlayerType.Player_Black)
+        {
+            playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            playerBlackProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+        }
+        else if (playerType == Enums.EPlayerType.Player_White)
+        {
+            playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            playerWhiteProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+        }
+    }
+
+    public void SetOpponentProfile(UsersInfoData opponentInfo)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            // 객체가 유효한지 확인
+            if (playerBlackProfileImage == null || playerBlackProfileText == null ||
+                playerWhiteProfileImage == null || playerWhiteProfileText == null)
+            {
+                Debug.LogWarning("프로필 UI 객체가 유효하지 않습니다.");
+                return;
+            }
+            
+            if (opponentInfo == null) return;
+        
+            if (opponentInfo.playerType == Enums.EPlayerType.Player_Black)
+            {
+                playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.profileimageindex);
+                playerBlackProfileText.text = $"{opponentInfo.rank}급 {opponentInfo.nickname}";
+            }
+            else if (opponentInfo.playerType == Enums.EPlayerType.Player_White)
+            {
+                playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.profileimageindex);
+                playerWhiteProfileText.text = $"{opponentInfo.rank}급 {opponentInfo.nickname}";
+            }
+        });
     }
 
     public void InitClock()

@@ -13,7 +13,7 @@ public class TestBoardStart : MonoBehaviour
     void Start()
     {
         gameLogic = new GameLogic();
-        gameLogic.GameStart(boardCellController,gamePanelController, Enums.EGameType.PassAndPlay);
+        //gameLogic.GameStart(boardCellController,gamePanelController, Enums.EGameType.PassAndPlay);
     }
 
 }

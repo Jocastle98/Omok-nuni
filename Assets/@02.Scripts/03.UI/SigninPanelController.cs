@@ -15,6 +15,15 @@ public class SigninPanelController : PopupPanelController
     [SerializeField] private TMP_InputField mUsernameInputField;
     [SerializeField] private TMP_InputField mPasswordInputField;
 
+    private Action OnSigninButtonClick;
+
+    public void Show(Action onSigninButtonClick)
+    {
+        base.Show();
+        
+        OnSigninButtonClick = onSigninButtonClick;
+    }
+    
     public async void OnClickSigninButton()
     {
         string username = mUsernameInputField.text;
@@ -31,7 +40,7 @@ public class SigninPanelController : PopupPanelController
         await NetworkManager.Instance.SigninWithSigninData(signinData, (string nickname) =>
         {
             Debug.Log("어서오세요 "+nickname+"님");
-            Destroy(gameObject);
+            Hide(OnSigninButtonClick);
         }, (int result) =>
         {
             if (result == 0)        //INVALID_USERNAME

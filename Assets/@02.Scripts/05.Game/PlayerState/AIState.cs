@@ -18,6 +18,7 @@ public class AIState : BasePlayerState
     
     public override void OnEnter(GameLogic gameLogic)
     {
+        if (gameLogic.isGameOver) return; 
         var result = MinimaxAIController.GetBestMove(gameLogic.GetBoard());
         if (result.HasValue)
         {
@@ -25,7 +26,7 @@ public class AIState : BasePlayerState
         }
         else
         {
-            gameLogic.EndGame();
+            gameLogic.EndGame(Enums.EPlayerType.None);
         }
     }
 

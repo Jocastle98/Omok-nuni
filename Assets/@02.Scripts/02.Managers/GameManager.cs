@@ -20,12 +20,14 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mSignupPanel;
     [SerializeField] private GameObject mSigninPanel;
     [SerializeField] private GameObject mProfilePanel;
+    [SerializeField] private GameObject mSelectProfilePanel;
+    [SerializeField] private GameObject mScorePanel;
     [SerializeField] private GameObject mSelectProfileForProfilePanel;
     [SerializeField] private GameObject mSelectProfileForSignupPanel;
     [SerializeField] private GameObject mRankingPanel;
     [SerializeField] private List<Sprite> mProfileSprites;
-    
-    
+
+
     private Canvas mCanvas;
 
     private Enums.EGameType mGameType;
@@ -36,12 +38,85 @@ public class GameManager : Singleton<GameManager>
 
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
+    
+    public Action OnMainPanelUpdate;
+    public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
+    public Action<UsersInfoData> OnOpponentGameProfileUpdate;
 
     private void Start()
     {
         OpenSigninPanel();
     }
+    
+    #region  Score
 
+    // TODO: 스코어 급수에 맞게 조정 현재는(-30~30)
+    
+    public async void WinGame()
+    {
+        // 서버에 wincount 증가 요청
+        await NetworkManager.Instance.AddWinCount(
+            successCallback: async () =>
+            {
+                // 성공 시 최신 사용자 정보 가져오기
+                var userInfo = await NetworkManager.Instance.GetUserInfo(
+                    successCallback: () => { Debug.Log("유저 정보 갱신 성공"); },
+                    failureCallback: () => { Debug.LogWarning("유저 정보 갱신 실패"); }
+                );
+
+                // 승패 점수는 wincount - losecount, 추가로 등급과 승급 포인트도 가져옴
+                int totalScore = userInfo.wincount - userInfo.losecount;
+                // 수정: OpenScorePanel에 등급과 승급 포인트 정보를 추가로 전달
+                OpenScorePanel(true, 1, totalScore, userInfo.rank, userInfo.rankuppoints);
+            },
+            failureCallback: () =>
+            {
+                Debug.LogWarning("승리 카운트 업데이트 실패");
+            }
+        );
+    }
+
+    public async void LoseGame()
+    {
+        // 서버에 losecount 증가 요청
+        await NetworkManager.Instance.AddLoseCount(
+            successCallback: async () =>
+            {
+                var userInfo = await NetworkManager.Instance.GetUserInfo(
+                    successCallback: () => { Debug.Log("유저 정보 갱신 성공"); },
+                    failureCallback: () => { Debug.LogWarning("유저 정보 갱신 실패"); }
+                );
+
+                int totalScore = userInfo.wincount - userInfo.losecount;
+                // 수정: 등급과 승급 포인트도 전달
+                OpenScorePanel(false, -1, totalScore, userInfo.rank, userInfo.rankuppoints);
+            },
+            failureCallback: () =>
+            {
+                Debug.LogWarning("패배 카운트 업데이트 실패");
+            }
+        );
+    }
+    /// <summary>
+    /// 승점 패널 오픈
+    /// </summary>
+    /// <param name="isWin">승패</param>
+    /// <param name="addDelete">점수획득 1/-1</param>
+    public void OpenScorePanel(bool isWin, int addDelete, int totalScore, int rank, int rankuppoints)
+    {
+        if (mCanvas != null)
+        {
+            var scorePanelObject = Instantiate(mScorePanel, mCanvas.transform);
+            var scoreController = scorePanelObject.GetComponent<ScorePanelController>();
+            if (scoreController != null)
+            {
+                //  서버에서 가져온 총점, 승패, 증감값과 함께 등급, 승급 포인트를 전달
+                scoreController.InitializePanel(totalScore, isWin, addDelete, rank, rankuppoints);
+            }
+        }
+    }
+    #endregion
+    
     // 게임 화면으로 씬 전환하는 메서드
     public void ChangeToGameScene(Enums.EGameType gameType)
     {
@@ -130,7 +205,7 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var signinPanelObj = Instantiate(mSigninPanel, mCanvas.transform);
-            signinPanelObj.GetComponent<PopupPanelController>().Show();
+            signinPanelObj.GetComponent<SigninPanelController>().Show(OnMainPanelUpdate);
         }
     }
 
@@ -199,9 +274,9 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
+            mbIsStartGame = false;
             GameObject waitingPanelObject = Instantiate(waitingPanel, mCanvas.transform);
             waitingPanelObject.GetComponent<WaitingPanelController>().Show();
-            mbIsStartGame = false;
         }
     }
 
@@ -222,10 +297,17 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-
         }
     }
 
+    // 콜백 초기화 메서드
+    private void ClearAllCallbacks()
+    {
+        OnMainPanelUpdate = null;
+        OnMyGameProfileUpdate = null;
+        OnOpponentGameProfileUpdate = null;
+    }
+    
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 인트로 BGM 재생
@@ -233,8 +315,7 @@ public class GameManager : Singleton<GameManager>
         {
             AudioManager.Instance.PlayIntroBgm();
         }
-
-        // 임시기능: 테스트용
+        
         if (scene.name == "Game")
         {
             AudioManager.Instance.PlayGameBgm();
@@ -256,7 +337,8 @@ public class GameManager : Singleton<GameManager>
             }
 
             mGameLogic = new GameLogic();
-            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType);
+            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType, 
+                OnMyGameProfileUpdate, OnOpponentGameProfileUpdate);
         }
 
         mCanvas = GameObject.FindObjectOfType<Canvas>();
@@ -264,6 +346,8 @@ public class GameManager : Singleton<GameManager>
 
     private void OnApplicationQuit()
     {
+        ClearAllCallbacks();
+        
         mGameLogic?.Dispose();
         mGameLogic = null;
     }
