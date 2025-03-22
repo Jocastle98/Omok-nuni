@@ -21,6 +21,11 @@ public class MainPanelController : MonoBehaviour
         GameManager.Instance.OnMainPanelUpdate += SetProfileInfo;
         GameManager.Instance.OnMainPanelUpdate?.Invoke();
     }
+
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnMainPanelUpdate -= SetProfileInfo;
+    }
     
     public async void SetProfileInfo()
     {

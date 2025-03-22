@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UserDataStructs;
@@ -22,7 +23,7 @@ public class GameLogic : IDisposable
     public Enums.EPlayerType localPlayerType = Enums.EPlayerType.Player_Black;
     public bool isGameOver = false;
     private Action<Enums.EPlayerType> OnMyGameProfileUpdate;
-    private Action<Enums.EPlayerType, MultiplayManager> OnOpponentGameProfileUpdate;
+    private Action<UsersInfoData> OnOpponentGameProfileUpdate;
     
     /// <summary>
     /// 게임 시작 메서드
@@ -30,13 +31,13 @@ public class GameLogic : IDisposable
     /// <param name="boardCellController"></param>
     /// <param name="playMode"></param>
     public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController, Enums.EGameType playMode, 
-        Action<Enums.EPlayerType> onMyGameProfileUpdate, Action<Enums.EPlayerType, MultiplayManager> onOpponentGameProfileUpdate)
+        Action<Enums.EPlayerType> onMyGameProfileUpdate, Action<UsersInfoData> onOpponentGameProfileUpdate)
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;
         OnMyGameProfileUpdate = onMyGameProfileUpdate;
         OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
-        
+            
         switch (playMode)
         {
             case Enums.EGameType.PassAndPlay:
@@ -54,10 +55,10 @@ public class GameLogic : IDisposable
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.MultiPlay:
-                mMultiplayManager = new MultiplayManager((state, roomId) =>
+                mMultiplayManager =  new MultiplayManager((state, roomId) =>
                 {
+                    mMultiplayManager.OnOpponentProfileUpdate += OnOpponentGameProfileUpdate;
                     mRoomId = roomId;
-                    SendUserInfo(roomId);
                     switch (state)
                     {
                         case Enums.EMultiplayManagerState.CreateRoom:
@@ -69,25 +70,25 @@ public class GameLogic : IDisposable
                         case Enums.EMultiplayManagerState.JoinRoom:
                             Debug.Log("## Join Room");
                             mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
-                            mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
+                            mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId);
                             
                             // 방들어온 플레이어는 백
                             localPlayerType = mPlayer_White.playerType; 
-                            OpponentGameProfileUpdate(Enums.EPlayerType.Player_Black, mMultiplayManager);
                             MyGameProfileUpdate(Enums.EPlayerType.Player_White);
+                            SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_White);
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
                             Debug.Log("## Start Game");
                             GameManager.Instance.SetIsStartGame(true);
                             
-                            mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
+                            mPlayer_Black = new PlayerState(true, mMultiplayManager, mRoomId);
                             mPlayer_White = new MultiplayerState(false, mMultiplayManager);
                             
                             // 첫 수 두는 플레이어 흑
                             localPlayerType = mPlayer_Black.playerType;
                             MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
-                            OpponentGameProfileUpdate(Enums.EPlayerType.Player_White, mMultiplayManager);
+                            SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_Black);
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
@@ -227,16 +228,6 @@ public class GameLogic : IDisposable
             GameManager.Instance.OpenWaitingPanel();
         });
     }
-
-    private async void SendUserInfo(string roomId)
-    {
-        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
-        Debug.Log(userInfo.nickname);
-        UnityThread.executeInUpdate(() =>
-        {
-            mMultiplayManager.SendOpponentInfo(roomId, userInfo.nickname, userInfo.profileimageindex, userInfo.rank);
-        });
-    }
     
     private void MyGameProfileUpdate(Enums.EPlayerType playerType)
     {
@@ -246,12 +237,30 @@ public class GameLogic : IDisposable
         });
     }
 
-    private void OpponentGameProfileUpdate(Enums.EPlayerType playerType, MultiplayManager multiplayManager)
+    private void SendOpponentGameProfile(string roomId, Enums.EPlayerType playerType)
     {
         UnityThread.executeInUpdate(() =>
         {
-            OnOpponentGameProfileUpdate?.Invoke(playerType, multiplayManager);
+            mMultiplayManager.SendOpponentProfile(roomId, SetMyUserInfo(roomId, playerType));
         });
+    }
+
+    private UsersInfoData SetMyUserInfo(string roomId, Enums.EPlayerType playerType)
+    {
+        // 네트워크에서 실제 사용자 정보를 받아옵니다
+        UserInfoResult userInfo = NetworkManager.Instance.GetUserInfoSync(() => { }, () => { });
+
+        // 실제 데이터를 기반으로 사용자 정보를 설정
+        UsersInfoData usersInfoData = new UsersInfoData
+        {
+            roomId = roomId,
+            nickname = userInfo.nickname,
+            profileimageindex = userInfo.profileimageindex,
+            rank = userInfo.rank,
+            playerType = playerType
+        };
+
+        return usersInfoData;
     }
     
     /// <summary>
