@@ -15,17 +15,6 @@ public class MainPanelController : MonoBehaviour
     [SerializeField] private Image profileImage;
     [SerializeField] private TMP_Text userInfoText;
     [SerializeField] private TMP_Text coinText;
-
-    private void Start()
-    {
-        GameManager.Instance.OnMainPanelUpdate += SetProfileInfo;
-        GameManager.Instance.OnMainPanelUpdate?.Invoke();
-    }
-
-    private void OnDestroy()
-    {
-        GameManager.Instance.OnMainPanelUpdate -= SetProfileInfo;
-    }
     
     public async void SetProfileInfo()
     {
