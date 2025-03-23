@@ -9,7 +9,9 @@ public class GameLogic : IDisposable
 {
     public BoardCellController boardCellController;
     public GamePanelController gamePanelController;
-
+    
+    public int currentSelectedCell;
+    
     private BasePlayerState mPlayer_Black;
     private BasePlayerState mPlayer_White;
     private BasePlayerState mCurrentPlayer;
@@ -202,8 +204,8 @@ public class GameLogic : IDisposable
                 {
                     //금수 최신화
                     if(lists[i][k] == null) continue;
-                    int x = lists[i][k].blockIndex % (boardCellController.size + 1);
-                    int y = lists[i][k].blockIndex / (boardCellController.size + 1);
+                    int x = lists[i][k].cellIndex % (boardCellController.size + 1);
+                    int y = lists[i][k].cellIndex / (boardCellController.size + 1);
                     CheckCellInRule(y,x);
                 }
             }
@@ -236,7 +238,12 @@ public class GameLogic : IDisposable
         
         return true;
     }
-
+    
+    /// <summary>
+    /// X,Y좌표를 기준으로 firstScanRange * 2 의 길이 만큼 4방향으로 금수가 있는지 확인하는 메서드 
+    /// </summary>
+    /// <param name="Y"></param>
+    /// <param name="X"></param>
     public void CheckCellInRule(int Y, int X)
     {
         int firstScanRange = 5;
@@ -321,12 +328,18 @@ public class GameLogic : IDisposable
     
     public bool ForbiddenSelf(BoardCell cell)
     {
-        int X = cell.blockIndex % (boardCellController.size + 1);
-        int Y = cell.blockIndex / (boardCellController.size + 1);
+        int X = cell.cellIndex % (boardCellController.size + 1);
+        int Y = cell.cellIndex / (boardCellController.size + 1);
         return ForbiddenSelf(Y, X);
     }
     
-    //자신의 좌표가 금수라면 false를 반환하는 목적으로 만든 함수
+    /// <summary>
+    /// 자신의 위치가 금수인지 확인하는 메서드
+    /// 금수라면 false, 금수가 아니라면 true
+    /// </summary>
+    /// <param name="Y"></param>
+    /// <param name="X"></param>
+    /// <returns></returns>
     public bool ForbiddenSelf(int Y, int X)
     {
         int firstScanRange = 5;
@@ -392,9 +405,16 @@ public class GameLogic : IDisposable
         return true;
     }
 
-    //거짓금수
-    //금수가 될 위치 놓았을 때 금수가 되는 배열에 새로운 금수가 있다면 거짓금수
-    //false == 금수 , true == 거짓금수
+    
+    /// <summary>
+    ///거짓금수를 확인하는 메서드
+    ///금수가 될 위치 놓았을 때 자신의 위치에서, 자신이 금수간 된 배열의 2칸 이내에 새로운 금수가 있다면 거짓금수
+    ///false == 금수 , true == 거짓금수
+    /// </summary>
+    /// <param name="cell"></param>
+    /// <param name="firstList"></param>
+    /// <param name="secondList"></param>
+    /// <returns></returns>
     public bool FakeForbidden(BoardCell cell, BoardCell[] firstList, BoardCell[] secondList)
     {
         //첫번째 금수가 되는 칸
@@ -454,7 +474,12 @@ public class GameLogic : IDisposable
         return false;
     }
 
-    //렌주룰 (33 44 룰)
+    /// <summary>
+    /// 렌주룰
+    /// 매개변수로 받은 배열의 모든 칸에 금수 체크를 하고 리스트를 반환하는 메서드
+    /// </summary>
+    /// <param name="list"></param>
+    /// <returns></returns>
     public (List<BoardCell>, List<BoardCell>, BoardCell result44, BoardCell rule6) RenjuRule(BoardCell[] list)
     {
         //33이 될 수 있는 최대길이는 4이다
@@ -678,13 +703,14 @@ public class GameLogic : IDisposable
         return false;
     }
 
-    public BoardCell[][] MakeLists(int boardSize, BoardCell cell, int checkLength)
-    {
-        int X = cell.blockIndex % (boardSize + 1);
-        int Y = cell.blockIndex / (boardSize + 1);
-        return MakeLists(boardSize, Y, X, checkLength);
-    }
-
+    /// <summary>
+    /// 받은 좌표를 중심으로 전방향으로 리스트를 만들고 반환하는 메서드
+    /// </summary>
+    /// <param name="boardSize"></param>
+    /// <param name="Y"></param>
+    /// <param name="X"></param>
+    /// <param name="checkLenght"></param>
+    /// <returns></returns>
     public BoardCell[][] MakeLists(int boardSize,int Y, int X,int checkLenght)
     {
         int endOfLeft = checkLenght * -1;

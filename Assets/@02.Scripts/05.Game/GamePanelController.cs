@@ -21,6 +21,10 @@ public class GamePanelController : MonoBehaviour
     private const float mDisableAlpha = 0.3f;
     private const float mEnableAlpha = 1.0f;
     
+    //착수버튼이 눌렸을 때 플레이어에게 알림 
+    public delegate void OnBeginButtonClicked();
+    public OnBeginButtonClicked onBeginButtonClicked;
+    
     /// <summary>
     /// Play하고 있을 때는 턴을 표시하는 turnUI를 보여주고
     /// Record(기보)하고 있을 때는 recordUI를 보여줌
@@ -98,7 +102,7 @@ public class GamePanelController : MonoBehaviour
     /// </summary>
     public void OnClickBeginButton()
     {
-        
+        onBeginButtonClicked?.Invoke();
     }
 
     #region Record UI(기보 기능 UI)

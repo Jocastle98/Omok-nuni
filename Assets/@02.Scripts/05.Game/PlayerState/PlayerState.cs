@@ -30,11 +30,28 @@ public class PlayerState : BasePlayerState
         mbIsMultiplay = true;
     }
 
+    /// <summary>
+    /// 자신의 턴이 되었을 때 착수가능하게 버튼을 활성화
+    /// </summary>
+    /// <param name="gameLogic"></param>
     public override void OnEnter(GameLogic gameLogic)
     {
-        //수를 둔다
-        gameLogic.boardCellController.onCellClicked = (Y, X) =>
+        //셀이 눌렸을 때 : 셀 선택
+        gameLogic.boardCellController.onCellClicked = (cellIndex) =>
         {
+            gameLogic.currentSelectedCell = cellIndex;
+        };
+        
+        //착수 버튼을 눌렀을 때 : 선택된 셀에 착수
+        gameLogic.gamePanelController.onBeginButtonClicked = () =>
+        {
+            int cellIndex = gameLogic.currentSelectedCell;
+            if (cellIndex == null) return;
+            
+            int size = gameLogic.boardCellController.size;
+            int X = cellIndex % (size + 1);
+            int Y = cellIndex / (size + 1);
+            
             HandleMove(gameLogic, Y, X);
         };
     }
@@ -42,7 +59,8 @@ public class PlayerState : BasePlayerState
     public override void OnExit(GameLogic gameLogic)
     {
         //델리게이트 초기화
-        gameLogic.boardCellController.onCellClicked = null;
+        gameLogic.gamePanelController.onBeginButtonClicked = null;
+        gameLogic.boardCellController.onCellClicked  = null;
     }
 
     public override void HandleMove(GameLogic gameLogic, int Y, int X)
