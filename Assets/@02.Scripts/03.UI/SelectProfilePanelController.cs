@@ -29,7 +29,7 @@ public class SelectProfilePanelController : PopupPanelController
     {
         await NetworkManager.Instance.ChangeProfileImage(new ProfileImageData(profileIndex), () => { }, () => { });
         OnProfileSelected?.Invoke();
-        Hide();
+        Hide(() => GameManager.Instance.OnMainPanelUpdate?.Invoke());
     }
     
     public void OnClickSelectProfileButtonFromSignupPanel(int profileIndex)
