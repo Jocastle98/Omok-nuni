@@ -5,10 +5,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UserDataStructs;
 
-public class SelectProfilePanelController : PanelController
+public class SelectProfilePanelController : PopupPanelController
 {
     [SerializeField] private List<Image> mProfileImages;
     public Action OnProfileSelected;
+    public Action<int> OnProfileSelectedReturn;
 
     public override void Show()
     {
@@ -24,10 +25,16 @@ public class SelectProfilePanelController : PanelController
         Hide();
     }
 
-    public async void OnClickSelectProfileButton(int profileIndex)
+    public async void OnClickSelectProfileButtonFromProfilePanel(int profileIndex)
     {
         await NetworkManager.Instance.ChangeProfileImage(new ProfileImageData(profileIndex), () => { }, () => { });
         OnProfileSelected?.Invoke();
+        Hide(() => GameManager.Instance.OnMainPanelUpdate?.Invoke());
+    }
+    
+    public void OnClickSelectProfileButtonFromSignupPanel(int profileIndex)
+    {
+        OnProfileSelectedReturn?.Invoke(profileIndex);
         Hide();
     }
 }

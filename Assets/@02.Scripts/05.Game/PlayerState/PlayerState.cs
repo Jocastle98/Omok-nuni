@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Burst.Intrinsics;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class PlayerState : BasePlayerState
@@ -29,6 +29,7 @@ public class PlayerState : BasePlayerState
         mRoomId = roomId;
         mbIsMultiplay = true;
     }
+    
 
     /// <summary>
     /// 자신의 턴이 되었을 때 착수가능하게 버튼을 활성화

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 게임의 전체적인 흐름을 관리하는 싱글톤 게임 매니저 클래스.
@@ -20,6 +21,10 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mSigninPanel;
     [SerializeField] private GameObject mProfilePanel;
     [SerializeField] private GameObject mSelectProfilePanel;
+    [SerializeField] private GameObject mScorePanel;
+    [SerializeField] private GameObject mSelectProfileForProfilePanel;
+    [SerializeField] private GameObject mSelectProfileForSignupPanel;
+    [SerializeField] private GameObject mRankingPanel;
     [SerializeField] private List<Sprite> mProfileSprites;
 
 
@@ -33,12 +38,85 @@ public class GameManager : Singleton<GameManager>
 
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
+    
+    public Action OnMainPanelUpdate;
+    public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
+    public Action<UsersInfoData> OnOpponentGameProfileUpdate;
 
     private void Start()
     {
         OpenSigninPanel();
     }
+    
+    #region  Score
 
+    // TODO: 스코어 급수에 맞게 조정 현재는(-30~30)
+    
+    public async void WinGame()
+    {
+        // 서버에 wincount 증가 요청
+        await NetworkManager.Instance.AddWinCount(
+            successCallback: async () =>
+            {
+                // 성공 시 최신 사용자 정보 가져오기
+                var userInfo = await NetworkManager.Instance.GetUserInfo(
+                    successCallback: () => { Debug.Log("유저 정보 갱신 성공"); },
+                    failureCallback: () => { Debug.LogWarning("유저 정보 갱신 실패"); }
+                );
+
+                // 승패 점수는 wincount - losecount, 추가로 등급과 승급 포인트도 가져옴
+                int totalScore = userInfo.wincount - userInfo.losecount;
+                // 수정: OpenScorePanel에 등급과 승급 포인트 정보를 추가로 전달
+                OpenScorePanel(true, 1, totalScore, userInfo.rank, userInfo.rankuppoints);
+            },
+            failureCallback: () =>
+            {
+                Debug.LogWarning("승리 카운트 업데이트 실패");
+            }
+        );
+    }
+
+    public async void LoseGame()
+    {
+        // 서버에 losecount 증가 요청
+        await NetworkManager.Instance.AddLoseCount(
+            successCallback: async () =>
+            {
+                var userInfo = await NetworkManager.Instance.GetUserInfo(
+                    successCallback: () => { Debug.Log("유저 정보 갱신 성공"); },
+                    failureCallback: () => { Debug.LogWarning("유저 정보 갱신 실패"); }
+                );
+
+                int totalScore = userInfo.wincount - userInfo.losecount;
+                // 수정: 등급과 승급 포인트도 전달
+                OpenScorePanel(false, -1, totalScore, userInfo.rank, userInfo.rankuppoints);
+            },
+            failureCallback: () =>
+            {
+                Debug.LogWarning("패배 카운트 업데이트 실패");
+            }
+        );
+    }
+    /// <summary>
+    /// 승점 패널 오픈
+    /// </summary>
+    /// <param name="isWin">승패</param>
+    /// <param name="addDelete">점수획득 1/-1</param>
+    public void OpenScorePanel(bool isWin, int addDelete, int totalScore, int rank, int rankuppoints)
+    {
+        if (mCanvas != null)
+        {
+            var scorePanelObject = Instantiate(mScorePanel, mCanvas.transform);
+            var scoreController = scorePanelObject.GetComponent<ScorePanelController>();
+            if (scoreController != null)
+            {
+                //  서버에서 가져온 총점, 승패, 증감값과 함께 등급, 승급 포인트를 전달
+                scoreController.InitializePanel(totalScore, isWin, addDelete, rank, rankuppoints);
+            }
+        }
+    }
+    #endregion
+    
     // 게임 화면으로 씬 전환하는 메서드
     public void ChangeToGameScene(Enums.EGameType gameType)
     {
@@ -49,6 +127,8 @@ public class GameManager : Singleton<GameManager>
     // 메인 화면으로 씬 전환하는 메서드
     public void ChangeToMainScene()
     {
+        ClearAllCallbacks();
+        
         // gameLogic 초기화
         mGameLogic?.Dispose();
         mGameLogic = null;
@@ -79,6 +159,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
+            var rankingPanelObj = Instantiate(mRankingPanel, mCanvas.transform);
+            rankingPanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
@@ -87,8 +169,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            GameObject shopPanelObject = Instantiate(shopPanel, mCanvas.transform);
-            // shopPanelController 컴포넌트 연결 및 창 띄우는 메서드
+            var shopPanelObject = Instantiate(shopPanel, mCanvas.transform);
+            shopPanelObject.GetComponent<PopupPanelController>().Show();
         }
     }
 
@@ -125,7 +207,7 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var signinPanelObj = Instantiate(mSigninPanel, mCanvas.transform);
-            signinPanelObj.GetComponent<PanelController>().Show();
+            signinPanelObj.GetComponent<SigninPanelController>().Show(OnMainPanelUpdate);
         }
     }
 
@@ -135,7 +217,7 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var signupPanelObj = Instantiate(mSignupPanel, mCanvas.transform);
-            signupPanelObj.GetComponent<PanelController>().Show();
+            signupPanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
@@ -144,24 +226,40 @@ public class GameManager : Singleton<GameManager>
         if (mCanvas != null)
         {
             var profilePanelObj = Instantiate(mProfilePanel, mCanvas.transform);
-            profilePanelObj.GetComponent<PanelController>().Show();
+            profilePanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 
-    public PanelController OpenSelectProfilePanel()
+    // 프로필 패널에서 프로필 수정 시 호출
+    public PopupPanelController OpenSelectProfilePanelFromProfilePanel()
     {
         if (mCanvas != null)
         {
-            var selectProfilePanelObj = Instantiate(mSelectProfilePanel, mCanvas.transform);
-            selectProfilePanelObj.GetComponent<PanelController>().Show();
+            var selectProfilePanelObj = Instantiate(mSelectProfileForProfilePanel, mCanvas.transform);
+            selectProfilePanelObj.GetComponent<PopupPanelController>().Show();
 
-            return selectProfilePanelObj.GetComponent<PanelController>();
+            return selectProfilePanelObj.GetComponent<PopupPanelController>();
         }
 
         Debug.Log("Canvas not open");
         return null;
     }
 
+    // 회원가입 패널에서 프로필 수정 시 호출
+    public PopupPanelController OpenSelectProfilePanelFromSignupPanel()
+    {
+        if (mCanvas != null)
+        {
+            var selectProfilePanelObj = Instantiate(mSelectProfileForSignupPanel, mCanvas.transform);
+            selectProfilePanelObj.GetComponent<PopupPanelController>().Show();
+
+            return selectProfilePanelObj.GetComponent<PopupPanelController>();
+        }
+
+        Debug.Log("Canvas not open");
+        return null;
+    }
+    
     public Sprite GetProfileSprite(int profileIndex)
     {
         if (profileIndex >= 0 && profileIndex < mProfileSprites.Count)
@@ -178,9 +276,9 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
+            mbIsStartGame = false;
             GameObject waitingPanelObject = Instantiate(waitingPanel, mCanvas.transform);
             waitingPanelObject.GetComponent<WaitingPanelController>().Show();
-            mbIsStartGame = false;
         }
     }
 
@@ -204,15 +302,34 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
+    // 콜백 초기화 메서드
+    private void ClearAllCallbacks()
+    {
+        OnMainPanelUpdate = null;
+        OnMyGameProfileUpdate = null;
+        OnOpponentGameProfileUpdate = null;
+    }
+    
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        mCanvas = GameObject.FindObjectOfType<Canvas>();
+        
         // 인트로 BGM 재생
         if (scene.name == "Main")
         {
             AudioManager.Instance.PlayIntroBgm();
-        }
+            
+            MainPanelController mainPanelController = GameObject.FindObjectOfType<MainPanelController>();
 
-        // 임시기능: 테스트용
+            if (mainPanelController != null)
+            {
+                OnMainPanelUpdate -= mainPanelController.SetProfileInfo;
+                OnMainPanelUpdate += mainPanelController.SetProfileInfo;
+            }
+            
+            OnMainPanelUpdate?.Invoke();
+        }
+        
         if (scene.name == "Game")
         {
             AudioManager.Instance.PlayGameBgm();
@@ -234,14 +351,15 @@ public class GameManager : Singleton<GameManager>
             }
 
             mGameLogic = new GameLogic();
-            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType);
+            mGameLogic.GameStart(boardCellController, gamePanelController, mGameType, 
+                OnMyGameProfileUpdate, OnOpponentGameProfileUpdate);
         }
-
-        mCanvas = GameObject.FindObjectOfType<Canvas>();
     }
 
     private void OnApplicationQuit()
     {
+        ClearAllCallbacks();
+        
         mGameLogic?.Dispose();
         mGameLogic = null;
     }

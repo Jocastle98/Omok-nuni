@@ -17,7 +17,7 @@ public abstract class BasePlayerState
             bool gameResult = gameLogic.GameResult(player, Y, X);
             if (gameResult)
             {
-                gameLogic.EndGame();
+                gameLogic.EndGame(player);
             }
             else
             {
