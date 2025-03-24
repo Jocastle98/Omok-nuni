@@ -62,6 +62,7 @@ public class ProfilePanelController : PopupPanelController
 
     public void OnClickBackButton()
     {
+        GameManager.Instance.OnMainPanelUpdate();
         Hide();
     }
 

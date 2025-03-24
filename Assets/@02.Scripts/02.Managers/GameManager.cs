@@ -326,8 +326,6 @@ public class GameManager : Singleton<GameManager>
                 OnMainPanelUpdate -= mainPanelController.SetProfileInfo;
                 OnMainPanelUpdate += mainPanelController.SetProfileInfo;
             }
-            
-            OnMainPanelUpdate?.Invoke();
         }
         
         if (scene.name == "Game")
