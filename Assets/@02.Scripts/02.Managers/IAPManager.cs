@@ -6,8 +6,6 @@ using UnityEngine.Purchasing;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// TODO: enum EItemType Enums로 이동
-/// TODO: Coin 지급 로직
 /// 테스트 사용방법 : BuyProduct에 EItemType 매개변수넣고 호출(테스트는 버튼에 int로 받아 EItemType으로 변환)
 /// </summary>
 public class IAPManager : Singleton<IAPManager>, IStoreListener
@@ -112,16 +110,7 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
             Debug.Log("BuyProductID FAIL. Not initialized.");
         }
     }
-
-    public bool HadPurchased(Enums.EItemType itemType)
-    {
-        if (!IsInitialized()) return false;
-
-        string productId = ShopItemMapping[itemType];
-        var product = mStoreController.products.WithID(productId);
-        if (product != null) {return product.hasReceipt;}
-        return false;
-    }
+    
     
     public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
     {
@@ -150,37 +139,81 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
     {
         if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_COIN_1000, StringComparison.Ordinal))
         {
-            Debug.Log("코인 1000개 지급");
-            
-            //TODO: 코인 1000개 지급
-            
+            NetworkManager.Instance.AddCoin(1000, i =>
+            {
+                GameManager.Instance.OpenConfirmPanel("코인이 1,000개 지급되었습니다!", null, false);
+                GameManager.Instance.OnCoinUpdated?.Invoke();
+            }, () =>
+            {
+                GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+            } );
+
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_COIN_2000, StringComparison.Ordinal))
         {
-            //TODO: 코인 2000개 지급
-            Debug.Log("코인 2000개 지급");
+            NetworkManager.Instance.AddCoin(2000, i =>
+            {
+                GameManager.Instance.OpenConfirmPanel("코인이 2,000개 지급되었습니다!", null, false);
+                GameManager.Instance.OnCoinUpdated?.Invoke();
+            }, () =>
+            {
+                GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+            } );
+            
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_COIN_4500, StringComparison.Ordinal))
         {
-            //TODO: 코인 4500개 지급
-            Debug.Log("코인 4500개 지급");
+            NetworkManager.Instance.AddCoin(4500, i =>
+            {
+                GameManager.Instance.OpenConfirmPanel("코인이 4,500개 지급되었습니다!", null, false);
+                GameManager.Instance.OnCoinUpdated?.Invoke();
+            }, () =>
+            {
+                GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+            } );
+            
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_COIN_10000, StringComparison.Ordinal))
         {
-            //TODO: 코인 10000개 지급
-            Debug.Log("코인 10000개 지급");
+            NetworkManager.Instance.AddCoin(10000, i =>
+            {
+                GameManager.Instance.OpenConfirmPanel("코인이 10,000개 지급되었습니다!", null, false);
+                GameManager.Instance.OnCoinUpdated?.Invoke();
+            }, () =>
+            {
+                GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+            } );
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_NOADS, StringComparison.Ordinal))
         {
-            //TODO: 광고제거 지급
-            Debug.Log("광고제거 지급");
-            //UserInformations.IsNoAds = true;서버에서 광고제거 아이템 구매 여부 받아오는 것으로 변경하기
+            NetworkManager.Instance.RemoveAds(() =>
+            {
+                GameManager.Instance.OpenConfirmPanel("광고제거가 적용되었습니다!", null, false);
+                GameManager.Instance.OnAdsRemoved?.Invoke();
+            }, () =>
+            {
+                GameManager.Instance.OpenConfirmPanel("광고제거 실패", null, false);
+            });
+
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_NOADS_COIN_2000, StringComparison.Ordinal))
         {
-            //TODO: 광고제거 + 코인 2000개 지급
-            Debug.Log("광고제거 + 코인 2000개 지급");
-            //UserInformations.IsNoAds = true; 서버에서 광고제거 아이템 구매 여부 받아오는 것으로 변경하기
+            NetworkManager.Instance.RemoveAds(() =>
+            {
+            }, () =>
+            {
+                GameManager.Instance.OpenConfirmPanel("광고제거 실패", null, false);
+                return;
+            });
+            
+            NetworkManager.Instance.AddCoin(2000, i =>
+            {
+                GameManager.Instance.OpenConfirmPanel("광고제거와 코인이 2,000개 지급되었습니다!", null, false);
+                GameManager.Instance.OnCoinUpdated?.Invoke();
+            }, () =>
+            {
+                GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+            } );
         }
         else
         {

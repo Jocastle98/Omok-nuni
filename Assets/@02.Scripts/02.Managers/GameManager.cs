@@ -41,6 +41,8 @@ public class GameManager : Singleton<GameManager>
     public Action OnMainPanelUpdate;
     public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
     public Action<UsersInfoData> OnOpponentGameProfileUpdate;
+    public Action OnCoinUpdated;
+    public Action OnAdsRemoved;
 
     private void Start()
     {

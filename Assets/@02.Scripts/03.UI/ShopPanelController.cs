@@ -2,16 +2,37 @@
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShopPanelController : PopupPanelController
 {
     public TMP_Text coinText;
+    public Button[] NoAdsButtons;
 
-    private void OnEnable()
+    private async void OnEnable()
+    {
+        UpdateCoin();
+        GameManager.Instance.OnCoinUpdated += UpdateCoin;
+        GameManager.Instance.OnAdsRemoved += UpdateAdButtons;
+
+        var userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
+        if (userInfo.hasadremoval)
+        {
+            UpdateAdButtons();
+        }
+    }
+
+    private void OnDisable()
+    {
+        GameManager.Instance.OnCoinUpdated -= UpdateCoin;
+        GameManager.Instance.OnAdsRemoved -= UpdateAdButtons;
+    }
+
+    private void UpdateCoin()
     {
         NetworkManager.Instance.GetUserInfo(() =>
         {
-            Debug.Log("코인 로드 완료");
+            
         }, () =>
         {
             Debug.Log("코인 로드 실패");
@@ -22,6 +43,12 @@ public class ShopPanelController : PopupPanelController
             coinText.text = coin.ToString();
 
         });
+    }
+
+    private void UpdateAdButtons()
+    {
+        NoAdsButtons[0].interactable = false;
+        NoAdsButtons[1].interactable = false;
     }
 
     public void OnClickCloseButton()
@@ -37,16 +64,6 @@ public class ShopPanelController : PopupPanelController
     public void OnClickShopItem(int type)
     {
         Enums.EItemType selectedItem = (Enums.EItemType)type;
-
-        if (selectedItem == Enums.EItemType.NoAds || selectedItem == Enums.EItemType.NoAds_Coin_2000)
-        {
-            if (IAPManager.Instance.HadPurchased(selectedItem))
-            {
-                Debug.Log("이미 구매한 상품입니다");
-                return;
-            }
-            
-        }
         IAPManager.Instance.BuyProduct(selectedItem);
     }
 }
