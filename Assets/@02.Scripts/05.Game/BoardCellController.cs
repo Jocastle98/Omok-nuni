@@ -7,10 +7,8 @@ using UnityEngine.Serialization;
 
 public class BoardCellController : MonoBehaviour
 {
-    //초기기화 작업도 있으면 좋을듯 함
-
     public BoardCell[,] cells;
-    public delegate void OnCellClicked(int X, int Y);
+    public delegate void OnCellClicked(int cellIndex);
     public OnCellClicked onCellClicked;
     public int size = 14;
     
@@ -29,7 +27,9 @@ public class BoardCellController : MonoBehaviour
         InitBoard();
     }
     
-
+    /// <summary>
+    /// 보드를 생성 및 초기화 메서드
+    /// </summary>
     public void InitBoard()
     {
         if (cells != null)
@@ -78,10 +78,7 @@ public class BoardCellController : MonoBehaviour
                 cells[y, x] = boardCell;
                 boardCell.InitBlockCell(blockCount++, (blockIndex) =>
                 {
-                    int X = blockIndex % (size + 1);
-                    int Y = blockIndex / (size + 1);
-                    
-                    onCellClicked?.Invoke(Y,X);
+                    onCellClicked?.Invoke(blockIndex);
                 });
                 
             }
