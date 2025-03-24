@@ -28,6 +28,10 @@ public class GamePanelController : MonoBehaviour
     private const float mEnableAlpha = 1.0f;
     
     private MultiplayManager mMultiplayManager;
+
+    //착수버튼이 눌렸을 때 플레이어에게 알림
+    public delegate void OnBeginButtonClicked();
+    public OnBeginButtonClicked onBeginButtonClicked;
     
     private void Awake()
     {
@@ -170,7 +174,7 @@ public class GamePanelController : MonoBehaviour
     /// </summary>
     public void OnClickBeginButton()
     {
-        
+        onBeginButtonClicked?.Invoke();
     }
 
     #region Record UI(기보 기능 UI)
