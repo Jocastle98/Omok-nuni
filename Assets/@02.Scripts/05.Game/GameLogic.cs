@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -54,7 +55,40 @@ public class GameLogic : IDisposable
                 mPlayer_White = new AIState(false);
 
                 OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
-                SetState(mPlayer_Black);
+                
+                NetworkManager.Instance.GetUserInfo(() =>
+                {
+                }, () =>
+                {
+                    //랭크 로드 실패시 기본난이도 중간으로 설정
+                    MinimaxAIController.SetLevel(Enums.EDifficultyLevel.Medium);
+                    Debug.Log("난이도 기본 중 설정");
+                    SetState(mPlayer_Black);
+                }).ContinueWith(userInfo =>
+                {
+                    if (string.IsNullOrEmpty(userInfo.nickname) && userInfo.rank == 0) return;
+                    int rank = userInfo.rank;
+                    Enums.EDifficultyLevel level;
+                    if (rank >= 10 && rank <= 18)
+                    {
+                        level = Enums.EDifficultyLevel.Easy;
+                        Debug.Log("난이도 하 설정");
+                    }
+                    else if (rank >= 5 && rank <= 9)
+                    {
+                        level = Enums.EDifficultyLevel.Medium;
+                        Debug.Log("난이도 중 설정");
+                    }
+                    else
+                    {
+                        level = Enums.EDifficultyLevel.Hard;
+                        Debug.Log("난이도 상 설정");
+                    }
+
+                    MinimaxAIController.SetLevel(level);
+                    SetState(mPlayer_Black);
+                });
+                
                 break;
             case Enums.EGameType.MultiPlay:
                 mMultiplayManager =  new MultiplayManager((state, roomId) =>
@@ -119,11 +153,6 @@ public class GameLogic : IDisposable
             case Enums.EPlayerType.Player_White:
                 SetState(mPlayer_Black);
                 break;
-        }
-
-        if (mCurrentPlayer is AIState aiPlayer)
-        {
-            aiPlayer.OnEnter(this);
         }
     }
 
@@ -299,7 +328,8 @@ public class GameLogic : IDisposable
             return false;
         }
         
-        //승점 패널
+        //NextTurn() 중복 호출 문제로 주석처리 
+        /*//승점 패널
         bool isWin = GameResult(playerType, Y, X);
         if (isWin)
         {
@@ -311,6 +341,7 @@ public class GameLogic : IDisposable
             // 5목 아니면 다음 턴
             NextTurn(playerType);
         }
+        */
         
 
         return true;

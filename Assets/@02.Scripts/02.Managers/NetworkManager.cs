@@ -135,7 +135,7 @@ public class NetworkManager : Singleton<NetworkManager>
     public async UniTask<UserInfoResult> GetUserInfo(Action successCallback, Action failureCallback)
     {
         string sid = PlayerPrefs.GetString("sid");
-        if (sid == null)
+        if (string.IsNullOrEmpty(sid))
         {
             Debug.Log("유저 데이터 불러오기에 실패했습니다. \n" +
                       "세션 데이터가 없습니다.");
@@ -161,13 +161,41 @@ public class NetworkManager : Singleton<NetworkManager>
                         false);
                 }
                 failureCallback?.Invoke();
+                return new UserInfoResult();
             }
 
+            // 응답 상태 체크
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                string errorMessage = "서버 오류 발생: " + www.error;
+                if (www.result == UnityWebRequest.Result.ConnectionError)
+                {
+                    errorMessage = "네트워크 오류가 발생했습니다.";
+                }
+                else if (www.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    errorMessage = $"HTTP 오류 발생: {www.responseCode}";
+                }
+
+                Debug.LogError(errorMessage);
+                GameManager.Instance.OpenConfirmPanel(errorMessage, () => { failureCallback?.Invoke(); }, false);
+                failureCallback?.Invoke();  // HTTP 오류나 네트워크 오류 시 실패 콜백 호출
+                return new UserInfoResult();  // 실패 시 빈 결과 반환
+            }
+            
             var resultStr = www.downloadHandler.text;
+            
+            // 응답 본문 처리
+            if (string.IsNullOrEmpty(resultStr))
+            {
+                Debug.LogError("서버 응답이 비어 있습니다.");
+                GameManager.Instance.OpenConfirmPanel("서버 응답이 비어 있습니다.", () => { failureCallback?.Invoke(); }, false);
+                failureCallback?.Invoke();  // 응답 본문이 비어있을 때 실패 콜백 호출
+                return new UserInfoResult();  // 빈 결과 반환
+            }
+            
             UserInfoResult userInfo = JsonUtility.FromJson<UserInfoResult>(resultStr);
-            
             successCallback?.Invoke();
-            
             return userInfo;
         }
     }
@@ -372,4 +400,104 @@ public class NetworkManager : Singleton<NetworkManager>
             }
         }
     }
+
+    /// <summary>
+    /// 코인 추가
+    /// </summary>
+    /// <param name="amount">추가할 코인 수량</param>
+    /// <param name="successCallback"></param>
+    /// <param name="failureCallback"></param>
+    /// <returns>비동기</returns>
+    public async UniTask<CoinResult> AddCoin(int amount, Action<int> successCallback = null,
+        Action failureCallback = null)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (string.IsNullOrEmpty(sid))
+        {
+            Debug.LogWarning("세션 쿠기가 없습니다. 코인 추가 불가");
+            failureCallback?.Invoke();
+            return new CoinResult { success = false, coin = 0, message = "세션 쿠키가 없습니다" };
+        }
+
+        CoinData coinData = new CoinData { amount = amount };
+        string jsonStr = JsonUtility.ToJson(coinData);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonStr);
+
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/addcoin", UnityWebRequest.kHttpVerbPOST))
+        {
+            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+            www.SetRequestHeader("Content-Type", "application/json");
+
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+
+                if (www.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogWarning("코인 추가 실패: " +www.error);
+                    failureCallback?.Invoke();
+                    return new CoinResult { success = false, coin = 0, message = www.error };
+                }
+
+                var resultStr = www.downloadHandler.text;
+                CoinResult coinResult = JsonUtility.FromJson<CoinResult>(resultStr);
+
+                if (coinResult.success)
+                {
+                    successCallback?.Invoke(coinResult.coin);
+                }
+                else
+                {
+                    failureCallback?.Invoke();
+                }
+
+                return coinResult;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("코인 추가 중 예외 발생: " + ex.Message);
+                failureCallback?.Invoke();
+                return new CoinResult { success = false, coin = 0, message = ex.Message };
+            }
+        }
+    }
+
+    public async UniTask RemoveAds(Action successCallback, Action failureCallback)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (string.IsNullOrEmpty(sid))
+        {
+            failureCallback?.Invoke();
+            return;
+        }
+
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/removeads", UnityWebRequest.kHttpVerbPOST))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                    successCallback?.Invoke();
+                }
+                else
+                {
+                    failureCallback?.Invoke();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("RemoveAds 예외 발생" + ex.Message);
+                failureCallback?.Invoke();
+            }
+        }
+    }
+    
 }
