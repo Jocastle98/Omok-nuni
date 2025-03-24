@@ -93,8 +93,9 @@ public class GameLogic : IDisposable
             case Enums.EGameType.MultiPlay:
                 mMultiplayManager =  new MultiplayManager((state, roomId) =>
                 {
-                    mMultiplayManager.OnOpponentProfileUpdate += OnOpponentGameProfileUpdate;
                     mRoomId = roomId;
+                    mMultiplayManager.OnOpponentProfileUpdate += OnOpponentGameProfileUpdate;
+                    
                     switch (state)
                     {
                         case Enums.EMultiplayManagerState.CreateRoom:
@@ -128,10 +129,14 @@ public class GameLogic : IDisposable
                             SetState(mPlayer_Black);
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
+                            Debug.Log("## Exit Room");
                             // todo: 퇴장 처리
+                            
                             break;
                         case Enums.EMultiplayManagerState.EndGame:
+                            Debug.Log("## End Game");
                             // todo: 게임 종료 처리
+                            
                             break;
                     }
                 });
@@ -197,8 +202,6 @@ public class GameLogic : IDisposable
         //씬 혹은 게임화면 위치 변경
         
         //TODO: 게임 진행 로직 완성되면 ScorePanel을 띄워 승점 관리
-        
-        
     }
 
     /// <summary>

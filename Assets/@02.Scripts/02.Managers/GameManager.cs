@@ -26,8 +26,7 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mSelectProfileForSignupPanel;
     [SerializeField] private GameObject mRankingPanel;
     [SerializeField] private List<Sprite> mProfileSprites;
-
-
+    
     private Canvas mCanvas;
 
     private Enums.EGameType mGameType;
@@ -38,7 +37,7 @@ public class GameManager : Singleton<GameManager>
 
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
-    
+
     public Action OnMainPanelUpdate;
     public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
     public Action<UsersInfoData> OnOpponentGameProfileUpdate;
@@ -135,7 +134,7 @@ public class GameManager : Singleton<GameManager>
 
         SceneManager.LoadScene("Main");
     }
-
+    
     // 대국 시작 시 모드선택 패널 호출 메서드
     public void OpenGameTypeSelectPanel()
     {
@@ -301,7 +300,7 @@ public class GameManager : Singleton<GameManager>
         {
         }
     }
-
+    
     // 콜백 초기화 메서드
     private void ClearAllCallbacks()
     {

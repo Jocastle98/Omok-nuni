@@ -92,7 +92,6 @@ public class WaitingPanelController : PopupPanelController
         
         GameManager.Instance.OpenConfirmPanel("다른 유저와의 매칭이 실패하였습니다.", () =>
         {
-            // todo: AI와 매칭 기능 구현
             GameManager.Instance.ChangeToGameScene(Enums.EGameType.SinglePlay);
         }, false);
     }

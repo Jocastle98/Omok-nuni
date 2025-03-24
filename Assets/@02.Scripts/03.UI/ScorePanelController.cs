@@ -108,7 +108,7 @@ private void RefreshIcons(int currentScore)
         Hide(() =>
         {
             GameManager.Instance.ChangeToMainScene();
+            Debug.Log("메인씬으로 전환");
         });
-
     }
 }

@@ -66,34 +66,6 @@ public class MultiplayManager : IDisposable
         mSocket.Connect();
     }
     
-    // 상대방의 프로필 정보 수신
-    private void OnOpponentProfileReceived(SocketIOResponse response)
-    {
-        try
-        {
-            var data = response.GetValue<UsersInfoData>();
-            OnOpponentProfileUpdate?.Invoke(data); // 프로필 정보를 UI로 전달
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error in OnOpponentProfileReceived: {ex.Message}");
-        }
-    }
-
-    public void SendOpponentProfile(string roomId, UsersInfoData profileData)
-    {
-        var data = new 
-        {
-            roomId,
-            nickname = profileData.nickname,
-            profileimageindex = profileData.profileimageindex,
-            rank = profileData.rank,
-            playerType = profileData.playerType
-        };
-        
-        mSocket.Emit("opponentProfile", data);
-    }
-    
     // 자신이 방(세션)을 생성
     private void CreateRoom(SocketIOResponse response)
     {
@@ -127,6 +99,40 @@ public class MultiplayManager : IDisposable
         mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.EndGame, null);
     }
     
+    public void LeaveRoom(string roomId)
+    {
+        mSocket.Emit("leaveRoom", new { roomId });
+    }
+    
+    // 상대방의 프로필 정보를 서버로부터 수신
+    private void OnOpponentProfileReceived(SocketIOResponse response)
+    {
+        try
+        {
+            var data = response.GetValue<UsersInfoData>();
+            OnOpponentProfileUpdate?.Invoke(data); // 프로필 정보를 UI로 전달
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error in OnOpponentProfileReceived: {ex.Message}");
+        }
+    }
+
+    // 자신의 프로필 정보를 서버로 송신
+    public void SendOpponentProfile(string roomId, UsersInfoData profileData)
+    {
+        var data = new 
+        {
+            roomId,
+            nickname = profileData.nickname,
+            profileimageindex = profileData.profileimageindex,
+            rank = profileData.rank,
+            playerType = profileData.playerType
+        };
+        
+        mSocket.Emit("opponentProfile", data);
+    }
+    
     // 서버로부터 상대방의 마커 정보를 받기 위한 메서드
     private void DoOpponent(SocketIOResponse response)
     {
@@ -146,23 +152,18 @@ public class MultiplayManager : IDisposable
     {
         mSocket.Emit("doPlayer", new { roomId , position });
     }
-
-    public void LeaveRoom(string roomId)
-    {
-        mSocket.Emit("leaveRoom", new { roomId });
-    }
-    
-    // 재대국 신청 메서드
-    public void RequestRematch(string roomId)
-    {
-        mSocket.Emit("requestRematch", new { roomId });
-    }
     
     // 새로운 방으로 이동 (서버에서 받은 새로운 방 정보 처리)
     private void RematchStart(SocketIOResponse response)
     {
         var data = response.GetValue<RoomData>();
         mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.StartGame, data.roomId);
+    }
+    
+    // 재대국 신청 메서드
+    public void RequestRematch(string roomId)
+    {
+        mSocket.Emit("requestRematch", new { roomId });
     }
     
     public void Dispose()
