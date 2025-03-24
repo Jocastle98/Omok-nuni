@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -41,6 +42,6 @@ public abstract class Singleton<T> : MonoBehaviour where T : Component
             Destroy(gameObject);
         }
     }
-    
+
     protected abstract void OnSceneLoaded(Scene scene, LoadSceneMode mode);
 }
