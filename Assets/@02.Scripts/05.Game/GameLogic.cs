@@ -152,11 +152,6 @@ public class GameLogic : IDisposable
                 SetState(mPlayer_Black);
                 break;
         }
-
-        if (mCurrentPlayer is AIState aiPlayer)
-        {
-            aiPlayer.OnEnter(this);
-        }
     }
 
     /// <summary>
@@ -331,7 +326,8 @@ public class GameLogic : IDisposable
             return false;
         }
         
-        //승점 패널
+        //NextTurn() 중복 호출 문제로 주석처리 
+        /*//승점 패널
         bool isWin = GameResult(playerType, Y, X);
         if (isWin)
         {
@@ -343,6 +339,7 @@ public class GameLogic : IDisposable
             // 5목 아니면 다음 턴
             NextTurn(playerType);
         }
+        */
         
 
         return true;
