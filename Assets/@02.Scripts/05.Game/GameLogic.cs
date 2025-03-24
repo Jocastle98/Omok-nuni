@@ -25,6 +25,9 @@ public class GameLogic : IDisposable
     private Action<Enums.EPlayerType> OnMyGameProfileUpdate;
     private Action<UsersInfoData> OnOpponentGameProfileUpdate;
     
+    //기보 리스트
+    private List<(int y, int x, Enums.EPlayerType stone)> mMoveHistory = new List<(int, int, Enums.EPlayerType)>();
+    
     /// <summary>
     /// 게임 시작 메서드
     /// </summary>
@@ -132,6 +135,12 @@ public class GameLogic : IDisposable
     {
         if (isGameOver) return; 
         isGameOver = true;
+        
+        // 서버에 기보 기록 전송, recordID 는 날짜 시간
+        // TODO: recordID를 플레이어 이름과 상대플레이어로 변경
+        string recordId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        NetworkManager.Instance.AddOmokRecord(recordId, mMoveHistory);
+
         SetState(null);
         mPlayer_Black = null;
         mPlayer_White = null;
@@ -276,6 +285,9 @@ public class GameLogic : IDisposable
         {
             boardCellController.cells[Y, X].SetMark(playerType);
             boardCellController.cells[Y, X].playerType = playerType;
+            
+            //기보에 추가
+            mMoveHistory.Add((Y, X, playerType));
             
             BoardCell[][] lists = MakeLists(boardCellController.size,Y,X,4);
             

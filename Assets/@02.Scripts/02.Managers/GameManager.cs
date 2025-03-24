@@ -25,6 +25,7 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mSelectProfileForProfilePanel;
     [SerializeField] private GameObject mSelectProfileForSignupPanel;
     [SerializeField] private GameObject mRankingPanel;
+    [SerializeField] private GameObject mRecordListPanel;
     [SerializeField] private List<Sprite> mProfileSprites;
 
 
@@ -149,6 +150,8 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
+            var recordListPanelObj = Instantiate(mRecordListPanel, mCanvas.transform);
+            recordListPanelObj.GetComponent<PopupPanelController>().Show();
         }
     }
 

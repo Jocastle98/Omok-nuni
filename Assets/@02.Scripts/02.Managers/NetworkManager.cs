@@ -7,6 +7,35 @@ using Cysharp.Threading.Tasks;
 using UnityEngine.Networking;
 using UserDataStructs;
 
+[Serializable]
+public class OmokRecordWrapper
+{
+    public OmokRecord[] records;
+}
+
+[Serializable]
+public class OmokRecord
+{
+    public string userId;    
+    public string recordId;  
+    public List<OmokMove> moves;
+    public string createdAt;
+}
+
+[Serializable]
+public class OmokMove
+{
+    public int y;
+    public int x;
+    public int stone;
+}
+
+[Serializable]
+public class OmokRecordRequest
+{
+    public string recordId;
+    public List<OmokMove> moves;
+}
 public class NetworkManager : Singleton<NetworkManager>
 {
     // 로그아웃
@@ -372,4 +401,109 @@ public class NetworkManager : Singleton<NetworkManager>
             }
         }
     }
+    
+    // 오목 기록 추가
+    public async UniTask AddOmokRecord(string recordId, List<(int y, int x, Enums.EPlayerType stone)> moves,
+                                   Action successCallback = null, Action failureCallback = null)
+{
+    string sid = PlayerPrefs.GetString("sid");
+    if (string.IsNullOrEmpty(sid))
+    {
+        Debug.LogWarning("세션 쿠키가 없습니다. 기보 저장 불가.");
+        failureCallback?.Invoke();
+        return;
+    }
+
+    // body로 보낼 JSON 데이터 구성
+    // moves를 OmokMove 배열로 변환
+    List<OmokMove> moveList = new List<OmokMove>();
+    foreach (var m in moves)
+    {
+        moveList.Add(new OmokMove { y = m.y, x = m.x, stone = (int)m.stone });
+    }
+
+    var requestBody = new
+    {
+        recordId = recordId,
+        moves = moveList
+    };
+    string json = JsonUtility.ToJson(requestBody);
+    byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+
+    using (UnityWebRequest www =
+           new UnityWebRequest(Constants.ServerURL + "/users/addomokrecord", "POST"))
+    {
+        www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Cookie", sid);
+        www.SetRequestHeader("Content-Type", "application/json");
+
+        try
+        {
+            await www.SendWebRequest().ToUniTask();
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("오목 기보 저장 성공");
+                successCallback?.Invoke();
+            }
+            else
+            {
+                Debug.LogWarning("오목 기보 저장 실패: " + www.error);
+                failureCallback?.Invoke();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("오목 기보 저장 중 예외: " + ex.Message);
+            failureCallback?.Invoke();
+        }
+    }
+}
+    // 오목 기록 가져오기
+    public async UniTask<List<OmokRecord>> GetOmokRecords(
+        Action successCallback = null, Action failureCallback = null)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (string.IsNullOrEmpty(sid))
+        {
+            Debug.LogWarning("세션 쿠키가 없습니다. 기보 조회 불가.");
+            failureCallback?.Invoke();
+            return new List<OmokRecord>();
+        }
+
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/getomokrecords", "GET"))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                    var resultStr = www.downloadHandler.text;
+
+                    OmokRecordWrapper wrapper = 
+                        JsonUtility.FromJson<OmokRecordWrapper>(resultStr);
+
+                    successCallback?.Invoke();
+                    return new List<OmokRecord>(wrapper.records);
+                }
+                else
+                {
+                    Debug.LogWarning("오목 기보 조회 실패: " + www.error);
+                    failureCallback?.Invoke();
+                    return new List<OmokRecord>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("오목 기보 조회 중 예외: " + ex.Message);
+                failureCallback?.Invoke();
+                return new List<OmokRecord>();
+            }
+        }
+    }
+    
 }
