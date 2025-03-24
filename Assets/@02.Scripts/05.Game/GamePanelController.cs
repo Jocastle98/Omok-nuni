@@ -33,19 +33,6 @@ public class GamePanelController : MonoBehaviour
     public delegate void OnBeginButtonClicked();
     public OnBeginButtonClicked onBeginButtonClicked;
     
-    private void Awake()
-    {
-        GameManager.Instance.OnMyGameProfileUpdate += SetMyProfile;
-        GameManager.Instance.OnOpponentGameProfileUpdate += SetOpponentProfile;
-    }
-    
-    private void OnDestroy()
-    {
-        // 이벤트 구독 해제
-        GameManager.Instance.OnMyGameProfileUpdate -= SetMyProfile;
-        GameManager.Instance.OnOpponentGameProfileUpdate -= SetOpponentProfile;
-    }
-    
     /// <summary>
     /// Play하고 있을 때는 턴을 표시하는 turnUI를 보여주고
     /// Record(기보)하고 있을 때는 recordUI를 보여줌
