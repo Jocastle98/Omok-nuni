@@ -329,7 +329,10 @@ public class GameManager : Singleton<GameManager>
                 OnMainPanelUpdate += mainPanelController.SetProfileInfo;
             }
             
-            OnMainPanelUpdate?.Invoke();
+            NetworkManager.Instance.GetUserInfo(() =>
+            {
+                OnMainPanelUpdate?.Invoke();
+            }, () => { });
         }
         
         if (scene.name == "Game")
@@ -342,9 +345,18 @@ public class GameManager : Singleton<GameManager>
 
             // BoardCellController 초기화
             boardCellController.InitBoard();
-
-            // GamePanelController UI 초기화
-            gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
+            
+            if (gamePanelController != null)
+            {
+                // GamePanelController UI 초기화
+                gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
+                
+                OnMyGameProfileUpdate -= gamePanelController.SetMyProfile;
+                OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
+                
+                OnOpponentGameProfileUpdate -= gamePanelController.SetOpponentProfile;
+                OnOpponentGameProfileUpdate += gamePanelController.SetOpponentProfile;
+            }
 
             // Game Logic 객체 생성
             if (mGameLogic != null)

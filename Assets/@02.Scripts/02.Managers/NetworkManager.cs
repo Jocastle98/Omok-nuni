@@ -135,7 +135,7 @@ public class NetworkManager : Singleton<NetworkManager>
     public async UniTask<UserInfoResult> GetUserInfo(Action successCallback, Action failureCallback)
     {
         string sid = PlayerPrefs.GetString("sid");
-        if (sid == null)
+        if (string.IsNullOrEmpty(sid))
         {
             Debug.Log("유저 데이터 불러오기에 실패했습니다. \n" +
                       "세션 데이터가 없습니다.");
@@ -161,13 +161,41 @@ public class NetworkManager : Singleton<NetworkManager>
                         false);
                 }
                 failureCallback?.Invoke();
+                return new UserInfoResult();
             }
 
+            // 응답 상태 체크
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                string errorMessage = "서버 오류 발생: " + www.error;
+                if (www.result == UnityWebRequest.Result.ConnectionError)
+                {
+                    errorMessage = "네트워크 오류가 발생했습니다.";
+                }
+                else if (www.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    errorMessage = $"HTTP 오류 발생: {www.responseCode}";
+                }
+
+                Debug.LogError(errorMessage);
+                GameManager.Instance.OpenConfirmPanel(errorMessage, () => { failureCallback?.Invoke(); }, false);
+                failureCallback?.Invoke();  // HTTP 오류나 네트워크 오류 시 실패 콜백 호출
+                return new UserInfoResult();  // 실패 시 빈 결과 반환
+            }
+            
             var resultStr = www.downloadHandler.text;
+            
+            // 응답 본문 처리
+            if (string.IsNullOrEmpty(resultStr))
+            {
+                Debug.LogError("서버 응답이 비어 있습니다.");
+                GameManager.Instance.OpenConfirmPanel("서버 응답이 비어 있습니다.", () => { failureCallback?.Invoke(); }, false);
+                failureCallback?.Invoke();  // 응답 본문이 비어있을 때 실패 콜백 호출
+                return new UserInfoResult();  // 빈 결과 반환
+            }
+            
             UserInfoResult userInfo = JsonUtility.FromJson<UserInfoResult>(resultStr);
-            
             successCallback?.Invoke();
-            
             return userInfo;
         }
     }
