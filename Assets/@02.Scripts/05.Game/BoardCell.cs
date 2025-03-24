@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class BoardCell : MonoBehaviour, IPointerClickHandler
@@ -15,7 +16,7 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
     public Enums.EPlayerType playerType;
     public delegate void OnCellClicked(int index);
     public OnCellClicked onCellClicked;
-    public int blockIndex;
+    public int cellIndex;
     public bool IsForbidden = false;
     
     private Sprite mSprite;
@@ -28,13 +29,13 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
 
     public void InitBlockCell(int blockindex, OnCellClicked onCellClicked)
     {
-        blockIndex = blockindex;
+        cellIndex = blockindex;
         this.onCellClicked = onCellClicked;
     }
     
     public void OnPointerClick(PointerEventData eventData)
     {
-        onCellClicked?.Invoke(blockIndex);
+        onCellClicked?.Invoke(cellIndex);
     }
 
     public void SetMark(Enums.EPlayerType playerType)
