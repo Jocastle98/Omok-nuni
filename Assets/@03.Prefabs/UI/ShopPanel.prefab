@@ -1705,6 +1705,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panelRectTransform: {fileID: 2518308762236240476}
   coinText: {fileID: 1023709109179348063}
+  NoAdsButtons:
+  - {fileID: 4341685885178244854}
+  - {fileID: 302911022063110556}
 --- !u!1 &4343775989454461825
 GameObject:
   m_ObjectHideFlags: 0
