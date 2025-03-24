@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using SocketIOClient;
 using UnityEngine;
+using UserDataStructs;
 
 public class RoomData
 {
@@ -17,16 +18,22 @@ public class MoveData
     public int position { get; set; }
 }
 
-public class OpponentInfoResult
+public class UsersInfoData
 {
-    [JsonProperty("opponentNickname")]
-    public string opponentNickname { get; set; }
+    [JsonProperty("roomId")]
+    public string roomId { get; set; }
     
-    [JsonProperty("opponentProfileImageIndex")]
-    public int opponentProfileImageIndex { get; set; }
+    [JsonProperty("nickname")]
+    public string nickname { get; set; }
     
-    [JsonProperty("opponentRank")]
-    public int opponentRank { get; set; }
+    [JsonProperty("profileimageindex")]
+    public int profileimageindex { get; set; }
+    
+    [JsonProperty("rank")]
+    public int rank { get; set; }
+    
+    [JsonProperty("playerType")]
+    public Enums.EPlayerType playerType { get; set; }
 }
 
 public class MultiplayManager : IDisposable
@@ -34,8 +41,8 @@ public class MultiplayManager : IDisposable
     private SocketIOUnity mSocket;
     
     private event Action<Enums.EMultiplayManagerState, string> mOnMultiplayStateChange;
-    public Action<OpponentInfoResult> OnOpponentInfoReceived;
     public Action<MoveData> OnOpponentMove;
+    public Action<UsersInfoData> OnOpponentProfileUpdate;
 
     public MultiplayManager(Action<Enums.EMultiplayManagerState, string> onMultiplayStateChange)
     {
@@ -52,11 +59,39 @@ public class MultiplayManager : IDisposable
         mSocket.On("startGame", StartGame);
         mSocket.On("exitRoom", ExitRoom);
         mSocket.On("endGame", EndGame);
-        mSocket.On("receiveOpponentInfo", ReceiveOpponentInfo);
         mSocket.On("doOpponent", DoOpponent);
         mSocket.On("rematchStart", RematchStart);
+        mSocket.On("opponentProfile", OnOpponentProfileReceived);
         
         mSocket.Connect();
+    }
+    
+    // 상대방의 프로필 정보 수신
+    private void OnOpponentProfileReceived(SocketIOResponse response)
+    {
+        try
+        {
+            var data = response.GetValue<UsersInfoData>();
+            OnOpponentProfileUpdate?.Invoke(data); // 프로필 정보를 UI로 전달
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error in OnOpponentProfileReceived: {ex.Message}");
+        }
+    }
+
+    public void SendOpponentProfile(string roomId, UsersInfoData profileData)
+    {
+        var data = new 
+        {
+            roomId,
+            nickname = profileData.nickname,
+            profileimageindex = profileData.profileimageindex,
+            rank = profileData.rank,
+            playerType = profileData.playerType
+        };
+        
+        mSocket.Emit("opponentProfile", data);
     }
     
     // 자신이 방(세션)을 생성
@@ -91,20 +126,6 @@ public class MultiplayManager : IDisposable
     {
         mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.EndGame, null);
     }
-    
-    // 상대방 정보 수신
-    private void ReceiveOpponentInfo(SocketIOResponse response)
-    {
-        var data = response.GetValue<OpponentInfoResult>();
-        OnOpponentInfoReceived?.Invoke(data);
-        Debug.Log(OnOpponentInfoReceived);
-    }
-    
-    // 플레이어의 정보를 서버로 전달하기 위한 메서드
-    public void SendOpponentInfo(string roomId, string nickname, int profileImageIndex, int rank)
-    {
-        mSocket.Emit("opponentInfo", new { roomId, nickname, profileImageIndex, rank });
-    } 
     
     // 서버로부터 상대방의 마커 정보를 받기 위한 메서드
     private void DoOpponent(SocketIOResponse response)

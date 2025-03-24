@@ -24,4 +24,9 @@ public class GameTypeSelectPanelController : PopupPanelController
             GameManager.Instance.ChangeToGameScene(Enums.EGameType.MultiPlay);
         });
     }
+
+    public void OnClickBackButton()
+    {
+        Hide();
+    }
 }
