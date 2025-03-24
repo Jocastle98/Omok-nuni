@@ -127,6 +127,8 @@ public class GameManager : Singleton<GameManager>
     // 메인 화면으로 씬 전환하는 메서드
     public void ChangeToMainScene()
     {
+        ClearAllCallbacks();
+        
         // gameLogic 초기화
         mGameLogic?.Dispose();
         mGameLogic = null;
@@ -310,10 +312,22 @@ public class GameManager : Singleton<GameManager>
     
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        mCanvas = GameObject.FindObjectOfType<Canvas>();
+        
         // 인트로 BGM 재생
         if (scene.name == "Main")
         {
             AudioManager.Instance.PlayIntroBgm();
+            
+            MainPanelController mainPanelController = GameObject.FindObjectOfType<MainPanelController>();
+
+            if (mainPanelController != null)
+            {
+                OnMainPanelUpdate -= mainPanelController.SetProfileInfo;
+                OnMainPanelUpdate += mainPanelController.SetProfileInfo;
+            }
+            
+            OnMainPanelUpdate?.Invoke();
         }
         
         if (scene.name == "Game")
@@ -340,8 +354,6 @@ public class GameManager : Singleton<GameManager>
             mGameLogic.GameStart(boardCellController, gamePanelController, mGameType, 
                 OnMyGameProfileUpdate, OnOpponentGameProfileUpdate);
         }
-
-        mCanvas = GameObject.FindObjectOfType<Canvas>();
     }
 
     private void OnApplicationQuit()
