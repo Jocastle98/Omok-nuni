@@ -111,4 +111,12 @@ private void RefreshIcons(int currentScore)
             Debug.Log("메인씬으로 전환");
         });
     }
+
+    public void OnClickRematchButton()
+    {
+        Hide(() =>
+        {
+            
+        });
+    }
 }

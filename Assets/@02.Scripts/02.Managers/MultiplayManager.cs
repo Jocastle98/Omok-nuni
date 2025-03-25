@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using SocketIOClient;
 using UnityEngine;
-using UserDataStructs;
 
 public class RoomData
 {
@@ -43,7 +42,7 @@ public class MultiplayManager : IDisposable
     private event Action<Enums.EMultiplayManagerState, string> mOnMultiplayStateChange;
     public Action<MoveData> OnOpponentMove;
     public Action<UsersInfoData> OnOpponentProfileUpdate;
-
+    
     public MultiplayManager(Action<Enums.EMultiplayManagerState, string> onMultiplayStateChange)
     {
         mOnMultiplayStateChange = onMultiplayStateChange;
@@ -60,8 +59,7 @@ public class MultiplayManager : IDisposable
         mSocket.On("exitRoom", ExitRoom);
         mSocket.On("endGame", EndGame);
         mSocket.On("doOpponent", DoOpponent);
-        mSocket.On("rematchStart", RematchStart);
-        mSocket.On("opponentProfile", OnOpponentProfileReceived);
+        mSocket.On("opponentProfile", OpponentProfileReceived);
         
         mSocket.Connect();
     }
@@ -104,8 +102,10 @@ public class MultiplayManager : IDisposable
         mSocket.Emit("leaveRoom", new { roomId });
     }
     
+    #region ProfileData
+    
     // 상대방의 프로필 정보를 서버로부터 수신
-    private void OnOpponentProfileReceived(SocketIOResponse response)
+    private void OpponentProfileReceived(SocketIOResponse response)
     {
         try
         {
@@ -132,6 +132,9 @@ public class MultiplayManager : IDisposable
         
         mSocket.Emit("opponentProfile", data);
     }
+    #endregion
+    
+    #region MoveData
     
     // 서버로부터 상대방의 마커 정보를 받기 위한 메서드
     private void DoOpponent(SocketIOResponse response)
@@ -153,18 +156,7 @@ public class MultiplayManager : IDisposable
         mSocket.Emit("doPlayer", new { roomId , position });
     }
     
-    // 새로운 방으로 이동 (서버에서 받은 새로운 방 정보 처리)
-    private void RematchStart(SocketIOResponse response)
-    {
-        var data = response.GetValue<RoomData>();
-        mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.StartGame, data.roomId);
-    }
-    
-    // 재대국 신청 메서드
-    public void RequestRematch(string roomId)
-    {
-        mSocket.Emit("requestRematch", new { roomId });
-    }
+    #endregion
     
     public void Dispose()
     {
