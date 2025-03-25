@@ -13,12 +13,19 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
     [SerializeField]private Image mStoneImage;
     [SerializeField]private Image mUtilImage;
     [SerializeField]private List<Sprite> mImages;
+    [SerializeField]private int mFadeCount = 5;
+    private int fading; 
     
     public Enums.EPlayerType playerType = Enums.EPlayerType.None;
     public delegate void OnCellClicked(int index);
     public OnCellClicked onCellClicked;
     public int cellIndex;
     public bool IsForbidden = false;
+
+    private void OnEnable()
+    {
+        fading = mFadeCount;
+    }
     
     public void InitBlockCell(int blockindex, OnCellClicked onCellClicked)
     {
@@ -109,5 +116,19 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
             return null;
         }
         return mImages[(int)GameImage];
+    }
+
+    public void FadeMode(BasePlayerState player)
+    {
+
+        float alpha = fading == mFadeCount ? 1f : (float)fading / mFadeCount; 
+        fading--;
+
+        mStoneImage.DOFade(alpha, 0); 
+
+        if (fading < 0)
+        {
+            player.onMode -= FadeMode;
+        }
     }
 }

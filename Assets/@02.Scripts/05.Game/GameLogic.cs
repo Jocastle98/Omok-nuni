@@ -136,6 +136,13 @@ public class GameLogic : IDisposable
                     }
                 });
                 break;
+            case Enums.EGameType.PassAndPlayFade:
+                mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone);
+                mPlayer_White = new PlayerState(false,Enums.EEasterEggMode.FadeStone);
+                
+                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
+                SetState(mPlayer_Black);
+                break;
         }
     }
 
