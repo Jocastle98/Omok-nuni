@@ -57,8 +57,6 @@ public class AdmobAdsManager : Singleton<AdmobAdsManager>
 
     public async void ShowRewardedAd() //코인 지급을 하나의 메서드로 빼도 될듯
     {
-        const string REWARD_MESSAGE = "보상 제공. Type: {0}, Amount : {1}";
-
         UserInfoResult userinfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
 
         if (userinfo.hasadremoval)
@@ -78,9 +76,9 @@ public class AdmobAdsManager : Singleton<AdmobAdsManager>
         //광고 제거 아이템이 없을 떄
         if (mRewardedAd != null && mRewardedAd.CanShowAd())
         {
-            mRewardedAd.Show((Reward reward) =>
+            mRewardedAd.Show(async (Reward reward) =>
             {
-                NetworkManager.Instance.AddCoin(500, i =>
+                await NetworkManager.Instance.AddCoin(500, i =>
                 {
                     GameManager.Instance.OpenConfirmPanel("코인이 500개 지급되었습니다!", null, false);
                     GameManager.Instance.OnCoinUpdated?.Invoke();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Purchasing;
 using UnityEngine.SceneManagement;
@@ -17,21 +18,7 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
     public const string PRODUCT_ID_COIN_10000 = "coin_10000";
     public const string PRODUCT_ID_NOADS = "noads";
     public const string PRODUCT_ID_NOADS_COIN_2000 = "noads_coin_2000";
-
-    /// <summary>
-    /// HadPurchased() Test용
-    /// </summary>
-    private Dictionary<Enums.EItemType, string> ShopItemMapping = new Dictionary<Enums.EItemType, string>()
-    {
-        { Enums.EItemType.Coin_1000, "coin_1000" },
-        { Enums.EItemType.Coin_2000, "coin_2000" },
-        { Enums.EItemType.Coin_4500, "coin_4500" },
-        { Enums.EItemType.Coin_10000, "coin_10000" },
-        { Enums.EItemType.NoAds, "noads" },
-        { Enums.EItemType.NoAds_Coin_2000, "noads_coin_2000" },
-    };
-    
-
+  
     private IStoreController mStoreController; //구매 과정을 제어하는 함수를 제공
     private IExtensionProvider mStoreExtensionProvider; //여러 플랫폼을 위한 확장 처리를 제공
 
@@ -139,81 +126,95 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
     {
         if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_COIN_1000, StringComparison.Ordinal))
         {
-            NetworkManager.Instance.AddCoin(1000, i =>
+            UniTask.Void(async () =>
             {
-                GameManager.Instance.OpenConfirmPanel("코인이 1,000개 지급되었습니다!", null, false);
-                GameManager.Instance.OnCoinUpdated?.Invoke();
-            }, () =>
-            {
-                GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
-            } );
-
+                await NetworkManager.Instance.AddCoin(1000, i =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("코인이 1,000개 지급되었습니다!", null, false);
+                    GameManager.Instance.OnCoinUpdated?.Invoke();
+                }, () =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+                } );
+            });
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_COIN_2000, StringComparison.Ordinal))
         {
-            NetworkManager.Instance.AddCoin(2000, i =>
+            UniTask.Void(async () =>
             {
-                GameManager.Instance.OpenConfirmPanel("코인이 2,000개 지급되었습니다!", null, false);
-                GameManager.Instance.OnCoinUpdated?.Invoke();
-            }, () =>
-            {
-                GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
-            } );
-            
+                await NetworkManager.Instance.AddCoin(2000, i =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("코인이 2,000개 지급되었습니다!", null, false);
+                    GameManager.Instance.OnCoinUpdated?.Invoke();
+                }, () =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+                } );
+            });
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_COIN_4500, StringComparison.Ordinal))
         {
-            NetworkManager.Instance.AddCoin(4500, i =>
+            UniTask.Void(async () =>
             {
-                GameManager.Instance.OpenConfirmPanel("코인이 4,500개 지급되었습니다!", null, false);
-                GameManager.Instance.OnCoinUpdated?.Invoke();
-            }, () =>
-            {
-                GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
-            } );
-            
+                await NetworkManager.Instance.AddCoin(4500, i =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("코인이 4,500개 지급되었습니다!", null, false);
+                    GameManager.Instance.OnCoinUpdated?.Invoke();
+                }, () =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+                } );
+            });
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_COIN_10000, StringComparison.Ordinal))
         {
-            NetworkManager.Instance.AddCoin(10000, i =>
+            UniTask.Void(async () =>
             {
-                GameManager.Instance.OpenConfirmPanel("코인이 10,000개 지급되었습니다!", null, false);
-                GameManager.Instance.OnCoinUpdated?.Invoke();
-            }, () =>
-            {
-                GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
-            } );
+                await NetworkManager.Instance.AddCoin(10000, i =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("코인이 10,000개 지급되었습니다!", null, false);
+                    GameManager.Instance.OnCoinUpdated?.Invoke();
+                }, () =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+                } );
+            });
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_NOADS, StringComparison.Ordinal))
         {
-            NetworkManager.Instance.RemoveAds(() =>
+            UniTask.Void(async () =>
             {
-                GameManager.Instance.OpenConfirmPanel("광고제거가 적용되었습니다!", null, false);
-                GameManager.Instance.OnAdsRemoved?.Invoke();
-            }, () =>
-            {
-                GameManager.Instance.OpenConfirmPanel("광고제거 실패", null, false);
+                await NetworkManager.Instance.RemoveAds(() =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("광고제거가 적용되었습니다!", null, false);
+                    GameManager.Instance.OnAdsRemoved?.Invoke();
+                }, () =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("광고제거 실패", null, false);
+                });
             });
-
         }
         else if (string.Equals(purchaseEvent.purchasedProduct.definition.id, PRODUCT_ID_NOADS_COIN_2000, StringComparison.Ordinal))
         {
-            NetworkManager.Instance.RemoveAds(() =>
+            UniTask.Void(async () =>
             {
-            }, () =>
-            {
-                GameManager.Instance.OpenConfirmPanel("광고제거 실패", null, false);
-                return;
-            });
+                await NetworkManager.Instance.RemoveAds(() =>
+                {
+                }, () =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("광고제거 실패", null, false);
+                    return;
+                });
             
-            NetworkManager.Instance.AddCoin(2000, i =>
-            {
-                GameManager.Instance.OpenConfirmPanel("광고제거와 코인이 2,000개 지급되었습니다!", null, false);
-                GameManager.Instance.OnCoinUpdated?.Invoke();
-            }, () =>
-            {
-                GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
-            } );
+                await NetworkManager.Instance.AddCoin(2000, i =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("광고제거와 코인이 2,000개 지급되었습니다!", null, false);
+                    GameManager.Instance.OnCoinUpdated?.Invoke();
+                }, () =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+                } );
+            });
         }
         else
         {
