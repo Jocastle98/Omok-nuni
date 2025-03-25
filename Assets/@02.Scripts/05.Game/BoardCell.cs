@@ -6,31 +6,32 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class BoardCell : MonoBehaviour, IPointerClickHandler
 {
-    //프로퍼티로 만들어서 타입에 따라 이미지를 변경
-    //클릭이 된 후에 셀렉트 이미지가 있었으면 좋겠음
+    [SerializeField]private Image mStoneImage;
+    [SerializeField]private Image mUtilImage;
+    [SerializeField]private List<Sprite> mImages;
     
-
-    public Enums.EPlayerType playerType;
+    public Enums.EPlayerType playerType = Enums.EPlayerType.None;
     public delegate void OnCellClicked(int index);
     public OnCellClicked onCellClicked;
     public int cellIndex;
     public bool IsForbidden = false;
     
-    private Sprite mSprite;
-    private Image mImage;
-
-    private void Awake()
-    {
-        mImage = GetComponent<Image>();
-    }
-
     public void InitBlockCell(int blockindex, OnCellClicked onCellClicked)
     {
         cellIndex = blockindex;
         this.onCellClicked = onCellClicked;
+    }
+
+    public void ResetCell()
+    {
+        mStoneImage.DOFade(0,0);
+        mStoneImage.sprite = GetImage(Enums.EGameImage.None);
+        IsForbidden = false;
+        playerType = Enums.EPlayerType.None;
     }
     
     public void OnPointerClick(PointerEventData eventData)
@@ -43,12 +44,70 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
         switch (playerType)
         {
             case Enums.EPlayerType.Player_Black:
-                //이미지 불러와서 스프라이트에 할당
-                mImage.color =  Color.green;
+                mStoneImage.DOFade(1,0);
+                mStoneImage.sprite = GetImage(Enums.EGameImage.BlackStone);
                 break;
             case Enums.EPlayerType.Player_White:
-                mImage.color =  Color.red;
+                mStoneImage.DOFade(1,0);
+                mStoneImage.sprite = GetImage(Enums.EGameImage.WhiteStone);
                 break;
         }
+    }
+
+    public void SelectMark(bool onMark)
+    {
+        if (onMark)
+        {
+            mUtilImage.DOFade(1,0);
+            mUtilImage.sprite = GetImage(Enums.EGameImage.Selector);
+        }
+        else
+        {
+            mUtilImage.DOFade(0,0);
+            mUtilImage.sprite = GetImage(Enums.EGameImage.None);
+        }
+    }
+
+    public void OnForbbiden(bool isForbidden,BasePlayerState Player_Black)
+    {
+        if (isForbidden)
+        {
+            IsForbidden = true;
+            PlayerState player = Player_Black as PlayerState;
+            player.onForbbidenMark += ForbbidneMark;
+
+        }
+        else
+        {
+            IsForbidden = false;
+            PlayerState player = Player_Black as PlayerState;
+            player.onForbbidenMark -= ForbbidneMark;
+            
+            mUtilImage.DOFade(0,0);
+            mUtilImage.sprite = GetImage(Enums.EGameImage.None);
+        }
+    }
+
+    public void ForbbidneMark(bool onMark)
+    {
+        if (onMark)
+        {
+            mUtilImage.DOFade(1,0);
+            mUtilImage.sprite = GetImage(Enums.EGameImage.XMarker);
+        }
+        else
+        {
+            mUtilImage.DOFade(0,0);
+            mUtilImage.sprite = GetImage(Enums.EGameImage.None);
+        }
+    }
+
+    public Sprite GetImage(Enums.EGameImage GameImage)
+    {
+        if (GameImage == Enums.EGameImage.None)
+        {
+            return null;
+        }
+        return mImages[(int)GameImage];
     }
 }
