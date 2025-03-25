@@ -42,6 +42,9 @@ public class MultiplayManager : IDisposable
     private event Action<Enums.EMultiplayManagerState, string> mOnMultiplayStateChange;
     public Action<MoveData> OnOpponentMove;
     public Action<UsersInfoData> OnOpponentProfileUpdate;
+    public Action OnRematchRequestReceived;
+    public Action OnRematchAccepted;
+    public Action OnRematchRejected;
     
     public MultiplayManager(Action<Enums.EMultiplayManagerState, string> onMultiplayStateChange)
     {
@@ -60,6 +63,11 @@ public class MultiplayManager : IDisposable
         mSocket.On("endGame", EndGame);
         mSocket.On("doOpponent", DoOpponent);
         mSocket.On("opponentProfile", OpponentProfileReceived);
+        
+        // 재대국 관련 이벤트 핸들러 추가
+        mSocket.On("rematchRequestReceived", RematchRequestReceived);
+        mSocket.On("rematchAccepted", RematchAccepted);
+        mSocket.On("rematchRejected", RematchRejected);
         
         mSocket.Connect();
     }
@@ -156,6 +164,47 @@ public class MultiplayManager : IDisposable
         mSocket.Emit("doPlayer", new { roomId , position });
     }
     
+    #endregion
+
+    #region RematchData
+
+    // 재대국 요청을 서버에 보냄
+    public void SendRematchRequest(string roomId)
+    {
+        mSocket.Emit("sendRematchRequest", new { roomId });
+    }
+
+    // 서버로부터 재대국 요청을 받았을 때 처리
+    private void RematchRequestReceived(SocketIOResponse response)
+    {
+        // UI 업데이트 또는 알림을 띄울 수 있음
+        OnRematchRequestReceived?.Invoke();
+    }
+
+    // 재대국 요청 승낙
+    public void AcceptRematch(string roomId)
+    {
+        mSocket.Emit("rematchAccepted", new { roomId });
+    }
+
+    // 재대국 요청 거절
+    public void RejectRematch()
+    {
+        mSocket.Emit("rematchRejected");
+    }
+
+    // 서버로부터 재대국 승낙을 받았을 때 처리
+    private void RematchAccepted(SocketIOResponse response)
+    {
+        OnRematchAccepted?.Invoke();
+    }
+
+    // 서버로부터 재대국 거절을 받았을 때 처리
+    private void RematchRejected(SocketIOResponse response)
+    {
+        OnRematchRejected?.Invoke();
+    }
+
     #endregion
     
     public void Dispose()

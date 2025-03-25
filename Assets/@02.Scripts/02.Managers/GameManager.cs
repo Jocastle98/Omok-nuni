@@ -122,6 +122,7 @@ public class GameManager : Singleton<GameManager>
     public void ChangeToGameScene(Enums.EGameType gameType)
     {
         mGameType = gameType;
+        
         SceneManager.LoadScene("Game");
     }
 

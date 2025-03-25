@@ -346,6 +346,25 @@ public class GameLogic : IDisposable
 
         return usersInfoData;
     }
+
+    private void ResetGame()
+    {
+        isGameOver = false;
+        currentSelectedCell = Int32.MaxValue;
+        
+        // 보드 초기화
+        boardCellController.InitBoard();
+        
+        // UI 초기화
+        gamePanelController.InitClock();
+        gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
+        
+        // 플레이어 상태 초기화
+        if (mPlayer_Black != null && mPlayer_White != null)
+        {
+            SetState(mPlayer_Black);
+        }
+    }
     
     /// <summary>
     /// (Y, X) 좌표에 해당 플레이어의 돌을 놓는 메서드
