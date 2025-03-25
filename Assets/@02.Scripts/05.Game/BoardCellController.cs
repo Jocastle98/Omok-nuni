@@ -21,11 +21,6 @@ public class BoardCellController : MonoBehaviour
     {
         mGrid = Util.GetChildComponent<RectTransform>(gameObject, mGirdStr);
     }
-
-    void Start()
-    {
-        InitBoard();
-    }
     
     /// <summary>
     /// 보드를 생성 및 초기화 메서드

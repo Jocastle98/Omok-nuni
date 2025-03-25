@@ -52,7 +52,7 @@ public class PlayerState : BasePlayerState
         {
             int X = cellIndex % (size + 1);
             int Y = cellIndex / (size + 1);
-            BoardCell cell = gameLogic.boardCellController.cells[X, Y];
+            BoardCell cell = gameLogic.boardCellController.cells[Y, X];
             if (cell.IsForbidden != true && cell.playerType == Enums.EPlayerType.None)
             {
                 SelectCell(cellIndex, gameLogic);
