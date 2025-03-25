@@ -20,6 +20,9 @@ public class MoveData
 
 public class UsersInfoData
 {
+    [JsonProperty("userId")]
+    public string userId { get; set; }
+    
     [JsonProperty("roomId")]
     public string roomId { get; set; }
     
@@ -85,6 +88,7 @@ public class MultiplayManager : IDisposable
         var data = new 
         {
             roomId,
+            userId = profileData.userId,
             nickname = profileData.nickname,
             profileimageindex = profileData.profileimageindex,
             rank = profileData.rank,
