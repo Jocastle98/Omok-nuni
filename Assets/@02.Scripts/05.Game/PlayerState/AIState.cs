@@ -37,6 +37,6 @@ public class AIState : BasePlayerState
 
     public override void HandleMove(GameLogic gameLogic, int y, int x)
     {
-        ProcessMove(gameLogic, Enums.EPlayerType.Player_White, y, x);
+        ProcessMove(gameLogic, playerType, y, x);
     }
 }

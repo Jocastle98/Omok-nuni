@@ -74,4 +74,17 @@ namespace UserDataStructs
         public UserRankProfileResult[] userrankprofiles;
         public UserRankProfileResult playerrankprofile;
     }
+
+    public struct CoinData
+    {
+        public int amount;
+    }
+
+    public struct CoinResult
+    {
+        public bool success;
+        public int coin;
+        public string message;
+    }
+    
 }
