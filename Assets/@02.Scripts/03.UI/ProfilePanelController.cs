@@ -62,6 +62,7 @@ public class ProfilePanelController : PopupPanelController
 
     public void OnClickBackButton()
     {
+        GameManager.Instance.OnMainPanelUpdate();
         Hide();
     }
 
@@ -83,14 +84,14 @@ public class ProfilePanelController : PopupPanelController
         if (userInfo.wincount > 0)
         {
             float winRateValue = (float)userInfo.wincount / (userInfo.wincount + userInfo.losecount) * 100f;
-            mWinRateText.text = winRateValue.ToString("F2") + "%";
+            mWinRateText.text = "Win Rate: "+winRateValue.ToString("F2") + "%";
         }
         else
         {
-            mWinRateText.text = "0%";
+            mWinRateText.text = "Win Rate: "+"0%";
         }
         mRankText.text = userInfo.rank.ToString();
-        mRankupPoinText.text = userInfo.rankuppoints.ToString() + " / "+Constants.RankChangeThreshold.ToString();
+        mRankupPoinText.text = userInfo.rankuppoints.ToString() + " / "+ getRankChangeThreshold(userInfo.rank).ToString();
 
         if (userInfo.winlosestreak < 0)
         {
@@ -104,5 +105,19 @@ public class ProfilePanelController : PopupPanelController
         mWinLoseStreakText.text = Mathf.Abs(userInfo.winlosestreak).ToString();
         mADBlockText.text = userInfo.hasadremoval ? "O" : "X";
         mProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+    }
+
+    private int getRankChangeThreshold(int rank)
+    {
+        if (rank >= 10) {
+            return 3; // 10급 ~ 18급: 3점
+        } 
+        else if (rank >= 5) {
+            return 5; // 5급 ~ 9급: 5점
+        } 
+        else 
+        {
+            return 10; // 1급 ~ 4급: 10점
+        }
     }
 }
