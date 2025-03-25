@@ -101,19 +101,14 @@ public class GameLogic : IDisposable
                         case Enums.EMultiplayManagerState.CreateRoom:
                             Debug.Log("## Create Room");
                             
-                            // todo: 대기화면 표시(제한시간 동안 급수에 맞는 상대 매칭 실패 시 싱글 플레이로 모드 전환)
-                            WaitingMatch();
+                            // 코인 소비 체크
+                            ConsumeCoinProcess(state);
                             break;
                         case Enums.EMultiplayManagerState.JoinRoom:
                             Debug.Log("## Join Room");
-                            mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
-                            mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId);
                             
-                            // 방들어온 플레이어는 백
-                            localPlayerType = mPlayer_White.playerType; 
-                            MyGameProfileUpdate(Enums.EPlayerType.Player_White);
-                            SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_White);
-                            SetState(mPlayer_Black);
+                            // 코인 소비 체크
+                            ConsumeCoinProcess(state);
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
                             Debug.Log("## Start Game");
@@ -261,6 +256,61 @@ public class GameLogic : IDisposable
         {
             GameManager.Instance.OpenWaitingPanel();
         });
+    }
+
+    /// <summary>
+    /// 코인을 소비하는 메서드
+    /// </summary>
+    private void ConsumeCoinProcess(Enums.EMultiplayManagerState multiplayManagerState)
+    {
+        if (multiplayManagerState == Enums.EMultiplayManagerState.CreateRoom)
+        {
+            UnityThread.executeInUpdate(() =>
+            {
+                NetworkManager.Instance.ConsumeCoin(Constants.ConsumeCoin, 
+                    successCallback: (remainingCoins) => 
+                    {
+                        GameManager.Instance.OpenConfirmPanel($"남은 코인은 {remainingCoins} 입니다.", () =>
+                        {
+                            WaitingMatch();
+                        }, false);
+                    },
+                    failureCallback: () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("코인이 부족합니다.", () =>
+                        {
+                            GameManager.Instance.ChangeToMainScene();
+                        }, false);
+                    });
+            });
+        }
+        else if (multiplayManagerState == Enums.EMultiplayManagerState.JoinRoom)
+        {
+            UnityThread.executeInUpdate(() =>
+            {
+                NetworkManager.Instance.ConsumeCoin(Constants.ConsumeCoin,
+                    successCallback: (remainingCoins) =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel($"남은 코인은 {remainingCoins} 입니다.", () =>
+                        {
+                            mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
+                            mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId);
+                            
+                            // 방들어온 플레이어는 백
+                            localPlayerType = mPlayer_White.playerType; 
+                            MyGameProfileUpdate(Enums.EPlayerType.Player_White);
+                            SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_White);
+                            SetState(mPlayer_Black);
+                        }, false);
+                    }, failureCallback: () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("코인이 부족합니다.", () =>
+                        {
+                            GameManager.Instance.ChangeToMainScene();
+                        }, false);
+                    });
+            });
+        }
     }
     
     private void MyGameProfileUpdate(Enums.EPlayerType playerType)

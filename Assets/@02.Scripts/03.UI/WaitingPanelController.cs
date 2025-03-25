@@ -33,9 +33,15 @@ public class WaitingPanelController : PopupPanelController
     {
         StopProgressBar();
         
-        Hide();
+        Hide(() =>
+        {
+            GameManager.Instance.OpenConfirmPanel("매칭을 취소하였습니다. \n소비한 코인을 돌려드립니다.", () =>
+            {
+                NetworkManager.Instance.AddCoin(Constants.ConsumeCoin);
+                GameManager.Instance.ChangeToMainScene();
+            }, false);
+        });
         
-        GameManager.Instance.ChangeToMainScene();
     }
     
     private void StartProgressBar()
