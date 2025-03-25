@@ -2,6 +2,8 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Threading.Tasks;
+using UserDataStructs;
 
 public class ReplayListPanelController : PopupPanelController
 {
@@ -14,7 +16,7 @@ public class ReplayListPanelController : PopupPanelController
         await RefreshList();
     }
 
-    private async System.Threading.Tasks.Task RefreshList()
+    private async Task RefreshList()
     {
         //  서버에서 기보 목록 가져오기
         var records = await NetworkManager.Instance.GetOmokRecords(
@@ -22,17 +24,13 @@ public class ReplayListPanelController : PopupPanelController
             failureCallback: () => { Debug.LogWarning("기보 목록 가져오기 실패"); }
         );
 
-        Debug.Log("records count: " + records.Count);
-        // 기존 버튼 제거
         foreach (Transform child in content) 
         {
             Destroy(child.gameObject);
         }
 
-        // records 목록 순회하여 버튼 생성
         foreach (var record in records)
         {
-            // record.recordId, record.createdAt 등을 표시
             var buttonObj = Instantiate(historyButtonPrefab, content);
             var textTMP = buttonObj.GetComponentInChildren<TextMeshProUGUI>();
             if (textTMP != null)
@@ -40,7 +38,6 @@ public class ReplayListPanelController : PopupPanelController
                 textTMP.text = $"기보: {record.recordId}";
             }
 
-            // 클릭 시 ReplayPanel 열기
             buttonObj.GetComponent<Button>().onClick.AddListener(() =>
             {
                 OpenReplay(record);
@@ -48,23 +45,38 @@ public class ReplayListPanelController : PopupPanelController
         }
     }
 
-    private void OpenReplay(OmokRecord record)
+    private async void OpenReplay(OmokRecord record)
     {
+        var moveList = new List<(int, int, Enums.EPlayerType)>();
+        foreach (var m in record.moves)
+        {
+            moveList.Add((m.y, m.x, (Enums.EPlayerType)m.stone));
+        }
+        UserInfoResult blackInfo = default;
+        UserInfoResult whiteInfo = default;
+
+        if (!string.IsNullOrEmpty(record.blackUserId))
+        {
+            blackInfo = await NetworkManager.Instance.GetUserInfoByUserId(record.blackUserId);
+        }
+        if (!string.IsNullOrEmpty(record.whiteUserId))
+        {
+            whiteInfo = await NetworkManager.Instance.GetUserInfoByUserId(record.whiteUserId);
+        }
+
         var replayPanelObj = Instantiate(replayPanel, transform.parent);
         var replayCtrl = replayPanelObj.GetComponent<ReplayPanelController>();
         if (replayCtrl != null)
         {
-            var moveList = new List<(int, int, Enums.EPlayerType)>();
-            foreach (var m in record.moves)
-            {
-                moveList.Add((m.y, m.x, (Enums.EPlayerType)m.stone));
-            }
-            replayCtrl.OpenReplayPanel(moveList);
+            replayCtrl.OpenReplayPanel(moveList, blackInfo, whiteInfo);
         }
 
-        // 현재 리스트 패널은 닫거나 Hide
         gameObject.SetActive(false);
     }
+
+
+
+
 
     public void OnCloseButtonClick()
     {

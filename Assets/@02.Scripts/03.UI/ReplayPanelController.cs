@@ -34,13 +34,10 @@ public class ReplayPanelController : PopupPanelController
         blackUserInfo = blackInfo;
         whiteUserInfo = whiteInfo;
 
-        // 보드 초기화
         boardCellController.InitBoard();
 
-        // 흑/백 프로필 UI 표시
         SetPlayerProfiles();
 
-        // 처음에는 아무 수도 놓지 않았으므로 강조 해제
         HighlightCurrentPlayer(Enums.EPlayerType.None);
     }
 
@@ -89,7 +86,6 @@ public class ReplayPanelController : PopupPanelController
             boardCellController.cells[move.y, move.x].SetMark(move.stone);
             boardCellController.cells[move.y, move.x].playerType = move.stone;
 
-            // 지금 둔 돌이 흑인지 백인지에 따라 강조
             HighlightCurrentPlayer(move.stone);
         }
     }
