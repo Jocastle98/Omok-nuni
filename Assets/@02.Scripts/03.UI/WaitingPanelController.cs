@@ -14,7 +14,7 @@ public class WaitingPanelController : PopupPanelController
     
     private Coroutine mProgressCoroutine;
     
-    public void Show()
+    public override void Show()
     {
         base.Show();
         
