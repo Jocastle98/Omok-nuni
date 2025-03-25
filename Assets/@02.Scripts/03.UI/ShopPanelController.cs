@@ -40,7 +40,7 @@ public class ShopPanelController : PopupPanelController
         }).ContinueWith(userInfo =>
         {
             int coin = userInfo.coin;
-            coinText.text = coin.ToString();
+            coinText.text = $"{coin:N0} 코인";
 
         });
     }

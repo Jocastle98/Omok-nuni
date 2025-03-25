@@ -13,7 +13,7 @@ public class GameLogic : IDisposable
     public BoardCellController boardCellController;
     public GamePanelController gamePanelController;
     
-    public int currentSelectedCell;
+    public int currentSelectedCell = Int32.MaxValue;
     
     private BasePlayerState mPlayer_Black;
     private BasePlayerState mPlayer_White;
@@ -397,7 +397,7 @@ public class GameLogic : IDisposable
         {
             if (result6Bools[i] != null)
             {
-                result6Bools[i].IsForbidden = true;
+                result6Bools[i].OnForbbiden(true, mPlayer_Black);
                 return;
             }
 
@@ -405,12 +405,12 @@ public class GameLogic : IDisposable
             {
                 if (!FakeForbidden(result44Cell[i],lists[i],lists[i]))
                 {
-                    result44Cell[i].IsForbidden = true;
+                    result44Cell[i].OnForbbiden(true, mPlayer_Black);
                     return;
                 }
                 else
                 {
-                    result44Cell[i].IsForbidden = false;
+                    result44Cell[i].OnForbbiden(false, mPlayer_Black);
                 }
             }
 
@@ -424,12 +424,12 @@ public class GameLogic : IDisposable
                     {
                         if (!FakeForbidden(cell,lists[i],lists[k]))
                         {
-                            cell.IsForbidden = true;
+                            cell.OnForbbiden(true, mPlayer_Black);
                             return;
                         }
                         else
                         {
-                            cell.IsForbidden = false;
+                            cell.OnForbbiden(false, mPlayer_Black);
                         }
                     }
                 }
@@ -442,19 +442,19 @@ public class GameLogic : IDisposable
                     {
                         if (!FakeForbidden(cell,lists[i],lists[k]))
                         {
-                            cell.IsForbidden = true;
+                            cell.OnForbbiden(true, mPlayer_Black);
                             return;
                         }
                         else
                         {
-                            cell.IsForbidden = false;
+                            cell.OnForbbiden(false, mPlayer_Black);
                         }
                     }
                 }
             }
         }
 
-        boardCellController.cells[Y, X].IsForbidden = false;
+        boardCellController.cells[Y, X].OnForbbiden(false, mPlayer_Black);
     }
     
     public bool ForbiddenSelf(BoardCell cell)
