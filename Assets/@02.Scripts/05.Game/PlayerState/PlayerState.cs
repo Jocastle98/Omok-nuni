@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,6 +9,10 @@ public class PlayerState : BasePlayerState
     private MultiplayManager mMultiplayManager;
     private string mRoomId;
     private bool mbIsMultiplay;
+    private int size;
+    
+    public delegate void OnForbbidenMark(bool onMark);
+    public OnForbbidenMark onForbbidenMark;
     
     public PlayerState(bool Black)
     {
@@ -37,23 +42,36 @@ public class PlayerState : BasePlayerState
     /// <param name="gameLogic"></param>
     public override void OnEnter(GameLogic gameLogic)
     {
+        size = gameLogic.boardCellController.size;
+        
+        //금수 위치의 셀들의 이미지 활성화
+        onForbbidenMark?.Invoke(true);
+        
         //셀이 눌렸을 때 : 셀 선택
         gameLogic.boardCellController.onCellClicked = (cellIndex) =>
         {
-            gameLogic.currentSelectedCell = cellIndex;
+            int X = cellIndex % (size + 1);
+            int Y = cellIndex / (size + 1);
+            BoardCell cell = gameLogic.boardCellController.cells[Y, X];
+            if (cell.IsForbidden != true && cell.playerType == Enums.EPlayerType.None)
+            {
+                SelectCell(cellIndex, gameLogic);
+                gameLogic.currentSelectedCell = cellIndex;
+            }
         };
         
         //착수 버튼을 눌렀을 때 : 선택된 셀에 착수
         gameLogic.gamePanelController.onBeginButtonClicked = () =>
         {
             int cellIndex = gameLogic.currentSelectedCell;
-            if (cellIndex == null) return;
+            if (cellIndex == Int32.MaxValue) return;
             
-            int size = gameLogic.boardCellController.size;
             int X = cellIndex % (size + 1);
             int Y = cellIndex / (size + 1);
             
             HandleMove(gameLogic, Y, X);
+            
+            cellIndex = Int32.MaxValue;
         };
     }
 
@@ -62,6 +80,7 @@ public class PlayerState : BasePlayerState
         //델리게이트 초기화
         gameLogic.gamePanelController.onBeginButtonClicked = null;
         gameLogic.boardCellController.onCellClicked  = null;
+        onForbbidenMark?.Invoke(false);
     }
 
     public override void HandleMove(GameLogic gameLogic, int Y, int X)
@@ -72,5 +91,21 @@ public class PlayerState : BasePlayerState
         {
             mMultiplayManager.SendPlayerMove(mRoomId, Y *  15 + X);
         }
+    }
+
+    public void SelectCell(int newCell,GameLogic gameLogic)
+    {
+        int prevCell = gameLogic.currentSelectedCell;
+        if (prevCell != Int32.MaxValue)
+        {
+            int prevX = prevCell % (size + 1);
+            int prevY = prevCell / (size + 1);
+
+            gameLogic.boardCellController.cells[prevY, prevX].SelectMark(false);
+        }
+
+        int newX = newCell % (size + 1);
+        int newY = newCell / (size + 1);
+        gameLogic.boardCellController.cells[newY,newX].SelectMark(true);
     }
 }
