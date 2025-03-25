@@ -7,6 +7,9 @@ public abstract class BasePlayerState
     public Enums.EPlayerType playerType;
     public Enums.EEasterEggMode easterEggMode;
     
+    public delegate void OnForbbidenMark(bool onMark);
+    public OnForbbidenMark onForbbidenMark;
+    
     public delegate void OnMode(BasePlayerState player);
     public OnMode onMode;
 

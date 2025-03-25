@@ -11,9 +11,6 @@ public class PlayerState : BasePlayerState
     private bool mbIsMultiplay;
     private int size;
     
-    public delegate void OnForbbidenMark(bool onMark);
-    public OnForbbidenMark onForbbidenMark;
-    
     public PlayerState(bool Black)
     {
         if (Black)

@@ -75,20 +75,18 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    public void OnForbbiden(bool isForbidden,BasePlayerState Player_Black)
+    public void OnForbbiden(bool isForbidden,BasePlayerState playerBlack)
     {
         if (isForbidden)
         {
             IsForbidden = true;
-            PlayerState player = Player_Black as PlayerState;
-            player.onForbbidenMark += ForbbidneMark;
+            playerBlack.onForbbidenMark += ForbbidneMark;
 
         }
         else
         {
             IsForbidden = false;
-            PlayerState player = Player_Black as PlayerState;
-            player.onForbbidenMark -= ForbbidneMark;
+            playerBlack.onForbbidenMark -= ForbbidneMark;
             
             mUtilImage.DOFade(0,0);
             mUtilImage.sprite = GetImage(Enums.EGameImage.None);
