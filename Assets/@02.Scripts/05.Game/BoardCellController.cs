@@ -38,8 +38,7 @@ public class BoardCellController : MonoBehaviour
             {
                 for (int j = 0; j < size + 1; j++)
                 {
-                    cells[i, j].playerType = Enums.EPlayerType.None;
-                    //이미지 혹은 스프라이트 초기화
+                    cells[i, j].ResetCell();
                 }
             }
         }

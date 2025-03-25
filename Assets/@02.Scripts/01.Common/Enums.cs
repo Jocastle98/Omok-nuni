@@ -61,4 +61,14 @@ public class Enums
         Turn_White,
         Record
     }
+
+    public enum EGameImage
+    {
+        BlackStone,
+        WhiteStone,
+        Selector,
+        XMarker,
+        LastPosMark,
+        None,
+    }
 }
