@@ -60,14 +60,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5377358, g: 0.5377358, b: 0.5377358, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: de7034e616a70704db18d925d6f66455, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3fc1cddd20b06934f85f6c3844a01133, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -170,7 +170,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 500, y: 120}
+  m_SizeDelta: {x: 500, y: 110}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7013953601807883027
 CanvasRenderer:
@@ -193,14 +193,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7764706, g: 0.7764706, b: 0.7764706, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -375,8 +375,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u200B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
-  m_sharedMaterial: {fileID: -145588187229913381, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f1522554ce75dbe489f32d09d8e47e92, type: 2}
+  m_sharedMaterial: {fileID: -5825499341323318328, guid: f1522554ce75dbe489f32d09d8e47e92, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -479,7 +479,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 500, y: 120}
+  m_SizeDelta: {x: 500, y: 110}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4738158271791481948
 CanvasRenderer:
@@ -502,14 +502,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7735849, g: 0.7735849, b: 0.7735849, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -852,8 +852,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u200B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
-  m_sharedMaterial: {fileID: -145588187229913381, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f1522554ce75dbe489f32d09d8e47e92, type: 2}
+  m_sharedMaterial: {fileID: -5825499341323318328, guid: f1522554ce75dbe489f32d09d8e47e92, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1198,14 +1198,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5372549, g: 0.5372549, b: 0.5372549, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: de7034e616a70704db18d925d6f66455, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3fc1cddd20b06934f85f6c3844a01133, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1338,8 +1338,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uD68C\uC6D0\uAC00\uC785"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
-  m_sharedMaterial: {fileID: -145588187229913381, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f1522554ce75dbe489f32d09d8e47e92, type: 2}
+  m_sharedMaterial: {fileID: -5825499341323318328, guid: f1522554ce75dbe489f32d09d8e47e92, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1468,15 +1468,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.93333334, g: 0.93333334, b: 0.93333334, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: bdc3ac839cdd63d4b87f16f2f90c652e, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1734,8 +1734,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB85C\uADF8\uC778"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
-  m_sharedMaterial: {fileID: -145588187229913381, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f1522554ce75dbe489f32d09d8e47e92, type: 2}
+  m_sharedMaterial: {fileID: -5825499341323318328, guid: f1522554ce75dbe489f32d09d8e47e92, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1868,8 +1868,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB85C\uADF8\uC778"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
-  m_sharedMaterial: {fileID: -145588187229913381, guid: dfcdd174ac1cef24488a25d065ae5875, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f1522554ce75dbe489f32d09d8e47e92, type: 2}
+  m_sharedMaterial: {fileID: -5825499341323318328, guid: f1522554ce75dbe489f32d09d8e47e92, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
