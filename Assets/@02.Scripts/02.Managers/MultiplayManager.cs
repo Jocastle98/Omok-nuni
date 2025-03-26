@@ -56,7 +56,9 @@ public class MultiplayManager : IDisposable
         {
             Transport = SocketIOClient.Transport.TransportProtocol.WebSocket
         });
-        
+        mSocket.OnConnected += (sender, e) => {
+            Debug.Log("[MultiplayManager] 소켓 연결 성공!");
+        };
         mSocket.On("createRoom", CreateRoom);
         mSocket.On("joinRoom", JoinRoom);
         mSocket.On("startGame", StartGame);
@@ -68,7 +70,12 @@ public class MultiplayManager : IDisposable
         
         mSocket.Connect();
     }
-    
+    // 나의 급수를 서버로 전달
+    public void SendMyRank(int myRank)
+    {
+        Debug.Log($"[MultiplayManager] SendMyRank 호출, rank={myRank}");
+        mSocket.Emit("setRank", new { myRank });
+    }
     // 상대방의 프로필 정보 수신
     private void OnOpponentProfileReceived(SocketIOResponse response)
     {
