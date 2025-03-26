@@ -75,44 +75,54 @@ public class ReplayPanelController : PopupPanelController
 
 
     /// <summary>
-    /// 다음 수로 이동 
+    /// 보드 전체 초기화하고 current까지 다시 두기 
+    /// </summary>
+    private void ReloadBoard()
+    {
+        boardCellController.InitBoard();
+
+        for (int i = 0; i <= _currentIndex; i++)
+        {
+            var move = _moves[i];
+            boardCellController.cells[move.y, move.x].SetMark(move.stone);
+            boardCellController.cells[move.y, move.x].playerType = move.stone;
+        }
+
+        // 하이라이트
+        if (_currentIndex >= 0)
+        {
+            HighlightCurrentPlayer(_moves[_currentIndex].stone);
+        }
+        else
+        {
+            HighlightCurrentPlayer(Enums.EPlayerType.None);
+        }
+    }
+
+    /// <summary>
+    /// 다음 수로 이동
     /// </summary>
     public void OnNextButtonClick()
     {
         if (_currentIndex + 1 < _moves.Count)
         {
             _currentIndex++;
-            var move = _moves[_currentIndex];
-            boardCellController.cells[move.y, move.x].SetMark(move.stone);
-            boardCellController.cells[move.y, move.x].playerType = move.stone;
-
-            HighlightCurrentPlayer(move.stone);
+            ReloadBoard();
         }
     }
 
     /// <summary>
-    /// 이전 수로 이동 
+    /// 이전 수로 이동
     /// </summary>
     public void OnPrevButtonClick()
     {
         if (_currentIndex >= 0)
         {
-            var move = _moves[_currentIndex];
-            boardCellController.cells[move.y, move.x].SetMark(Enums.EPlayerType.None);
-            boardCellController.cells[move.y, move.x].playerType = Enums.EPlayerType.None;
             _currentIndex--;
-
-            if (_currentIndex >= 0)
-            {
-                var prevMove = _moves[_currentIndex];
-                HighlightCurrentPlayer(prevMove.stone);
-            }
-            else
-            {
-                HighlightCurrentPlayer(Enums.EPlayerType.None);
-            }
+            ReloadBoard();
         }
     }
+
 
     /// <summary>
     /// 흑/백 중 어느 쪽이 현재 수를 뒀는지 UI로 강조
