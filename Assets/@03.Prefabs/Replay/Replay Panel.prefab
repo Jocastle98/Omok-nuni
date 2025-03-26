@@ -1182,7 +1182,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panelRectTransform: {fileID: 5879500765145358633}
-  boardCellController: {fileID: 6819285111102633800}
+  boardCellController: {fileID: 5316398713800143469}
   blackPlayerProfileImage: {fileID: 5211001669130234437}
   blackPlayerProfileText: {fileID: 3904036259943511783}
   blackTurnPanel: {fileID: 8834881866638846246}
@@ -2000,7 +2000,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 622813797578044689}
+  - {fileID: 2288389372453498932}
   - {fileID: 8177517636639696189}
   - {fileID: 1390539847163641396}
   - {fileID: 77046357789361910}
@@ -2201,7 +2201,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1001 &2141856151620963160
+--- !u!1001 &782558751186816637
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -2298,15 +2298,15 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e19c0fd71708b0c4292806c57c7e427a, type: 3}
---- !u!224 &622813797578044689 stripped
+--- !u!224 &2288389372453498932 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1521595498174332489, guid: e19c0fd71708b0c4292806c57c7e427a, type: 3}
-  m_PrefabInstance: {fileID: 2141856151620963160}
+  m_PrefabInstance: {fileID: 782558751186816637}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6819285111102633800 stripped
+--- !u!114 &5316398713800143469 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4835618602918591504, guid: e19c0fd71708b0c4292806c57c7e427a, type: 3}
-  m_PrefabInstance: {fileID: 2141856151620963160}
+  m_PrefabInstance: {fileID: 782558751186816637}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
