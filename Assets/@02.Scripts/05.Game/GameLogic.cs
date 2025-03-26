@@ -145,6 +145,15 @@ public class GameLogic : IDisposable
                             break;
                     }
                 });
+                 
+                // 나의 급수 가져오기
+                UserInfoResult myInfo = NetworkManager.Instance.GetUserInfoSync(() => {}, () => {});
+                int myRank = myInfo.rank;
+
+                // 소켓연결 성공 시 0.1초후 서버로 나의급수 전송
+                UniTask.Delay(100).ContinueWith(() => {
+                    mMultiplayManager.SendMyRank(myRank);
+                });
                 break;
             case Enums.EGameType.PassAndPlayFade:
                 mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone);
