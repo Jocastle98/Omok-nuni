@@ -218,37 +218,48 @@ public class GameLogic : IDisposable
             
             if (localPlayerType == Enums.EPlayerType.Player_Black)
             {
-                NetworkManager.Instance.AddOmokRecord(
-                    recordId,
-                    blackUserId: myUserId,
-                    whiteUserId: mOpponentInfo.userId, 
-                    mMoveHistory,
-                    () => Debug.Log("기보 저장 성공"),
-                    () => Debug.Log("기보 저장 실패")
-                );
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddOmokRecord(
+                        recordId,
+                        blackUserId: myUserId,
+                        whiteUserId: mOpponentInfo.userId, 
+                        mMoveHistory,
+                        () => Debug.Log("기보 저장 성공"),
+                        () => Debug.Log("기보 저장 실패")
+                    );
+                });
+                
             }
             else
             {
-                NetworkManager.Instance.AddOmokRecord(
-                    recordId,
-                    blackUserId: mOpponentInfo.userId, 
-                    whiteUserId: myUserId,
-                    mMoveHistory,
-                    () => Debug.Log("기보 저장 성공"),
-                    () => Debug.Log("기보 저장 실패")
-                );
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddOmokRecord(
+                        recordId,
+                        blackUserId: mOpponentInfo.userId, 
+                        whiteUserId: myUserId,
+                        mMoveHistory,
+                        () => Debug.Log("기보 저장 성공"),
+                        () => Debug.Log("기보 저장 실패")
+                    );
+                });
             }
         }
         else
         {
             var myInfo = NetworkManager.Instance.GetUserInfoSync(() => {}, () => {});
             // 패스앤플레이 / AI 모드는 흑백 모두 나로설정
-            NetworkManager.Instance.AddOmokRecord(
-                recordId,
-                blackUserId: myInfo.userId, 
-                whiteUserId: myInfo.userId,
-                mMoveHistory
-            );
+
+            UniTask.Void(async () =>
+            {
+                await NetworkManager.Instance.AddOmokRecord(
+                        recordId,
+                        blackUserId: myInfo.userId,
+                        whiteUserId: myInfo.userId,
+                        mMoveHistory
+                        );
+            });
         }
 
         SetState(null);

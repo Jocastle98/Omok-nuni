@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SocketIOClient;
 using UnityEngine;
@@ -198,10 +199,18 @@ public class MultiplayManager : IDisposable
     {
         UnityThread.executeInUpdate(() =>
         {
-            GameManager.Instance.OpenConfirmPanel("상대방이 퇴장하였습니다. \n코인을 돌려받고 메인 화면으로 돌아갑니다.", () =>
+            GameManager.Instance.OpenConfirmPanel("상대방이 퇴장하였습니다. \n코인을 돌려받고 \n메인 화면으로 돌아갑니다.", () =>
             {
-                NetworkManager.Instance.AddCoin(Constants.ConsumeCoin);
-                GameManager.Instance.ChangeToMainScene();
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddCoin(Constants.ConsumeCoin, i =>
+                    {
+                        GameManager.Instance.ChangeToMainScene();
+                    }, () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("돌려 받지 못함", null, false);
+                    });
+                });
             });
         });
     }
@@ -234,10 +243,18 @@ public class MultiplayManager : IDisposable
     {
         UnityThread.executeInUpdate(() =>
         {
-            GameManager.Instance.OpenConfirmPanel("상대방이 거절했습니다. \n코인을 돌려받고 메인 화면으로 돌아갑니다.", () =>
+            GameManager.Instance.OpenConfirmPanel("상대방이 거절했습니다. \n코인을 돌려받고 \n메인 화면으로 돌아갑니다.", () =>
             {
-                NetworkManager.Instance.AddCoin(Constants.ConsumeCoin);
-                GameManager.Instance.ChangeToMainScene();
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddCoin(Constants.ConsumeCoin, i =>
+                    {
+                        GameManager.Instance.ChangeToMainScene();
+                    }, () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("돌려 받지 못함", null, false);
+                    });
+                });
             }, false);
         });
     }

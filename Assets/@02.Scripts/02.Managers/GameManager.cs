@@ -193,14 +193,14 @@ public class GameManager : Singleton<GameManager>
     }
 
     // 확인(and 취소) 패널 호출 메서드
-    public void OpenConfirmPanel(string message, Action OnConfirmButtonClick, 
-        bool activeCancelButton = true, Action OnCancelButtonClick = null)
+    public void OpenConfirmPanel(string message, Action onConfirmButtonClick, 
+        bool activeCancelButton = true, Action onCancelButtonClick = null)
     {
         if (mCanvas != null)
         {
             GameObject confirmPanelObject = Instantiate(confirmPanel, mCanvas.transform);
             confirmPanelObject.GetComponent<ConfirmPanelController>()
-                .Show(message, OnConfirmButtonClick, activeCancelButton, OnCancelButtonClick);
+                .Show(message, onConfirmButtonClick, activeCancelButton, onCancelButtonClick);
         }
     }
 
