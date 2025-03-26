@@ -87,5 +87,4 @@ namespace UserDataStructs
         public int coin;
         public string message;
     }
-    
 }
