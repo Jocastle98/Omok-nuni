@@ -49,6 +49,7 @@ public class GameLogic : IDisposable
         this.gamePanelController = gamePanelController;
         OnMyGameProfileUpdate = onMyGameProfileUpdate;
         OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
+        GameManager.Instance.SetIsMultiPlay(false);
         
         GameManager.Instance.OnRematchGame -= SendRematchGameRequest;
         GameManager.Instance.OnRematchGame += SendRematchGameRequest;
@@ -109,6 +110,7 @@ public class GameLogic : IDisposable
                 {
                     mRoomId = roomId;
                     MultiplayCallbackHandler();
+                    GameManager.Instance.SetIsMultiPlay(true);
                     
                     switch (state)
                     {

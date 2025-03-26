@@ -38,6 +38,7 @@ public class GameManager : Singleton<GameManager>
 
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
+    private bool mbIsMultiPlay = false;
 
     public Action OnMainPanelUpdate;
     public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
@@ -300,6 +301,16 @@ public class GameManager : Singleton<GameManager>
     public void SetIsStartGame(bool isStartGame)
     {
         mbIsStartGame = isStartGame;
+    }
+
+    public bool GetIsMultiPlay()
+    {
+        return mbIsMultiPlay;
+    }
+
+    public void SetIsMultiPlay(bool isMultiPlay)
+    {
+        mbIsMultiPlay = isMultiPlay;
     }
     
     // 콜백 초기화 메서드
