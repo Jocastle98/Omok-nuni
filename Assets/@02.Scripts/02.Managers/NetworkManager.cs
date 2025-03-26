@@ -7,6 +7,49 @@ using Cysharp.Threading.Tasks;
 using UnityEngine.Networking;
 using UserDataStructs;
 
+/// <summary>
+/// 클라이언트에서 서버로 기보를 전송할 때(POST /users/addomokrecord) 요청(Request) 바디로 사용하는 구조체
+/// </summary>
+public class OmokRecordPayload
+{
+    public string recordId;
+    public List<OmokMove> moves;
+    public string blackUserId;  
+    public string whiteUserId;
+}
+/// <summary>
+/// 여러 기보를 한 번에 받아올 때 배열 래핑 용도
+/// </summary>
+[Serializable]
+public class OmokRecordWrapper
+{
+    public OmokRecord[] records;
+}
+
+/// <summary>
+/// 서버에서 받아오는 기보를 표현하는 응답용 클래스
+/// </summary>
+[Serializable]
+public class OmokRecord
+{
+    public string blackUserId;
+    public string whiteUserId;
+    public string recordId;
+    public List<OmokMove> moves;
+    public string createdAt;
+}
+/// <summary>
+/// 각 수(돌을 놓은 좌표 y,x 와 돌 색 stone)를 표현하는 기본 자료구조
+/// </summary>
+[Serializable]
+public class OmokMove
+{
+    public int y;
+    public int x;
+    public int stone;
+}
+
+
 public class NetworkManager : Singleton<NetworkManager>
 {
     // 로그아웃
@@ -135,7 +178,7 @@ public class NetworkManager : Singleton<NetworkManager>
     public async UniTask<UserInfoResult> GetUserInfo(Action successCallback, Action failureCallback)
     {
         string sid = PlayerPrefs.GetString("sid");
-        if (string.IsNullOrEmpty(sid))
+        if (sid == null)
         {
             Debug.Log("유저 데이터 불러오기에 실패했습니다. \n" +
                       "세션 데이터가 없습니다.");
@@ -161,41 +204,13 @@ public class NetworkManager : Singleton<NetworkManager>
                         false);
                 }
                 failureCallback?.Invoke();
-                return new UserInfoResult();
             }
 
-            // 응답 상태 체크
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                string errorMessage = "서버 오류 발생: " + www.error;
-                if (www.result == UnityWebRequest.Result.ConnectionError)
-                {
-                    errorMessage = "네트워크 오류가 발생했습니다.";
-                }
-                else if (www.result == UnityWebRequest.Result.ProtocolError)
-                {
-                    errorMessage = $"HTTP 오류 발생: {www.responseCode}";
-                }
-
-                Debug.LogError(errorMessage);
-                GameManager.Instance.OpenConfirmPanel(errorMessage, () => { failureCallback?.Invoke(); }, false);
-                failureCallback?.Invoke();  // HTTP 오류나 네트워크 오류 시 실패 콜백 호출
-                return new UserInfoResult();  // 실패 시 빈 결과 반환
-            }
-            
             var resultStr = www.downloadHandler.text;
-            
-            // 응답 본문 처리
-            if (string.IsNullOrEmpty(resultStr))
-            {
-                Debug.LogError("서버 응답이 비어 있습니다.");
-                GameManager.Instance.OpenConfirmPanel("서버 응답이 비어 있습니다.", () => { failureCallback?.Invoke(); }, false);
-                failureCallback?.Invoke();  // 응답 본문이 비어있을 때 실패 콜백 호출
-                return new UserInfoResult();  // 빈 결과 반환
-            }
-            
             UserInfoResult userInfo = JsonUtility.FromJson<UserInfoResult>(resultStr);
+            
             successCallback?.Invoke();
+            
             return userInfo;
         }
     }
@@ -400,6 +415,164 @@ public class NetworkManager : Singleton<NetworkManager>
             }
         }
     }
+    
+    // 오목 기록 추가
+    public async UniTask AddOmokRecord(
+        string recordId,
+        string blackUserId, // 멀티플레이 시 흑 플레이어의 userId
+        string whiteUserId, // 멀티플레이 시 백 플레이어의 userId
+        List<(int y, int x, Enums.EPlayerType stone)> moves,
+        Action successCallback = null,
+        Action failureCallback = null)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (string.IsNullOrEmpty(sid))
+        {
+            Debug.LogWarning("세션 쿠키가 없습니다. 기보 저장 불가.");
+            failureCallback?.Invoke();
+            return;
+        }
+
+        List<OmokMove> moveList = new List<OmokMove>();
+        foreach (var m in moves)
+        {
+            moveList.Add(new OmokMove { y = m.y, x = m.x, stone = (int)m.stone });
+        }
+
+        OmokRecordPayload requestBody = new OmokRecordPayload
+        {
+            recordId    = recordId,
+            moves       = moveList,
+            blackUserId = blackUserId, 
+            whiteUserId = whiteUserId
+        };
+
+        string json   = JsonUtility.ToJson(requestBody);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+
+        using (UnityWebRequest www = new UnityWebRequest(Constants.ServerURL + "/users/addomokrecord", "POST"))
+        {
+            www.uploadHandler   = new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+            www.SetRequestHeader("Content-Type", "application/json");
+
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                    Debug.Log("오목 기보 저장 성공");
+                    successCallback?.Invoke();
+                }
+                else
+                {
+                    Debug.LogWarning("오목 기보 저장 실패: " + www.error);
+                    failureCallback?.Invoke();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("오목 기보 저장 중 예외: " + ex.Message);
+                failureCallback?.Invoke();
+            }
+        }
+    }
+
+
+
+    // 오목 기록 가져오기
+    public async UniTask<List<OmokRecord>> GetOmokRecords(
+        Action successCallback = null, Action failureCallback = null)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (string.IsNullOrEmpty(sid))
+        {
+            Debug.LogWarning("세션 쿠키가 없습니다. 기보 조회 불가.");
+            failureCallback?.Invoke();
+            return new List<OmokRecord>();
+        }
+
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/getomokrecords", "GET"))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                    var resultStr = www.downloadHandler.text;
+
+                    OmokRecordWrapper wrapper = 
+                        JsonUtility.FromJson<OmokRecordWrapper>(resultStr);
+
+                    successCallback?.Invoke();
+                    return new List<OmokRecord>(wrapper.records);
+                }
+                else
+                {
+                    Debug.LogWarning("오목 기보 조회 실패: " + www.error);
+                    failureCallback?.Invoke();
+                    return new List<OmokRecord>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("오목 기보 조회 중 예외: " + ex.Message);
+                failureCallback?.Invoke();
+                return new List<OmokRecord>();
+            }
+        }
+    }
+    
+    // 상대 정보 가져오기
+    public async UniTask<UserInfoResult> GetUserInfoByUserId(string targetUserId,
+        Action successCallback = null, Action failureCallback = null)
+    {
+        string sid = PlayerPrefs.GetString("sid");
+        if (string.IsNullOrEmpty(sid))
+        {
+            Debug.LogWarning("세션 쿠키가 없습니다.");
+            failureCallback?.Invoke();
+            return default;
+        }
+
+        string url = $"{Constants.ServerURL}/users/userinfo/{targetUserId}";
+        using (UnityWebRequest www =
+               new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Cookie", sid);
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                    var resultStr = www.downloadHandler.text;
+                    UserInfoResult userInfo = JsonUtility.FromJson<UserInfoResult>(resultStr);
+                    successCallback?.Invoke();
+                    return userInfo;
+                }
+                else
+                {
+                    Debug.LogWarning("상대 정보 가져오기 실패: " + www.error);
+                    failureCallback?.Invoke();
+                    return default;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("상대 정보 가져오는 중 예외: " + ex.Message);
+                failureCallback?.Invoke();
+                return default;
+            }
+        }
+    }
+
+    
 
     /// <summary>
     /// 코인 추가

@@ -34,6 +34,7 @@ namespace UserDataStructs
 
     public struct UserInfoResult
     {
+        public string userId;
         public string username;
         public string nickname;
         public int profileimageindex;

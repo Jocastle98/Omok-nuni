@@ -19,6 +19,9 @@ public class MoveData
 
 public class UsersInfoData
 {
+    [JsonProperty("userId")]
+    public string userId { get; set; }
+    
     [JsonProperty("roomId")]
     public string roomId { get; set; }
     
