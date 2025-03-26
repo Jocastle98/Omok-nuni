@@ -74,7 +74,6 @@ public class BoardCellController : MonoBehaviour
                 {
                     onCellClicked?.Invoke(blockIndex);
                 });
-                
             }
         }
     }

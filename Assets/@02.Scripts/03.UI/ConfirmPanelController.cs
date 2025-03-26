@@ -11,6 +11,7 @@ public class ConfirmPanelController : PopupPanelController
     [SerializeField] private GameObject cancelButton;
     
     public Action OnConfirmButtonClick;
+    public Action OnCancelButtonClick;
 
     /// <summary>
     /// 부모 클래스 Show() 메서드의 애니메이션 효과 + 메시지를 표시하고 콜백을 실행하는 기능의 메서드
@@ -18,12 +19,13 @@ public class ConfirmPanelController : PopupPanelController
     /// </summary>
     /// <param name="message">표시해야 될 메시지</param>
     /// <param name="OnConfirmButtonClick">ConfirmPanel이 닫히고 나면 실행되어야 할 콜백</param>
-    public void Show(string message, Action OnConfirmButtonClick, bool activeCancelButton)
+    public void Show(string message, Action onConfirmButtonClick, bool activeCancelButton, Action onCancelButtonClick)
     {
         base.Show();
         
         this.messageText.text = message;
-        this.OnConfirmButtonClick = OnConfirmButtonClick;
+        this.OnConfirmButtonClick = onConfirmButtonClick;
+        this.OnCancelButtonClick = onCancelButtonClick;
         this.cancelButton.SetActive(activeCancelButton);
     }
 
@@ -42,6 +44,6 @@ public class ConfirmPanelController : PopupPanelController
     /// </summary>
     public void OnClickCancelButton()
     {
-        Hide();
+        Hide(() => OnCancelButtonClick?.Invoke());
     }
 }

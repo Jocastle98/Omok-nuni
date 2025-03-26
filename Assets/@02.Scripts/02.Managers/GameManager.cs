@@ -27,8 +27,7 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject mRankingPanel;
     [SerializeField] private GameObject mRecordListPanel;
     [SerializeField] private List<Sprite> mProfileSprites;
-
-
+    
     private Canvas mCanvas;
 
     private Enums.EGameType mGameType;
@@ -39,10 +38,13 @@ public class GameManager : Singleton<GameManager>
 
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
-    
+    private bool mbIsMultiPlay = false;
+
     public Action OnMainPanelUpdate;
     public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
     public Action<UsersInfoData> OnOpponentGameProfileUpdate;
+    public Action OnRematchGame;
+    public Action OnCloseScorePanel;
     public Action OnCoinUpdated;
     public Action OnAdsRemoved;
 
@@ -124,6 +126,7 @@ public class GameManager : Singleton<GameManager>
     public void ChangeToGameScene(Enums.EGameType gameType)
     {
         mGameType = gameType;
+        
         SceneManager.LoadScene("Game");
     }
 
@@ -138,7 +141,7 @@ public class GameManager : Singleton<GameManager>
 
         SceneManager.LoadScene("Main");
     }
-
+    
     // 대국 시작 시 모드선택 패널 호출 메서드
     public void OpenGameTypeSelectPanel()
     {
@@ -190,13 +193,14 @@ public class GameManager : Singleton<GameManager>
     }
 
     // 확인(and 취소) 패널 호출 메서드
-    public void OpenConfirmPanel(string message, Action OnConfirmButtonClick, bool activeCancelButton = true)
+    public void OpenConfirmPanel(string message, Action onConfirmButtonClick, 
+        bool activeCancelButton = true, Action onCancelButtonClick = null)
     {
         if (mCanvas != null)
         {
             GameObject confirmPanelObject = Instantiate(confirmPanel, mCanvas.transform);
             confirmPanelObject.GetComponent<ConfirmPanelController>()
-                .Show(message, OnConfirmButtonClick, activeCancelButton);
+                .Show(message, onConfirmButtonClick, activeCancelButton, onCancelButtonClick);
         }
     }
 
@@ -299,20 +303,24 @@ public class GameManager : Singleton<GameManager>
         mbIsStartGame = isStartGame;
     }
 
-    // 승점 확인 패널 호출 메서드
-    public void OpenScoreConfirmationPanel()
+    public bool GetIsMultiPlay()
     {
-        if (mCanvas != null)
-        {
-        }
+        return mbIsMultiPlay;
     }
 
+    public void SetIsMultiPlay(bool isMultiPlay)
+    {
+        mbIsMultiPlay = isMultiPlay;
+    }
+    
     // 콜백 초기화 메서드
     private void ClearAllCallbacks()
     {
         OnMainPanelUpdate = null;
         OnMyGameProfileUpdate = null;
         OnOpponentGameProfileUpdate = null;
+        OnRematchGame = null;
+        OnCloseScorePanel = null;
     }
     
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -332,7 +340,7 @@ public class GameManager : Singleton<GameManager>
                 OnMainPanelUpdate += mainPanelController.SetProfileInfo;
             }
             
-            NetworkManager.Instance.GetUserInfo(() =>
+            NetworkManager.Instance.GetUserInfoSync(() =>
             {
                 OnMainPanelUpdate?.Invoke();
             }, () => { });
@@ -353,6 +361,9 @@ public class GameManager : Singleton<GameManager>
             {
                 // GamePanelController UI 초기화
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
+                
+                OnRematchGame = null;
+                OnCloseScorePanel = null;
                 
                 OnMyGameProfileUpdate -= gamePanelController.SetMyProfile;
                 OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
