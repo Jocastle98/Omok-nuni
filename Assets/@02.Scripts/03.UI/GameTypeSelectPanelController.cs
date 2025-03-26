@@ -8,6 +8,7 @@ public class GameTypeSelectPanelController : PopupPanelController
 {
     [SerializeField] private GameObject passAndPlayButton;
     [SerializeField] private GameObject multiplayButton;
+    [SerializeField] private GameObject passAndPlayButtonFade;
     
     public void OnClickPassAndPlayButton()
     {
@@ -22,6 +23,14 @@ public class GameTypeSelectPanelController : PopupPanelController
         Hide(() =>
         {
             GameManager.Instance.ChangeToGameScene(Enums.EGameType.MultiPlay);
+        });
+    }
+    
+    public void OnClickMultiplayFadeButton()
+    {
+        Hide(() =>
+        {
+            GameManager.Instance.ChangeToGameScene(Enums.EGameType.PassAndPlayFade);
         });
     }
 

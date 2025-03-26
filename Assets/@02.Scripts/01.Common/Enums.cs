@@ -27,7 +27,8 @@ public class Enums
     {
         PassAndPlay,    // 1개 폰 2인 플레이
         SinglePlay,     // 싱글 플레이
-        MultiPlay       // 멀티 플레이
+        MultiPlay,       // 멀티 플레이
+        PassAndPlayFade,
     }
 
     public enum EGameResult
@@ -70,5 +71,11 @@ public class Enums
         XMarker,
         LastPosMark,
         None,
+    }
+
+    public enum EEasterEggMode
+    {
+        None,
+        FadeStone,
     }
 }
