@@ -329,7 +329,7 @@ public class GameManager : Singleton<GameManager>
                 OnMainPanelUpdate += mainPanelController.SetProfileInfo;
             }
             
-            NetworkManager.Instance.GetUserInfo(() =>
+            NetworkManager.Instance.GetUserInfoSync(() =>
             {
                 OnMainPanelUpdate?.Invoke();
             }, () => { });
