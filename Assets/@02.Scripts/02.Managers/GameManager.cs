@@ -43,6 +43,7 @@ public class GameManager : Singleton<GameManager>
     public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
     public Action<UsersInfoData> OnOpponentGameProfileUpdate;
     public Action OnRematchGame;
+    public Action OnCloseScorePanel;
     public Action OnCoinUpdated;
     public Action OnAdsRemoved;
 
@@ -300,14 +301,6 @@ public class GameManager : Singleton<GameManager>
     {
         mbIsStartGame = isStartGame;
     }
-
-    // 승점 확인 패널 호출 메서드
-    public void OpenScoreConfirmationPanel()
-    {
-        if (mCanvas != null)
-        {
-        }
-    }
     
     // 콜백 초기화 메서드
     private void ClearAllCallbacks()
@@ -315,6 +308,8 @@ public class GameManager : Singleton<GameManager>
         OnMainPanelUpdate = null;
         OnMyGameProfileUpdate = null;
         OnOpponentGameProfileUpdate = null;
+        OnRematchGame = null;
+        OnCloseScorePanel = null;
     }
     
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -355,6 +350,9 @@ public class GameManager : Singleton<GameManager>
             {
                 // GamePanelController UI 초기화
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
+                
+                OnRematchGame = null;
+                OnCloseScorePanel = null;
                 
                 OnMyGameProfileUpdate -= gamePanelController.SetMyProfile;
                 OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
