@@ -148,10 +148,9 @@ public class GamePanelController : MonoBehaviour
     {
         GameManager.Instance.OpenConfirmPanel("기권하시겠습니까?", () =>
         {
-            // 패배처리
-            
-            
-            // 임시기능: 메인 화면으로 전환(패배처리 구현 시 삭제)
+            // 기권 처리
+
+            // 임시기능: 메인화면으로 씬 전환
             GameManager.Instance.ChangeToMainScene();
         });
     }

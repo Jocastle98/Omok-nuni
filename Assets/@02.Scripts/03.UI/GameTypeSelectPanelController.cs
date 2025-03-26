@@ -22,7 +22,18 @@ public class GameTypeSelectPanelController : PopupPanelController
     {
         Hide(() =>
         {
-            GameManager.Instance.ChangeToGameScene(Enums.EGameType.MultiPlay);
+            NetworkManager.Instance.ConsumeCoin(Constants.ConsumeCoin, 
+                successCallback: (remainingCoins) => 
+                {
+                    GameManager.Instance.OpenConfirmPanel($"남은 코인은 {remainingCoins} 입니다.", () =>
+                    {
+                        GameManager.Instance.ChangeToGameScene(Enums.EGameType.MultiPlay);
+                    }, false);
+                },
+                failureCallback: () =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("코인이 부족합니다.", () => { }, false);
+                });
         });
     }
     

@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class ScorePanelController : PopupPanelController
 {
@@ -8,7 +10,8 @@ public class ScorePanelController : PopupPanelController
     [SerializeField] private GameObject scoreImagePrefab;
     [SerializeField] private TextMeshProUGUI messageText;
     [SerializeField] private TextMeshProUGUI upgradeText;
-
+    
+    [SerializeField] private Button ResignButton;
  
     /// <summary>
     /// 점수 패널 초기화
@@ -22,6 +25,8 @@ public class ScorePanelController : PopupPanelController
     {
         Show();
 
+        GameManager.Instance.OnCloseScorePanel += Hide;
+        
         // 승/패 메시지
         if (isWin)
             messageText.text = $"오목에서 승리했습니다. {addDelete * 10}점을 획득!";
@@ -108,7 +113,34 @@ private void RefreshIcons(int currentScore)
         Hide(() =>
         {
             GameManager.Instance.ChangeToMainScene();
+            Debug.Log("메인씬으로 전환");
         });
+    }
 
+    public void OnClickRematchButton()
+    {
+        Hide(() =>
+        {
+            NetworkManager.Instance.ConsumeCoin(Constants.ConsumeCoin, 
+                successCallback: (remainingCoins) => 
+                {
+                    GameManager.Instance.OpenConfirmPanel($"남은 코인은 {remainingCoins} 입니다.", () =>
+                    {
+                        GameManager.Instance.OnRematchGame?.Invoke();
+                    }, false);
+                },
+                failureCallback: () =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("코인이 부족합니다.", () =>
+                    {
+                        GameManager.Instance.ChangeToMainScene();
+                    }, false);
+                });
+        });
+    }
+
+    private void Hide()
+    {
+        base.Hide();
     }
 }
