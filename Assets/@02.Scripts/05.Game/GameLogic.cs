@@ -196,18 +196,6 @@ public class GameLogic : IDisposable
     #endregion
     
     /// <summary>
-    /// 상대 프로필 정보 수신 시 GameLogic에서도 보관
-    /// </summary>
-    /// <param name="oppoData"></param>
-    private void OnOpponentProfileReceived(UsersInfoData oppoData)
-    {
-        mOpponentInfo = oppoData;
-        Debug.Log($"[GameLogic] Opponent userID={mOpponentInfo.userId}, nickname={mOpponentInfo.nickname}");
-
-        OnOpponentGameProfileUpdate?.Invoke(oppoData);
-    }
-
-    /// <summary>
     /// 턴을 변경하면 메서드
     /// </summary>
     /// <param name="player"></param>
@@ -381,7 +369,7 @@ public class GameLogic : IDisposable
             OnMyGameProfileUpdate?.Invoke(playerType);
         });
     }
-
+    
     private void SendOpponentGameProfile(string roomId, Enums.EPlayerType playerType)
     {
         UnityThread.executeInUpdate(() =>
@@ -409,7 +397,19 @@ public class GameLogic : IDisposable
 
         return usersInfoData;
     }
+    
+    /// <summary>
+    /// 상대 프로필 정보 수신 시 GameLogic에서도 보관
+    /// </summary>
+    /// <param name="oppoData"></param>
+    private void OnOpponentProfileReceived(UsersInfoData oppoData)
+    {
+        mOpponentInfo = oppoData;
+        Debug.Log($"[GameLogic] Opponent userID={mOpponentInfo.userId}, nickname={mOpponentInfo.nickname}");
 
+        OnOpponentGameProfileUpdate?.Invoke(oppoData);
+    }
+    
     private void ResetGame(Enums.EMultiplayManagerState multiplayManagerState)
     {
         UnityThread.executeInUpdate(() =>

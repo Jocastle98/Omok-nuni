@@ -81,27 +81,6 @@ public class MultiplayManager : IDisposable
         
         mSocket.Connect();
     }
-    // 나의 급수를 서버로 전달
-    public void SendMyRank(int myRank)
-    {
-        Debug.Log($"[MultiplayManager] SendMyRank 호출, rank={myRank}");
-        mSocket.Emit("setRank", new { myRank });
-    }
-    // 상대방의 프로필 정보 수신
-    private void OnOpponentProfileReceived(SocketIOResponse response)
-    {
-        try
-        {
-            var data = response.GetValue<UsersInfoData>();
-            OnOpponentProfileUpdate?.Invoke(data); // 프로필 정보를 UI로 전달
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error in OnOpponentProfileReceived: {ex.Message}");
-        }
-    }
-
-    
     
     // 자신이 방(세션)을 생성
     private void CreateRoom(SocketIOResponse response)
@@ -147,6 +126,13 @@ public class MultiplayManager : IDisposable
     }
     
     #region ProfileData
+    
+    // 나의 급수를 서버로 전달
+    public void SendMyRank(int myRank)
+    {
+        Debug.Log($"[MultiplayManager] SendMyRank 호출, rank={myRank}");
+        mSocket.Emit("setRank", new { myRank });
+    }
     
     // 상대방의 프로필 정보를 서버로부터 수신
     private void OpponentProfileReceived(SocketIOResponse response)
