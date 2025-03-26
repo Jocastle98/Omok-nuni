@@ -74,6 +74,9 @@ public class MultiplayManager : IDisposable
         mSocket.On("rematchAcceptedReceived", AcceptRematchReceived);
         mSocket.On("rematchRejectedReceived", RejectedRematchReceived);
         
+        mSocket.On("forfeitWinReceived", ForfeitWinReceived);
+        mSocket.On("forfeitLoseReceived", ForfeitLoseReceived);
+        
         mSocket.Connect();
     }
     
@@ -257,6 +260,27 @@ public class MultiplayManager : IDisposable
                 });
             }, false);
         });
+    }
+
+    #endregion
+
+    #region ForfeitData
+
+    public void SendForfeitRequest(string roomId)
+    {
+        mSocket.Emit("sendForfeitRequest", new { roomId });
+    }
+
+    private void ForfeitWinReceived(SocketIOResponse response)
+    {
+        Debug.Log("기권승리 메시지 받음");
+        GameManager.Instance.OnForfeitWin?.Invoke();
+    }
+
+    private void ForfeitLoseReceived(SocketIOResponse response)
+    {
+        Debug.Log("기권패배 메시지 받음");
+        GameManager.Instance.OnForfeitLose?.Invoke();
     }
 
     #endregion
