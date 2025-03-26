@@ -12,9 +12,7 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] private GameObject timer;
     
     [SerializeField] private GameObject turnUI;
-    [SerializeField] private GameObject resignButton;
-    [SerializeField] private GameObject recordUI;
-    [SerializeField] private GameObject backButton;
+    [SerializeField] private GameObject forfietButton;
     
     [SerializeField] private CanvasGroup blackTurnPanel;
     [SerializeField] private CanvasGroup whiteTurnPanel;
@@ -45,9 +43,7 @@ public class GamePanelController : MonoBehaviour
             case Enums.EGameUIState.Turn_Black:
                 timer.SetActive(true);
                 turnUI.SetActive(true);
-                resignButton.SetActive(true);
-                recordUI.SetActive(false);
-                backButton.SetActive(false);
+                forfietButton.SetActive(true);
                 
                 timer.GetComponent<Timer>().InitTimer();
                 blackTurnPanel.alpha = mEnableAlpha;
@@ -56,20 +52,11 @@ public class GamePanelController : MonoBehaviour
             case Enums.EGameUIState.Turn_White:
                 timer.SetActive(true);
                 turnUI.SetActive(true);
-                resignButton.SetActive(true);
-                recordUI.SetActive(false);
-                backButton.SetActive(false);
+                forfietButton.SetActive(true);
 
                 timer.GetComponent<Timer>().InitTimer();
                 blackTurnPanel.alpha = mDisableAlpha;
                 whiteTurnPanel.alpha = mEnableAlpha;
-                break;
-            case Enums.EGameUIState.Record:
-                timer.SetActive(false);
-                turnUI.SetActive(false);
-                resignButton.SetActive(false);
-                recordUI.SetActive(true);
-                backButton.SetActive(true);
                 break;
         }
     }
@@ -125,6 +112,8 @@ public class GamePanelController : MonoBehaviour
         });
     }
 
+    #region TimerController
+
     public void InitClock()
     {
         timer.GetComponent<Timer>().InitTimer();
@@ -140,18 +129,29 @@ public class GamePanelController : MonoBehaviour
         timer.GetComponent<Timer>().PauseTimer();
     }
     
+    #endregion
+    
     /// <summary>
     /// 기권버튼 클릭 시 패배 처리 호출하는 메서드
     /// 확인 팝업 후 확인 시 패배처리
     /// </summary>
-    public void OnClickResignButton()
+    public void OnClickForfeitButton()
     {
         GameManager.Instance.OpenConfirmPanel("기권하시겠습니까?", () =>
         {
-            // 기권 처리
-
-            // 임시기능: 메인화면으로 씬 전환
-            GameManager.Instance.ChangeToMainScene();
+            if (GameManager.Instance.GetIsMultiplay())
+            {
+                GameManager.Instance.OnSendForfeit?.Invoke();
+            }
+            else if (GameManager.Instance.GetIsSingleplay())
+            {
+                StopClock();
+                GameManager.Instance.LoseGame();
+            }
+            else
+            {
+                GameManager.Instance.ChangeToMainScene();
+            }
         });
     }
 
@@ -162,42 +162,4 @@ public class GamePanelController : MonoBehaviour
     {
         onBeginButtonClicked?.Invoke();
     }
-
-    #region Record UI(기보 기능 UI)
-    
-    // 맨 첫 턴으로 이동
-    public void OnClickFirstMoveButton()
-    {
-        
-    }
-
-    // 이전 턴으로 이동
-    public void OnClickPreviousMoveButton()
-    {
-        
-    }
-
-    // 다음 턴으로 이동
-    public void OnClickNextMoveButton()
-    {
-        
-    }
-
-    // 맨 마지막 턴으로 이동
-    public void OnClickLastMoveButton()
-    {
-        
-    }
-
-    // 뒤로 가기 버튼
-    public void OnClickBackButton()
-    {
-        GameManager.Instance.OpenConfirmPanel("내 기보를 종료하시겠습니까?", () =>
-        {
-            // 내 기보 목록 팝업 창으로 돌아갈지, 그냥 메인화면 자체로 돌아갈지?(일단은 메인화면)
-            GameManager.Instance.ChangeToMainScene();
-        });
-    }
-    
-    #endregion
 }
