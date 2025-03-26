@@ -659,7 +659,7 @@ public class NetworkManager : Singleton<NetworkManager>
         // 유저 정보를 가져와서 코인 잔액을 확인합니다.
         UserInfoResult userInfo = await GetUserInfo(() => { }, () => { });
 
-        if (userInfo.coin == null || userInfo.coin < amount)
+        if (userInfo.coin < amount)
         {
             Debug.LogWarning("코인이 부족합니다.");
             failureCallback?.Invoke();
