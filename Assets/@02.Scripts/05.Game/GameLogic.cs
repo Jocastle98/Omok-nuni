@@ -28,6 +28,13 @@ public class GameLogic : IDisposable
     private Action<Enums.EPlayerType> OnMyGameProfileUpdate;
     private Action<UsersInfoData> OnOpponentGameProfileUpdate;
     
+    //기보 리스트
+    private List<(int y, int x, Enums.EPlayerType stone)> mMoveHistory = new List<(int, int, Enums.EPlayerType)>();
+    //현재 플레이 모드
+    private Enums.EGameType mPlayMode;
+    // 상대방 정보를 저장할 필드
+    private UsersInfoData mOpponentInfo;
+    
     /// <summary>
     /// 게임 시작 메서드
     /// </summary>
@@ -41,7 +48,9 @@ public class GameLogic : IDisposable
         OnMyGameProfileUpdate = onMyGameProfileUpdate;
         OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
             
-        switch (playMode)
+        //전달받은 플레이모드
+        mPlayMode = playMode;
+        switch (mPlayMode)
         {
             case Enums.EGameType.PassAndPlay:
                 mPlayer_Black = new PlayerState(true);
@@ -94,6 +103,8 @@ public class GameLogic : IDisposable
                 mMultiplayManager =  new MultiplayManager((state, roomId) =>
                 {
                     mMultiplayManager.OnOpponentProfileUpdate += OnOpponentGameProfileUpdate;
+                    // 상대 정보가 수신될 때 GameLogic이 mOpponentInfo에 저장할 수 있음.
+                    mMultiplayManager.OnOpponentProfileUpdate += OnOpponentProfileReceived;
                     mRoomId = roomId;
                     switch (state)
                     {
@@ -136,7 +147,26 @@ public class GameLogic : IDisposable
                     }
                 });
                 break;
+            case Enums.EGameType.PassAndPlayFade:
+                mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone);
+                mPlayer_White = new PlayerState(false,Enums.EEasterEggMode.FadeStone);
+                
+                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
+                SetState(mPlayer_Black);
+                break;
         }
+    }
+    
+    /// <summary>
+    /// 상대 프로필 정보 수신 시 GameLogic에서도 보관
+    /// </summary>
+    /// <param name="oppoData"></param>
+    private void OnOpponentProfileReceived(UsersInfoData oppoData)
+    {
+        mOpponentInfo = oppoData;
+        Debug.Log($"[GameLogic] Opponent userID={mOpponentInfo.userId}, nickname={mOpponentInfo.nickname}");
+
+        OnOpponentGameProfileUpdate?.Invoke(oppoData);
     }
 
     /// <summary>
@@ -163,6 +193,52 @@ public class GameLogic : IDisposable
     {
         if (isGameOver) return; 
         isGameOver = true;
+        
+        // 서버에 기보 기록 전송, recordID 는 날짜 시간
+        // TODO: recordID를 플레이어 이름과 상대플레이어로 변경
+        string recordId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+        if (mPlayMode == Enums.EGameType.MultiPlay)
+        {
+            var myInfo = NetworkManager.Instance.GetUserInfoSync(() => {}, () => {});
+            string myUserId = myInfo.userId;
+
+            
+            if (localPlayerType == Enums.EPlayerType.Player_Black)
+            {
+                NetworkManager.Instance.AddOmokRecord(
+                    recordId,
+                    blackUserId: myUserId,
+                    whiteUserId: mOpponentInfo.userId, 
+                    mMoveHistory,
+                    () => Debug.Log("기보 저장 성공"),
+                    () => Debug.Log("기보 저장 실패")
+                );
+            }
+            else
+            {
+                NetworkManager.Instance.AddOmokRecord(
+                    recordId,
+                    blackUserId: mOpponentInfo.userId, 
+                    whiteUserId: myUserId,
+                    mMoveHistory,
+                    () => Debug.Log("기보 저장 성공"),
+                    () => Debug.Log("기보 저장 실패")
+                );
+            }
+        }
+        else
+        {
+            var myInfo = NetworkManager.Instance.GetUserInfoSync(() => {}, () => {});
+            // 패스앤플레이 / AI 모드는 흑백 모두 나로설정
+            NetworkManager.Instance.AddOmokRecord(
+                recordId,
+                blackUserId: myInfo.userId, 
+                whiteUserId: myInfo.userId,
+                mMoveHistory
+            );
+        }
+
         SetState(null);
         mPlayer_Black = null;
         mPlayer_White = null;
@@ -285,6 +361,8 @@ public class GameLogic : IDisposable
         UsersInfoData usersInfoData = new UsersInfoData
         {
             roomId = roomId,
+            //userId도 함께 넘겨줌 
+            userId = userInfo.userId,
             nickname = userInfo.nickname,
             profileimageindex = userInfo.profileimageindex,
             rank = userInfo.rank,
@@ -307,6 +385,9 @@ public class GameLogic : IDisposable
         {
             boardCellController.cells[Y, X].SetMark(playerType);
             boardCellController.cells[Y, X].playerType = playerType;
+            
+            //기보에 추가
+            mMoveHistory.Add((Y, X, playerType));
             
             BoardCell[][] lists = MakeLists(boardCellController.size,Y,X,4);
             

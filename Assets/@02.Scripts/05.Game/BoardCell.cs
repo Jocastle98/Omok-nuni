@@ -13,12 +13,19 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
     [SerializeField]private Image mStoneImage;
     [SerializeField]private Image mUtilImage;
     [SerializeField]private List<Sprite> mImages;
+    [SerializeField]private int mFadeCount = 5;
+    private int fading; 
     
     public Enums.EPlayerType playerType = Enums.EPlayerType.None;
     public delegate void OnCellClicked(int index);
     public OnCellClicked onCellClicked;
     public int cellIndex;
     public bool IsForbidden = false;
+
+    private void OnEnable()
+    {
+        fading = mFadeCount;
+    }
     
     public void InitBlockCell(int blockindex, OnCellClicked onCellClicked)
     {
@@ -68,20 +75,18 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    public void OnForbbiden(bool isForbidden,BasePlayerState Player_Black)
+    public void OnForbbiden(bool isForbidden,BasePlayerState playerBlack)
     {
         if (isForbidden)
         {
             IsForbidden = true;
-            PlayerState player = Player_Black as PlayerState;
-            player.onForbbidenMark += ForbbidneMark;
+            playerBlack.onForbbidenMark += ForbbidneMark;
 
         }
         else
         {
             IsForbidden = false;
-            PlayerState player = Player_Black as PlayerState;
-            player.onForbbidenMark -= ForbbidneMark;
+            playerBlack.onForbbidenMark -= ForbbidneMark;
             
             mUtilImage.DOFade(0,0);
             mUtilImage.sprite = GetImage(Enums.EGameImage.None);
@@ -109,5 +114,19 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
             return null;
         }
         return mImages[(int)GameImage];
+    }
+
+    public void FadeMode(BasePlayerState player)
+    {
+
+        float alpha = fading == mFadeCount ? 1f : (float)fading / mFadeCount; 
+        fading--;
+
+        mStoneImage.DOFade(alpha, 0); 
+
+        if (fading < 0)
+        {
+            player.onMode -= FadeMode;
+        }
     }
 }
