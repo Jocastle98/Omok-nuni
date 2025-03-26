@@ -135,6 +135,7 @@ public class MultiplayManager : IDisposable
         var data = new 
         {
             roomId,
+            userId = profileData.userId,
             nickname = profileData.nickname,
             profileimageindex = profileData.profileimageindex,
             rank = profileData.rank,

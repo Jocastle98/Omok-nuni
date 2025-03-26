@@ -102,11 +102,13 @@ public class GameLogic : IDisposable
             case Enums.EGameType.MultiPlay:
                 mMultiplayManager =  new MultiplayManager((state, roomId) =>
                 {
+                    mRoomId = roomId;
+                   
                     mMultiplayManager.OnOpponentProfileUpdate += OnOpponentGameProfileUpdate;
                     // 상대 정보가 수신될 때 GameLogic이 mOpponentInfo에 저장할 수 있음.
                     mMultiplayManager.OnOpponentProfileUpdate += OnOpponentProfileReceived;
-                    mRoomId = roomId;
                     mMultiplayManager.OnOpponentProfileUpdate += OnOpponentGameProfileUpdate;
+                    GameManager.Instance.OnRematchGame += SendRematchGameRequest;
                     
                     switch (state)
                     {
@@ -435,6 +437,14 @@ public class GameLogic : IDisposable
         if (mPlayer_Black != null && mPlayer_White != null)
         {
             SetState(mPlayer_Black);
+        }
+    }
+
+    private void SendRematchGameRequest()
+    {
+        if (mMultiplayManager != null)
+        {
+            mMultiplayManager.SendRematchRequest(mRoomId);
         }
     }
     

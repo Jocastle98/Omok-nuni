@@ -116,7 +116,7 @@ private void RefreshIcons(int currentScore)
     {
         Hide(() =>
         {
-            
+            GameManager.Instance.OnRematchGame?.Invoke();
         });
     }
 }
