@@ -37,6 +37,8 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
     {
         mStoneImage.DOFade(0,0);
         mStoneImage.sprite = GetImage(Enums.EGameImage.None);
+        mUtilImage.DOFade(0,0);
+        mUtilImage.sprite = GetImage(Enums.EGameImage.None);
         IsForbidden = false;
         playerType = Enums.EPlayerType.None;
     }
