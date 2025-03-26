@@ -11,9 +11,6 @@ public class PlayerState : BasePlayerState
     private bool mbIsMultiplay;
     private int size;
     
-    public delegate void OnForbbidenMark(bool onMark);
-    public OnForbbidenMark onForbbidenMark;
-    
     public PlayerState(bool Black)
     {
         if (Black)
@@ -26,6 +23,29 @@ public class PlayerState : BasePlayerState
         }
         
         mbIsMultiplay = false;
+    }
+    
+    public PlayerState(bool Black,Enums.EEasterEggMode mode)
+    {
+        if (Black)
+        {
+            playerType = Enums.EPlayerType.Player_Black;
+        }
+        else
+        {
+            playerType = Enums.EPlayerType.Player_White;
+        }
+        
+        mbIsMultiplay = false;
+
+        switch (mode)
+        {
+            case Enums.EEasterEggMode.None:
+                break;
+            case Enums.EEasterEggMode.FadeStone:
+                easterEggMode = Enums.EEasterEggMode.FadeStone;
+                break;
+        }
     }
 
     public PlayerState(bool Black, MultiplayManager multiplayManager, string roomId) : this(Black)
@@ -81,6 +101,11 @@ public class PlayerState : BasePlayerState
         gameLogic.gamePanelController.onBeginButtonClicked = null;
         gameLogic.boardCellController.onCellClicked  = null;
         onForbbidenMark?.Invoke(false);
+
+        if (easterEggMode != Enums.EEasterEggMode.None)
+        {
+            onMode?.Invoke(this);
+        }
     }
 
     public override void HandleMove(GameLogic gameLogic, int Y, int X)

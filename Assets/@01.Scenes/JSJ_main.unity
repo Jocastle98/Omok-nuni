@@ -979,6 +979,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99986556600525e4f9d4243e4a671c90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  profileImage: {fileID: 0}
+  userInfoText: {fileID: 0}
+  coinText: {fileID: 0}
 --- !u!114 &401161472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1986,6 +1989,9 @@ MonoBehaviour:
   mProfilePanel: {fileID: 0}
   mSelectProfilePanel: {fileID: 0}
   mScorePanel: {fileID: 0}
+  mSelectProfileForProfilePanel: {fileID: 0}
+  mSelectProfileForSignupPanel: {fileID: 0}
+  mRankingPanel: {fileID: 0}
   mProfileSprites: []
 --- !u!4 &1357659449
 Transform:
