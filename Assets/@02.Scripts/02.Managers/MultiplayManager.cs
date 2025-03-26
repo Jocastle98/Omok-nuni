@@ -46,7 +46,6 @@ public class MultiplayManager : IDisposable
     public Action<MoveData> OnOpponentMove;
     public Action<UsersInfoData> OnOpponentProfileUpdate;
     public Action OnRematchRequestReceived;
-    public Action OnRematchRejected;
     
     public MultiplayManager(Action<Enums.EMultiplayManagerState, string> onMultiplayStateChange)
     {
@@ -70,6 +69,7 @@ public class MultiplayManager : IDisposable
         
         // 재대국 관련 이벤트 핸들러 추가
         mSocket.On("rematchRequestReceived", RematchRequestReceived);
+        mSocket.On("rematchFailed", RematchFailed);
         mSocket.On("rematchAcceptedReceived", AcceptRematchReceived);
         mSocket.On("rematchRejectedReceived", RejectedRematchReceived);
         
@@ -193,6 +193,18 @@ public class MultiplayManager : IDisposable
         OnRematchRequestReceived?.Invoke();
     }
 
+    private void RematchFailed(SocketIOResponse response)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenConfirmPanel("상대방이 퇴장하였습니다. \n코인을 돌려받고 메인 화면으로 돌아갑니다.", () =>
+            {
+                NetworkManager.Instance.AddCoin(Constants.ConsumeCoin);
+                GameManager.Instance.ChangeToMainScene();
+            });
+        });
+    }
+
     // 재대국 요청 승낙
     public void AcceptRematch(string roomId)
     {
@@ -208,11 +220,25 @@ public class MultiplayManager : IDisposable
     public void RejectRematch()
     {
         mSocket.Emit("rematchRejected");
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenConfirmPanel("상대방의 요청을 거절했습니다. \n메인 화면으로 돌아갑니다.", () =>
+            {
+                GameManager.Instance.ChangeToMainScene();
+            }, false);
+        });
     }
     
     private void RejectedRematchReceived(SocketIOResponse response)
     {
-        OnRematchRejected?.Invoke();
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenConfirmPanel("상대방이 거절했습니다. \n코인을 돌려받고 메인 화면으로 돌아갑니다.", () =>
+            {
+                NetworkManager.Instance.AddCoin(Constants.ConsumeCoin);
+                GameManager.Instance.ChangeToMainScene();
+            }, false);
+        });
     }
 
     #endregion

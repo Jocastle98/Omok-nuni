@@ -253,6 +253,7 @@ MonoBehaviour:
   scoreImagePrefab: {fileID: 588675935411653125, guid: 236373ccb42213045bb097b0d8a9dee2, type: 3}
   messageText: {fileID: 6420732901047790155}
   upgradeText: {fileID: 6519377385308096293}
+  ResignButton: {fileID: 8269273569406912957}
 --- !u!222 &5917750801524751905
 CanvasRenderer:
   m_ObjectHideFlags: 0

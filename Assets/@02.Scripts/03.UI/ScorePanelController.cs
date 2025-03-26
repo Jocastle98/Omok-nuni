@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class ScorePanelController : PopupPanelController
 {
@@ -9,6 +10,8 @@ public class ScorePanelController : PopupPanelController
     [SerializeField] private GameObject scoreImagePrefab;
     [SerializeField] private TextMeshProUGUI messageText;
     [SerializeField] private TextMeshProUGUI upgradeText;
+    
+    [SerializeField] private Button ResignButton;
  
     /// <summary>
     /// 점수 패널 초기화

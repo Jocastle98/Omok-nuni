@@ -164,8 +164,6 @@ public class GameLogic : IDisposable
         mMultiplayManager.OnOpponentProfileUpdate += OnOpponentGameProfileUpdate;
         mMultiplayManager.OnRematchRequestReceived -= RematchGameRequestReceived;
         mMultiplayManager.OnRematchRequestReceived += RematchGameRequestReceived;
-        mMultiplayManager.OnRematchRejected -= GameManager.Instance.ChangeToMainScene;
-        mMultiplayManager.OnRematchRejected += GameManager.Instance.ChangeToMainScene;
     }
     
     /// <summary>
