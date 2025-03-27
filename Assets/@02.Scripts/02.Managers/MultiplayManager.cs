@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SocketIOClient;
 using UnityEngine;
@@ -56,7 +57,9 @@ public class MultiplayManager : IDisposable
         {
             Transport = SocketIOClient.Transport.TransportProtocol.WebSocket
         });
-        
+        mSocket.OnConnected += (sender, e) => {
+            Debug.Log("[MultiplayManager] 소켓 연결 성공!");
+        };
         mSocket.On("createRoom", CreateRoom);
         mSocket.On("joinRoom", JoinRoom);
         mSocket.On("startGame", StartGame);
@@ -72,6 +75,9 @@ public class MultiplayManager : IDisposable
         mSocket.On("rematchFailed", RematchFailed);
         mSocket.On("rematchAcceptedReceived", AcceptRematchReceived);
         mSocket.On("rematchRejectedReceived", RejectedRematchReceived);
+        
+        mSocket.On("forfeitWinReceived", ForfeitWinReceived);
+        mSocket.On("forfeitLoseReceived", ForfeitLoseReceived);
         
         mSocket.Connect();
     }
@@ -120,6 +126,13 @@ public class MultiplayManager : IDisposable
     }
     
     #region ProfileData
+    
+    // 나의 급수를 서버로 전달
+    public void SendMyRank(int myRank)
+    {
+        Debug.Log($"[MultiplayManager] SendMyRank 호출, rank={myRank}");
+        mSocket.Emit("setRank", new { myRank });
+    }
     
     // 상대방의 프로필 정보를 서버로부터 수신
     private void OpponentProfileReceived(SocketIOResponse response)
@@ -198,10 +211,18 @@ public class MultiplayManager : IDisposable
     {
         UnityThread.executeInUpdate(() =>
         {
-            GameManager.Instance.OpenConfirmPanel("상대방이 퇴장하였습니다. \n코인을 돌려받고 메인 화면으로 돌아갑니다.", () =>
+            GameManager.Instance.OpenConfirmPanel("상대방이 퇴장하였습니다. \n코인을 돌려받고 \n메인 화면으로 돌아갑니다.", () =>
             {
-                NetworkManager.Instance.AddCoin(Constants.ConsumeCoin);
-                GameManager.Instance.ChangeToMainScene();
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddCoin(Constants.ConsumeCoin, i =>
+                    {
+                        GameManager.Instance.ChangeToMainScene();
+                    }, () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("돌려 받지 못함", null, false);
+                    });
+                });
             });
         });
     }
@@ -234,12 +255,41 @@ public class MultiplayManager : IDisposable
     {
         UnityThread.executeInUpdate(() =>
         {
-            GameManager.Instance.OpenConfirmPanel("상대방이 거절했습니다. \n코인을 돌려받고 메인 화면으로 돌아갑니다.", () =>
+            GameManager.Instance.OpenConfirmPanel("상대방이 거절했습니다. \n코인을 돌려받고 \n메인 화면으로 돌아갑니다.", () =>
             {
-                NetworkManager.Instance.AddCoin(Constants.ConsumeCoin);
-                GameManager.Instance.ChangeToMainScene();
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddCoin(Constants.ConsumeCoin, i =>
+                    {
+                        GameManager.Instance.ChangeToMainScene();
+                    }, () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("돌려 받지 못함", null, false);
+                    });
+                });
             }, false);
         });
+    }
+
+    #endregion
+
+    #region ForfeitData
+
+    public void SendForfeitRequest(string roomId)
+    {
+        mSocket.Emit("sendForfeitRequest", new { roomId });
+    }
+
+    private void ForfeitWinReceived(SocketIOResponse response)
+    {
+        Debug.Log("기권승리 메시지 받음");
+        GameManager.Instance.OnForfeitWin?.Invoke();
+    }
+
+    private void ForfeitLoseReceived(SocketIOResponse response)
+    {
+        Debug.Log("기권패배 메시지 받음");
+        GameManager.Instance.OnForfeitLose?.Invoke();
     }
 
     #endregion

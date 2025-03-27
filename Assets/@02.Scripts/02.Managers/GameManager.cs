@@ -38,14 +38,23 @@ public class GameManager : Singleton<GameManager>
 
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
+    private bool mbIsMultiplay = false;
+    private bool mbIsSingleplay = false;
+
+    #region Callback
 
     public Action OnMainPanelUpdate;
     public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
     public Action<UsersInfoData> OnOpponentGameProfileUpdate;
     public Action OnRematchGame;
     public Action OnCloseScorePanel;
+    public Action OnSendForfeit;
+    public Action OnForfeitWin;
+    public Action OnForfeitLose;
     public Action OnCoinUpdated;
     public Action OnAdsRemoved;
+
+    #endregion
 
     private void Start()
     {
@@ -192,14 +201,14 @@ public class GameManager : Singleton<GameManager>
     }
 
     // 확인(and 취소) 패널 호출 메서드
-    public void OpenConfirmPanel(string message, Action OnConfirmButtonClick, 
-        bool activeCancelButton = true, Action OnCancelButtonClick = null)
+    public void OpenConfirmPanel(string message, Action onConfirmButtonClick, 
+        bool activeCancelButton = true, Action onCancelButtonClick = null)
     {
         if (mCanvas != null)
         {
             GameObject confirmPanelObject = Instantiate(confirmPanel, mCanvas.transform);
             confirmPanelObject.GetComponent<ConfirmPanelController>()
-                .Show(message, OnConfirmButtonClick, activeCancelButton, OnCancelButtonClick);
+                .Show(message, onConfirmButtonClick, activeCancelButton, onCancelButtonClick);
         }
     }
 
@@ -300,6 +309,26 @@ public class GameManager : Singleton<GameManager>
     public void SetIsStartGame(bool isStartGame)
     {
         mbIsStartGame = isStartGame;
+    }
+
+    public bool GetIsMultiplay()
+    {
+        return mbIsMultiplay;
+    }
+
+    public void SetIsMultiplay(bool isMultiPlay)
+    {
+        mbIsMultiplay = isMultiPlay;
+    }
+
+    public bool GetIsSingleplay()
+    {
+        return mbIsSingleplay;
+    }
+
+    public void SetIsSingleplay(bool isScoreCount)
+    {
+        mbIsSingleplay = isScoreCount;
     }
     
     // 콜백 초기화 메서드
