@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5450025357762566465}
   - component: {fileID: 8764893019697201514}
   m_Layer: 0
-  m_Name: Stone
+  m_Name: WhiteStone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -73,7 +73,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 21300000, guid: a57b2061ff4ac6d4c9cd977b6991fc21, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a40e7e0f9b726ff4e9564a95a9c1c113, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
