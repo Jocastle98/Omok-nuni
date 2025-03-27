@@ -1889,7 +1889,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mOmoknuniPrefab: {fileID: 1362085692213324268, guid: 235370b5759b6a843a00b9e778b2bb82, type: 3}
-  mStonePrefab: {fileID: 6366795221941138465, guid: d5ad8c6613d4c0344a017730056b20f7, type: 3}
+  mBlackStonePrefab: {fileID: 6366795221941138465, guid: d5ad8c6613d4c0344a017730056b20f7, type: 3}
+  mWhiteStonePrefab: {fileID: 6366795221941138465, guid: 381ff24690acfed4c998544f9e76eb24, type: 3}
   mStoneTargets:
   - {fileID: 299396218}
   - {fileID: 1128664239}
@@ -1914,7 +1915,8 @@ MonoBehaviour:
   fallDuration: 1
   collisionEffectPrefab: {fileID: 2353600328335836179, guid: ceec7516237b4104b94300043ca39784, type: 3}
   stackEffectPrefab: {fileID: 3432958286849152088, guid: 87ee7299dd44ed747af24dbb91bcd33b, type: 3}
-  mCloudObject: {fileID: 549974039}
+  blackStoneSprite: {fileID: 21300000, guid: c0cf454e4fcc8004b9621b478ec609d3, type: 3}
+  whiteStoneSprite: {fileID: 21300000, guid: 6ad8d918f4806e44893fe2c4bf081d90, type: 3}
 --- !u!1 &993569878
 GameObject:
   m_ObjectHideFlags: 0
