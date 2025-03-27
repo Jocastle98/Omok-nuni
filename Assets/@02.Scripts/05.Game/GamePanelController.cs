@@ -139,11 +139,11 @@ public class GamePanelController : MonoBehaviour
     {
         GameManager.Instance.OpenConfirmPanel("기권하시겠습니까?", () =>
         {
-            if (GameManager.Instance.GetIsMultiplay())
+            if (GameManager.Instance.bIsMultiplay)
             {
                 GameManager.Instance.OnSendForfeit?.Invoke();
             }
-            else if (GameManager.Instance.GetIsSingleplay())
+            else if (GameManager.Instance.bIsSingleplay)
             {
                 StopClock();
                 GameManager.Instance.LoseGame();

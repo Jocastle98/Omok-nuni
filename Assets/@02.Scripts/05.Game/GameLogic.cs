@@ -47,8 +47,11 @@ public class GameLogic : IDisposable
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;
-        GameManager.Instance.SetIsMultiplay(false);
-        GameManager.Instance.SetIsSingleplay(false);
+        
+        GameManager.Instance.bIsMultiplay = false;
+        GameManager.Instance.bIsSingleplay = false;
+        GameManager.Instance.bIsTryRematch = false;
+        GameManager.Instance.OnRecieveRematch = false;
         
         OnMyGameProfileUpdate = onMyGameProfileUpdate;
         OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
@@ -66,7 +69,7 @@ public class GameLogic : IDisposable
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.SinglePlay:
-                GameManager.Instance.SetIsSingleplay(true);
+                GameManager.Instance.bIsSingleplay = true;
                 
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new AIState(false);
@@ -110,9 +113,10 @@ public class GameLogic : IDisposable
             case Enums.EGameType.MultiPlay:
                 mMultiplayManager =  new MultiplayManager((state, roomId) =>
                 {
+                    GameManager.Instance.bIsMultiplay = true;
+                    
                     mRoomId = roomId;
                     MultiplayCallbackHandler();
-                    GameManager.Instance.SetIsMultiplay(true);
                     
                     switch (state)
                     {
@@ -133,13 +137,21 @@ public class GameLogic : IDisposable
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
                             Debug.Log("## Exit Room");
-                            // todo: 퇴장 처리
                             
                             break;
                         case Enums.EMultiplayManagerState.EndGame:
                             Debug.Log("## End Game");
-                            // todo: 게임 종료 처리
-                            
+
+                            if (!GameManager.Instance.bIsTryRematch)
+                            {
+                                UnityThread.executeInUpdate(() =>
+                                {
+                                    GameManager.Instance.OpenConfirmPanel("상대방이 퇴장하였습니다. \n메인화면으로 돌아갑니다.", () =>
+                                    {
+                                        GameManager.Instance.ChangeToMainScene();
+                                    }, false);
+                                });
+                            }
                             break;
                         case Enums.EMultiplayManagerState.RestartRoom:
                             Debug.Log("## Restart Room");
@@ -187,8 +199,6 @@ public class GameLogic : IDisposable
         mMultiplayManager.OnOpponentProfileUpdate += OnOpponentGameProfileUpdate;
         mMultiplayManager.OnOpponentProfileUpdate -= OnOpponentProfileReceived;
         mMultiplayManager.OnOpponentProfileUpdate += OnOpponentProfileReceived;
-        mMultiplayManager.OnOpponentProfileUpdate -= OnOpponentGameProfileUpdate;
-        mMultiplayManager.OnOpponentProfileUpdate += OnOpponentGameProfileUpdate;
         mMultiplayManager.OnRematchRequestReceived -= RematchGameRequestReceived;
         mMultiplayManager.OnRematchRequestReceived += RematchGameRequestReceived;
     }
@@ -418,16 +428,17 @@ public class GameLogic : IDisposable
             {
                 if (mbIsGameStarted) return; // 이미 시작된 경우 중복 호출 방지
                 mbIsGameStarted = true;
-                
+
+                gamePanelController.StartClock();
                 mCurrentPlayer = mPlayer_White;
-                
+
                 mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                 mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId);
-                    
+
                 GameManager.Instance.OnCloseScorePanel?.Invoke();
-                
+
                 // 방들어온 플레이어는 백
-                localPlayerType = mPlayer_White.playerType; 
+                localPlayerType = mPlayer_White.playerType;
                 MyGameProfileUpdate(Enums.EPlayerType.Player_White);
                 SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_White);
                 SetState(mPlayer_Black);
@@ -436,45 +447,43 @@ public class GameLogic : IDisposable
             {
                 if (mbIsGameStarted) return; // 다시 시작되지 않도록 방지
                 mbIsGameStarted = true;
-                
+
+                gamePanelController.StartClock();
                 mCurrentPlayer = mPlayer_Black;
-                
+
                 mPlayer_Black = new PlayerState(true, mMultiplayManager, mRoomId);
                 mPlayer_White = new MultiplayerState(false, mMultiplayManager);
-                    
-                GameManager.Instance.SetIsStartGame(true);
-                
+
+                GameManager.Instance.bIsStartGame = true;
+
                 // 첫 수 두는 플레이어 흑
                 localPlayerType = mPlayer_Black.playerType;
                 MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
                 SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
             }
-            
+
             GameManager.Instance.OpenConfirmPanel("새로운 대국이 시작되었습니다.", () =>
             {
-                AudioManager.Instance.PlayGameBgm();
-            
                 isGameOver = false;
                 currentSelectedCell = Int32.MaxValue;
-        
+
+                AudioManager.Instance.PlayGameBgm();
+
                 // 보드 초기화
                 boardCellController.InitBoard();
-        
+
                 // UI 초기화
-                gamePanelController.InitClock();
+                // gamePanelController.InitClock();
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
-            
-                if (gamePanelController != null)
-                {
-                    GameManager.Instance.OnCloseScorePanel = null;
-                    
-                    OnMyGameProfileUpdate -= gamePanelController.SetMyProfile;
-                    OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
-                
-                    OnOpponentGameProfileUpdate -= gamePanelController.SetOpponentProfile;
-                    OnOpponentGameProfileUpdate += gamePanelController.SetOpponentProfile;
-                }
+
+                GameManager.Instance.OnCloseScorePanel = null;
+
+                OnMyGameProfileUpdate -= gamePanelController.SetMyProfile;
+                OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
+
+                OnOpponentGameProfileUpdate -= gamePanelController.SetOpponentProfile;
+                OnOpponentGameProfileUpdate += gamePanelController.SetOpponentProfile;
             }, false);
         });
     }
@@ -483,6 +492,7 @@ public class GameLogic : IDisposable
     {
         UnityThread.executeInUpdate(() =>
         {
+            GameManager.Instance.bIsTryRematch = true;
             mMultiplayManager?.SendRematchRequest(mRoomId);
         });
     }
@@ -491,6 +501,7 @@ public class GameLogic : IDisposable
     {
         UnityThread.executeInUpdate(() =>
         {
+            GameManager.Instance.OnRecieveRematch = true;
             GameManager.Instance.OpenConfirmPanel("재대국 신청을 받았습니다. \n수락하시겠습니까?", () =>
             {
                 mMultiplayManager?.AcceptRematch(mRoomId);
