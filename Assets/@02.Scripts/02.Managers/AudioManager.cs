@@ -9,7 +9,7 @@ public class AudioManager : Singleton<AudioManager>
     [SerializeField] private AudioSource _sfxSource;
 
     [Header("Audio Clips")]
-    // 0: 인트로, 1: 메인, 2: 바둑 둘 때, 3: 게임 오버
+    // 0: 인트로, 1: 메인, 2: 바둑 둘 때, 3: 새 소리
     [SerializeField] private AudioClip[] _audioClips;
 
     private void Start()
