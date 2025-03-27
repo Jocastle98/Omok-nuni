@@ -26,7 +26,7 @@ public class ScorePanelController : PopupPanelController
     {
         Show();
 
-        ResignButton.gameObject.SetActive(GameManager.Instance.GetIsMultiplay());
+        ResignButton.gameObject.SetActive(GameManager.Instance.bIsMultiplay);
         GameManager.Instance.OnCloseScorePanel += Hide;
         
         // 승/패 메시지

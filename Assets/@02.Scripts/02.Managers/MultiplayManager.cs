@@ -194,6 +194,7 @@ public class MultiplayManager : IDisposable
     // 재대국 요청을 서버에 보냄
     public void SendRematchRequest(string roomId)
     {
+        
         Debug.Log("재대국 요청 보냄");
         mSocket.Emit("sendRematchRequest", new { roomId });
         GameManager.Instance.OpenWaitingPanel();
@@ -203,7 +204,6 @@ public class MultiplayManager : IDisposable
     private void RematchRequestReceived(SocketIOResponse response)
     {
         Debug.Log("재대용 요청 받음");
-        // UI 업데이트 또는 알림을 띄울 수 있음
         OnRematchRequestReceived?.Invoke();
     }
 
