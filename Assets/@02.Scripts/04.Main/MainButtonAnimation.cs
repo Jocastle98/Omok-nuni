@@ -6,6 +6,7 @@ using Unity.Mathematics;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
+//TODO: objectPool방식으로 관리
 public class MainButtonAnimation : MonoBehaviour
 {
     [Header("Prefab")]
@@ -29,7 +30,8 @@ public class MainButtonAnimation : MonoBehaviour
     [SerializeField] private Sprite whiteStoneSprite;       //메인 버튼에 있는 백돌
 
     private bool isBlackTurn = true;                        //흑, 백 번갈아
-
+    private List<int> occupiedIndexes = new ();
+    
     /// <summary>
     /// 메인메뉴 버튼을 클릭했을 때
     /// </summary>
@@ -47,7 +49,7 @@ public class MainButtonAnimation : MonoBehaviour
         omoknuni.transform.DOMove(targetPos, flyDuration).SetEase(Ease.InQuad).OnComplete(() =>
         {
             PlayHitAnimation(omoknuni, buttonIndex); 
-            PlayFallingStoneAnimation(buttonIndex);
+            PlayFallingStoneAnimation();
             ExitAnimation(omoknuni, targetPos, buttonIndex);
             UpdateButtonStateDelayed(onClickAction);
         });
@@ -66,9 +68,27 @@ public class MainButtonAnimation : MonoBehaviour
         mStoneTargets[buttonIndex].gameObject.SetActive(false);                              //메인 버튼에 있는 돌 비활성화
     }
 
-    private void PlayFallingStoneAnimation(int buttonIndex)
+    private void PlayFallingStoneAnimation()
     {
-        Vector3 spawnPos = mStoneTargets[buttonIndex].position;                                         //오목판에 놓일 돌 생성 위치
+        List<int> emptyIndexes = new();
+        for (int i = 0; i < mFalling.Length; i++)
+        {
+            if(!occupiedIndexes.Contains(i)) emptyIndexes.Add(i);
+        }
+
+        if (emptyIndexes.Count == 0)
+        {
+            occupiedIndexes.Clear();
+            for (int i = 0; i < mFalling.Length; i++)
+            {
+                emptyIndexes.Add(i);
+            }
+        }
+
+        int targetIndex = emptyIndexes[Random.Range(0, emptyIndexes.Count)];
+        Vector3 spawnPos = mStoneTargets[targetIndex].position;                                         //오목판에 놓일 돌 생성 위치
+        occupiedIndexes.Add(targetIndex);
+        
         GameObject stonePrefab = isBlackTurn ? mBlackStonePrefab : mWhiteStonePrefab;                   //순서에 따라 흑백 돌 결정
         var fallingStone = Instantiate(stonePrefab, spawnPos, quaternion.identity); //돌 프리팹 생성
 
@@ -81,7 +101,6 @@ public class MainButtonAnimation : MonoBehaviour
         {
             AudioManager.Instance.PlaySfxSound(2);                                              //착수 소리 재생
             Instantiate(stackEffectPrefab, fallingStone.transform.position, Quaternion.identity);    //착수 효과 생성
-            Destroy(fallingStone, 0.5f);                                                           //떨어진 돌 삭제
         });
     }
 
