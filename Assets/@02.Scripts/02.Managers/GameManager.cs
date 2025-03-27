@@ -37,10 +37,12 @@ public class GameManager : Singleton<GameManager>
     private GameLogic mGameLogic;
 
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
-    private bool mbIsStartGame = false;
-    private bool mbIsMultiplay = false;
-    private bool mbIsSingleplay = false;
-
+    public bool bIsStartGame = false;
+    public bool bIsMultiplay = false;
+    public bool bIsSingleplay = false;
+    public bool bIsTryRematch = false;
+    public bool OnRecieveRematch = false;
+    
     #region Callback
 
     public Action OnMainPanelUpdate;
@@ -311,42 +313,10 @@ public class GameManager : Singleton<GameManager>
     {
         if (mCanvas != null)
         {
-            mbIsStartGame = false;
+            bIsStartGame = false;
             GameObject waitingPanelObject = Instantiate(waitingPanel, mCanvas.transform);
             waitingPanelObject.GetComponent<WaitingPanelController>().Show();
         }
-    }
-
-    // waitingPanel의 종료 여부(게임 시작)를 waitingPanel로 전달(반환)해주는 메서드
-    public bool GetIsStartGame()
-    {
-        return mbIsStartGame;
-    }
-
-    // GameLogic에서 StartGame 여부를 설정(Set)해주는 메서드
-    public void SetIsStartGame(bool isStartGame)
-    {
-        mbIsStartGame = isStartGame;
-    }
-
-    public bool GetIsMultiplay()
-    {
-        return mbIsMultiplay;
-    }
-
-    public void SetIsMultiplay(bool isMultiPlay)
-    {
-        mbIsMultiplay = isMultiPlay;
-    }
-
-    public bool GetIsSingleplay()
-    {
-        return mbIsSingleplay;
-    }
-
-    public void SetIsSingleplay(bool isScoreCount)
-    {
-        mbIsSingleplay = isScoreCount;
     }
     
     // 콜백 초기화 메서드
@@ -355,8 +325,12 @@ public class GameManager : Singleton<GameManager>
         OnMainPanelUpdate = null;
         OnMyGameProfileUpdate = null;
         OnOpponentGameProfileUpdate = null;
+        
         OnRematchGame = null;
         OnCloseScorePanel = null;
+        OnSendForfeit = null;
+        OnForfeitWin = null;
+        OnForfeitLose = null;
     }
     
     protected override void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -391,20 +365,19 @@ public class GameManager : Singleton<GameManager>
             GamePanelController gamePanelController = GameObject.FindObjectOfType<GamePanelController>();
 
             // BoardCellController 초기화
-            boardCellController.InitBoard();
+            if (boardCellController != null)
+            {
+                boardCellController.InitBoard();
+            }
             
+            // GamePanelController 초기화
             if (gamePanelController != null)
             {
-                // GamePanelController UI 초기화
+                gamePanelController.InitClock();
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
-                
-                OnRematchGame = null;
-                OnCloseScorePanel = null;
-                
-                OnMyGameProfileUpdate -= gamePanelController.SetMyProfile;
+
+                ClearAllCallbacks();
                 OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
-                
-                OnOpponentGameProfileUpdate -= gamePanelController.SetOpponentProfile;
                 OnOpponentGameProfileUpdate += gamePanelController.SetOpponentProfile;
             }
 

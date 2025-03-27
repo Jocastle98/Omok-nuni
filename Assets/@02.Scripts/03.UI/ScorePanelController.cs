@@ -30,9 +30,10 @@ public class ScorePanelController : PopupPanelController
 
         Show();
 
-        ResignButton.gameObject.SetActive(GameManager.Instance.GetIsMultiplay());
-        GameManager.Instance.OnCloseScorePanel += Hide;
-
+        ResignButton.gameObject.SetActive(GameManager.Instance.bIsMultiplay);
+        GameManager.Instance.OnCloseScorePanel += this.Hide;
+        
+        // 승/패 메시지
         if (isWin)
             messageText.text = $"오목에서 승리했습니다.\n {addDelete*10}점을 획득!";
         else
@@ -152,27 +153,35 @@ public class ScorePanelController : PopupPanelController
 
     public void OnClickRematchButton()
     {
-        Hide(() =>
+        if (GameManager.Instance.OnRecieveRematch)
         {
-            UniTask.Void(async () =>
+            return;
+        }
+        else
+        {
+            Hide(() =>
             {
-                await NetworkManager.Instance.ConsumeCoin(Constants.ConsumeCoin, 
-                    successCallback: (remainingCoins) => 
-                    {
-                        GameManager.Instance.OpenConfirmPanel($"남은 코인은 {remainingCoins} 입니다.", () =>
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.ConsumeCoin(Constants.ConsumeCoin, 
+                        successCallback: (remainingCoins) => 
                         {
-                            GameManager.Instance.OnRematchGame?.Invoke();
-                        }, false);
-                    },
-                    failureCallback: () =>
-                    {
-                        GameManager.Instance.OpenConfirmPanel("코인이 부족합니다.", () =>
+                            GameManager.Instance.OpenConfirmPanel($"남은 코인은 {remainingCoins} 입니다.",
+                                () =>
+                                {
+                                    GameManager.Instance.OnRematchGame?.Invoke();
+                                }, false);
+                        },
+                        failureCallback: () =>
                         {
-                            GameManager.Instance.ChangeToMainScene();
-                        }, false);
-                    });
+                            GameManager.Instance.OpenConfirmPanel("코인이 부족합니다.", () =>
+                            {
+                                GameManager.Instance.ChangeToMainScene();
+                            }, false);
+                        });
+                });
             });
-        });
+        }
     }
 
     private void Hide()

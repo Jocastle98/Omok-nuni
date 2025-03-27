@@ -202,8 +202,7 @@ public class MultiplayManager : IDisposable
     // 서버로부터 재대국 요청을 받았을 때 처리
     private void RematchRequestReceived(SocketIOResponse response)
     {
-        Debug.Log("재대용 요청 받음");
-        // UI 업데이트 또는 알림을 띄울 수 있음
+        Debug.Log("재대국 요청 받음");
         OnRematchRequestReceived?.Invoke();
     }
 

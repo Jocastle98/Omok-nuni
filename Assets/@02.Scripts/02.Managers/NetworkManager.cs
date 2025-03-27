@@ -478,9 +478,7 @@ public class NetworkManager : Singleton<NetworkManager>
             }
         }
     }
-
-
-
+    
     // 오목 기록 가져오기
     public async UniTask<List<OmokRecord>> GetOmokRecords(
         Action successCallback = null, Action failureCallback = null)
@@ -571,8 +569,6 @@ public class NetworkManager : Singleton<NetworkManager>
             }
         }
     }
-
-    
 
     /// <summary>
     /// 코인 추가
