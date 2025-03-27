@@ -34,9 +34,9 @@ public class ScorePanelController : PopupPanelController
         GameManager.Instance.OnCloseScorePanel += Hide;
 
         if (isWin)
-            messageText.text = $"오목에서 승리했습니다. {addDelete}점을 획득!";
+            messageText.text = $"오목에서 승리했습니다.\n {addDelete*10}점을 획득!";
         else
-            messageText.text = $"오목에서 패배했습니다.\n {Mathf.Abs(addDelete)}점을 잃었습니다.";
+            messageText.text = $"오목에서 패배했습니다.\n {Mathf.Abs(addDelete)*10}점을 잃었습니다.";
 
         int minScore, maxScore, threshold;
         if (rank >= 11) 
@@ -64,6 +64,10 @@ public class ScorePanelController : PopupPanelController
             rightScoreText.text = "100";
         }
 
+        if (rank == 18 && rankuppoints < -3)
+        {
+            rankuppoints = -3;
+        }
         rankuppoints = Mathf.Clamp(rankuppoints, minScore, maxScore);
         
         RefreshIcons(rankuppoints, threshold);
