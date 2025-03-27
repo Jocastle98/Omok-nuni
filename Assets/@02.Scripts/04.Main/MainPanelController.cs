@@ -15,11 +15,11 @@ public class MainPanelController : MonoBehaviour
     [SerializeField] private Image profileImage;
     [SerializeField] private TMP_Text userInfoText;
     [SerializeField] private TMP_Text coinText;
-    private TestMainSceneButton animation;
+    private MainButtonAnimation mainButtonAnimation;
 
     private void Awake()
     {
-        animation = GetComponent<TestMainSceneButton>();
+        mainButtonAnimation = GetComponent<MainButtonAnimation>();
     }
 
     public async void SetProfileInfo()
@@ -33,26 +33,26 @@ public class MainPanelController : MonoBehaviour
     
     public void OnClickStartButton()
     {
-        animation.StartClickAnimation(0, ()=> GameManager.Instance.OpenGameTypeSelectPanel());
+        mainButtonAnimation.StartClickAnimation(0, ()=> GameManager.Instance.OpenGameTypeSelectPanel());
     }
     
     public void OnClickRecordButton()
     {
-        animation.StartClickAnimation(1, ()=> GameManager.Instance.OpenRecordPanel());
+        mainButtonAnimation.StartClickAnimation(1, ()=> GameManager.Instance.OpenRecordPanel());
     }
 
     public void OnClickLeaderboardButton()
     {
-        animation.StartClickAnimation(2, ()=> GameManager.Instance.OpenLeaderboardPanel());
+        mainButtonAnimation.StartClickAnimation(2, ()=> GameManager.Instance.OpenLeaderboardPanel());
     }
     public void OnClickShopButton()
     {
-        animation.StartClickAnimation(3, ()=> GameManager.Instance.OpenShopPanel());
+        mainButtonAnimation.StartClickAnimation(3, ()=> GameManager.Instance.OpenShopPanel());
     }
 
     public void OnClickSettingsButton()
     {
-        animation.StartClickAnimation(4, ()=> GameManager.Instance.OpenSettingsPanel());
+        mainButtonAnimation.StartClickAnimation(4, ()=> GameManager.Instance.OpenSettingsPanel());
     }
 
     public void OnClickProfileButton()

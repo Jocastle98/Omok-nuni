@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using Unity.Mathematics;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
-public class TestMainSceneButton : MonoBehaviour
+public class MainButtonAnimation : MonoBehaviour
 {
     [SerializeField] private GameObject mOmoknuniPrefab;
     [SerializeField] private GameObject mStonePrefab;
@@ -18,6 +17,13 @@ public class TestMainSceneButton : MonoBehaviour
     [SerializeField] private float fallDuration;
     [SerializeField] private GameObject collisionEffectPrefab;
     [SerializeField] private GameObject stackEffectPrefab;
+    [SerializeField] private GameObject mCloudObject;
+
+    private void Start()
+    {
+        var cloudStartPos = mCloudObject.transform.position; 
+        mCloudObject.transform.DOMoveY(cloudStartPos.y + 0.05f, 2f).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
+    }
 
     public void StartClickAnimation(int buttonIndex, Action onClickAction)
     {
@@ -28,6 +34,8 @@ public class TestMainSceneButton : MonoBehaviour
             .OnComplete(
                 () =>
                 {
+                    AudioManager.Instance.PlaySfxSound(3);
+                    omoknuniObject.GetComponent<Animator>().SetBool("isHit", true);
                     Instantiate(collisionEffectPrefab, omoknuniObject.transform.position, Quaternion.identity);
                     mStoneTargets[buttonIndex].gameObject.SetActive(false);
                     Vector3 spawnPos = mStoneTargets[buttonIndex].position;
@@ -36,23 +44,28 @@ public class TestMainSceneButton : MonoBehaviour
                     fallingStone.transform.DORotate(new Vector3(0, 0, 360), 0.5f, RotateMode.FastBeyond360);
                     fallingStone.transform.DOMove(mFalling[buttonIndex].position, 0.5f).SetEase(Ease.InQuad).OnComplete(() =>
                     {
-                        //Destroy(collisionEffectPrefab);
+                        AudioManager.Instance.PlaySfxSound(2);
                         Instantiate(stackEffectPrefab, fallingStone.transform.position, Quaternion.identity);
-                        DOVirtual.DelayedCall(3f, () =>
+                        DOVirtual.DelayedCall(0.5f, () =>
                         {
                             Destroy(fallingStone);
-                            //Destroy(stackEffectPrefab);
                         });
                     });
+
+                    var randomDirection =
+                        new Vector3(Random.Range(-5f, 5f), Random.Range(-10f, 10f), Random.Range(-5f, 5f));
                     
                     omoknuniObject.transform.DORotate(new Vector3(0, 0, 360), fallDuration, RotateMode.FastBeyond360);
-                    omoknuniObject.transform.DOMoveY(mStoneTargets[buttonIndex].position.y - 10f, fallDuration)
-                        .SetEase(Ease.InQuad).OnComplete(() => Destroy(omoknuniObject));
+                    omoknuniObject.transform.DOMove(mStoneTargets[buttonIndex].position + randomDirection, fallDuration)
+                        .SetEase(Ease.OutQuad).OnComplete(() =>
+                        {
+                            Destroy(omoknuniObject);
+                            mStoneTargets[buttonIndex].gameObject.SetActive(true);
+                        });
 
                     
                     DOVirtual.DelayedCall(1f, ()=> onClickAction?.Invoke());
-                    mStoneTargets[buttonIndex].gameObject.SetActive(true);
-
+ 
                 });
     }
 }
