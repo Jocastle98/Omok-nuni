@@ -57,7 +57,7 @@ MonoBehaviour:
   m_Spacing: 10
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
@@ -253,6 +253,10 @@ MonoBehaviour:
   scoreImagePrefab: {fileID: 588675935411653125, guid: 236373ccb42213045bb097b0d8a9dee2, type: 3}
   messageText: {fileID: 6420732901047790155}
   upgradeText: {fileID: 6519377385308096293}
+  addScoreLayoutGroup: {fileID: 8077011610016488863}
+  deleteScoreLayoutGroup: {fileID: 6381530021697930242}
+  leftScoreText: {fileID: 6160967592224025697}
+  rightScoreText: {fileID: 1197375990324229974}
   ResignButton: {fileID: 8269273569406912957}
 --- !u!222 &5917750801524751905
 CanvasRenderer:
@@ -959,7 +963,7 @@ MonoBehaviour:
   m_Spacing: 10
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
