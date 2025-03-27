@@ -22,9 +22,9 @@ public class WaitingPanelController : PopupPanelController
         StartProgressBar();
     }
 
-    public void Hide()
+    private void Hide()
     {
-        GameManager.Instance.SetIsStartGame(false);
+        GameManager.Instance.bIsStartGame =false;
         StopProgressBar();
         
         base.Hide();
@@ -89,7 +89,7 @@ public class WaitingPanelController : PopupPanelController
             float remainingTime = duration - time;
             progressText.text = string.Format("{0:0}초", remainingTime);
 
-            if (GameManager.Instance.GetIsStartGame())
+            if (GameManager.Instance.bIsStartGame)
             {
                 this.Hide();
             }
@@ -104,25 +104,47 @@ public class WaitingPanelController : PopupPanelController
     private void OnMatchingTimeout()
     {
         Hide();
-        
-        GameManager.Instance.OpenConfirmPanel("다른 유저와의 매칭이 실패하였습니다. \n급수에 맞는 AI와 매칭됩니다.", () =>
+
+        if (GameManager.Instance.bIsTryRematch)
         {
-            GameManager.Instance.ChangeToGameScene(Enums.EGameType.SinglePlay);
-        }, true, () =>
-        {
-            GameManager.Instance.OpenConfirmPanel("매칭을 취소하였습니다. \n소비한 코인을 돌려드립니다.", () =>
+            UnityThread.executeInUpdate(() =>
             {
-                UniTask.Void(async () =>
+                GameManager.Instance.OpenConfirmPanel("상대방이 응답하지 않았습니다. \n코인을 돌려받고 \n메인 화면으로 돌아갑니다.", () =>
                 {
-                    await NetworkManager.Instance.AddCoin(Constants.ConsumeCoin, i =>
+                    UniTask.Void(async () =>
                     {
-                        GameManager.Instance.ChangeToMainScene();
-                    }, () =>
-                    {
-                        GameManager.Instance.OpenConfirmPanel("돌려 받지 못함", null, false);
+                        await NetworkManager.Instance.AddCoin(Constants.ConsumeCoin, i =>
+                        {
+                            GameManager.Instance.ChangeToMainScene();
+                        }, () =>
+                        {
+                            GameManager.Instance.OpenConfirmPanel("돌려 받지 못함", null, false);
+                        });
                     });
-                });
-            }, false);
-        });
+                }, false);
+            });
+        }
+        else
+        {
+            GameManager.Instance.OpenConfirmPanel("다른 유저와의 매칭이 실패하였습니다. \n급수에 맞는 AI와 매칭됩니다.", () =>
+            {
+                GameManager.Instance.ChangeToGameScene(Enums.EGameType.SinglePlay);
+            }, true, () =>
+            {
+                GameManager.Instance.OpenConfirmPanel("매칭을 취소하였습니다. \n소비한 코인을 돌려드립니다.", () =>
+                {
+                    UniTask.Void(async () =>
+                    {
+                        await NetworkManager.Instance.AddCoin(Constants.ConsumeCoin, i =>
+                        {
+                            GameManager.Instance.ChangeToMainScene();
+                        }, () =>
+                        {
+                            GameManager.Instance.OpenConfirmPanel("돌려 받지 못함", null, false);
+                        });
+                    });
+                }, false);
+            });
+        }
     }
 }
