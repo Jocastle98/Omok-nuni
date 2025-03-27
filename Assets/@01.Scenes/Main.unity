@@ -154,11 +154,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 954880500}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -230, y: 699}
-  m_SizeDelta: {x: 658, y: 520}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 600, y: 600}
+  m_Pivot: {x: 0, y: 1}
 --- !u!222 &18529414
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -187,7 +187,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: ec8323865c297cd40a6e5e185f84788d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a157f03ccdadb3d46805462243d448f5, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -584,8 +584,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 221118907}
   - {fileID: 1324340423}
+  - {fileID: 221118907}
   - {fileID: 1906611225}
   - {fileID: 1311850317}
   - {fileID: 700765255}
@@ -658,7 +658,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 386, y: 0}
-  m_SizeDelta: {x: 94, y: 43}
+  m_SizeDelta: {x: 80, y: 43}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &299396219
 MonoBehaviour:
@@ -1069,7 +1069,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 226, y: 0}
-  m_SizeDelta: {x: 94, y: 43}
+  m_SizeDelta: {x: 80, y: 43}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &512723235
 MonoBehaviour:
@@ -1540,6 +1540,7 @@ GameObject:
   - component: {fileID: 954880503}
   - component: {fileID: 954880502}
   - component: {fileID: 954880501}
+  - component: {fileID: 954880504}
   m_Layer: 5
   m_Name: Main Panel
   m_TagString: Untagged
@@ -1626,6 +1627,30 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 954880499}
   m_CullTransparentMesh: 1
+--- !u!114 &954880504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 954880499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 626b6a091d528ca4ab26a6701a4c4e84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mOmoknuniObject: {fileID: 1362085692213324268, guid: 235370b5759b6a843a00b9e778b2bb82, type: 3}
+  mStoneTargets:
+  - {fileID: 299396218}
+  - {fileID: 1128664239}
+  - {fileID: 1298338416}
+  - {fileID: 1740115757}
+  - {fileID: 512723234}
+  - {fileID: 1793507371}
+  flyDuration: 1
+  fallDuration: 1
+  mStonePrefab: {fileID: 6366795221941138465, guid: d5ad8c6613d4c0344a017730056b20f7, type: 3}
+  mFalling: {fileID: 2065861218}
 --- !u!1 &1003777830
 GameObject:
   m_ObjectHideFlags: 0
@@ -1793,7 +1818,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 323, y: 0}
-  m_SizeDelta: {x: 94, y: 43}
+  m_SizeDelta: {x: 80, y: 43}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1128664240
 MonoBehaviour:
@@ -2046,7 +2071,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 226, y: 0}
-  m_SizeDelta: {x: 94, y: 43}
+  m_SizeDelta: {x: 80, y: 43}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1298338417
 MonoBehaviour:
@@ -2690,7 +2715,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 226, y: 0}
-  m_SizeDelta: {x: 94, y: 43}
+  m_SizeDelta: {x: 80, y: 43}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1740115758
 MonoBehaviour:
@@ -2765,7 +2790,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 226, y: 0}
-  m_SizeDelta: {x: 94, y: 43}
+  m_SizeDelta: {x: 80, y: 43}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1793507372
 MonoBehaviour:
@@ -3400,8 +3425,8 @@ Canvas:
   m_GameObject: {fileID: 2056492254}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1

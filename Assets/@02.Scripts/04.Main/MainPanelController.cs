@@ -15,7 +15,13 @@ public class MainPanelController : MonoBehaviour
     [SerializeField] private Image profileImage;
     [SerializeField] private TMP_Text userInfoText;
     [SerializeField] private TMP_Text coinText;
-    
+    private TestMainSceneButton animation;
+
+    private void Awake()
+    {
+        animation = GetComponent<TestMainSceneButton>();
+    }
+
     public async void SetProfileInfo()
     {
         UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
@@ -27,26 +33,26 @@ public class MainPanelController : MonoBehaviour
     
     public void OnClickStartButton()
     {
-        GameManager.Instance.OpenGameTypeSelectPanel();
+        animation.StartClickAnimation(0, ()=> GameManager.Instance.OpenGameTypeSelectPanel());
     }
     
     public void OnClickRecordButton()
     {
-        GameManager.Instance.OpenRecordPanel();
+        animation.StartClickAnimation(1, ()=> GameManager.Instance.OpenRecordPanel());
     }
 
     public void OnClickLeaderboardButton()
     {
-        GameManager.Instance.OpenLeaderboardPanel();
+        animation.StartClickAnimation(2, ()=> GameManager.Instance.OpenLeaderboardPanel());
     }
     public void OnClickShopButton()
     {
-        GameManager.Instance.OpenShopPanel();
+        animation.StartClickAnimation(3, ()=> GameManager.Instance.OpenShopPanel());
     }
 
     public void OnClickSettingsButton()
     {
-        GameManager.Instance.OpenSettingsPanel();
+        animation.StartClickAnimation(4, ()=> GameManager.Instance.OpenSettingsPanel());
     }
 
     public void OnClickProfileButton()
@@ -55,4 +61,5 @@ public class MainPanelController : MonoBehaviour
     }
     
     // 로그아웃 클릭 시 호출되는 메서드 구현
+    
 }
