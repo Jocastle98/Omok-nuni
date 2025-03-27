@@ -3835,7 +3835,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 677349357}
         m_TargetAssemblyTypeName: GamePanelController, Assembly-CSharp
-        m_MethodName: OnClickResignButton
+        m_MethodName: OnClickForfeitButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

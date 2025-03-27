@@ -47,12 +47,12 @@ public class GameLogic : IDisposable
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;
+        GameManager.Instance.SetIsMultiplay(false);
+        GameManager.Instance.SetIsSingleplay(false);
+        
         OnMyGameProfileUpdate = onMyGameProfileUpdate;
         OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
-        GameManager.Instance.SetIsMultiPlay(false);
-        
-        GameManager.Instance.OnRematchGame -= SendRematchGameRequest;
-        GameManager.Instance.OnRematchGame += SendRematchGameRequest;
+        GameManagerCallbackHandler();
             
         //전달받은 플레이모드
         mPlayMode = playMode;
@@ -66,6 +66,8 @@ public class GameLogic : IDisposable
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.SinglePlay:
+                GameManager.Instance.SetIsSingleplay(true);
+                
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new AIState(false);
 
@@ -110,7 +112,7 @@ public class GameLogic : IDisposable
                 {
                     mRoomId = roomId;
                     MultiplayCallbackHandler();
-                    GameManager.Instance.SetIsMultiPlay(true);
+                    GameManager.Instance.SetIsMultiplay(true);
                     
                     switch (state)
                     {
@@ -145,6 +147,15 @@ public class GameLogic : IDisposable
                             break;
                     }
                 });
+                 
+                // 나의 급수 가져오기
+                UserInfoResult myInfo = NetworkManager.Instance.GetUserInfoSync(() => {}, () => {});
+                int myRank = myInfo.rank;
+
+                // 소켓연결 성공 시 0.1초후 서버로 나의급수 전송
+                UniTask.Delay(100).ContinueWith(() => {
+                    mMultiplayManager.SendMyRank(myRank);
+                });
                 break;
             case Enums.EGameType.PassAndPlayFade:
                 mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone);
@@ -156,6 +167,20 @@ public class GameLogic : IDisposable
         }
     }
 
+    #region CallbackHandler
+    
+    private void GameManagerCallbackHandler()
+    {
+        GameManager.Instance.OnRematchGame -= SendRematchGameRequest;
+        GameManager.Instance.OnRematchGame += SendRematchGameRequest;
+        GameManager.Instance.OnSendForfeit -= SendForfeit;
+        GameManager.Instance.OnSendForfeit += SendForfeit;
+        GameManager.Instance.OnForfeitWin -= ForfeitWin;
+        GameManager.Instance.OnForfeitWin += ForfeitWin;
+        GameManager.Instance.OnForfeitLose -= ForfeitLose;
+        GameManager.Instance.OnForfeitLose += ForfeitLose;
+    }
+    
     private void MultiplayCallbackHandler()
     {
         mMultiplayManager.OnOpponentProfileUpdate -= OnOpponentGameProfileUpdate;
@@ -168,18 +193,8 @@ public class GameLogic : IDisposable
         mMultiplayManager.OnRematchRequestReceived += RematchGameRequestReceived;
     }
     
-    /// <summary>
-    /// 상대 프로필 정보 수신 시 GameLogic에서도 보관
-    /// </summary>
-    /// <param name="oppoData"></param>
-    private void OnOpponentProfileReceived(UsersInfoData oppoData)
-    {
-        mOpponentInfo = oppoData;
-        Debug.Log($"[GameLogic] Opponent userID={mOpponentInfo.userId}, nickname={mOpponentInfo.nickname}");
-
-        OnOpponentGameProfileUpdate?.Invoke(oppoData);
-    }
-
+    #endregion
+    
     /// <summary>
     /// 턴을 변경하면 메서드
     /// </summary>
@@ -354,7 +369,7 @@ public class GameLogic : IDisposable
             OnMyGameProfileUpdate?.Invoke(playerType);
         });
     }
-
+    
     private void SendOpponentGameProfile(string roomId, Enums.EPlayerType playerType)
     {
         UnityThread.executeInUpdate(() =>
@@ -382,7 +397,19 @@ public class GameLogic : IDisposable
 
         return usersInfoData;
     }
+    
+    /// <summary>
+    /// 상대 프로필 정보 수신 시 GameLogic에서도 보관
+    /// </summary>
+    /// <param name="oppoData"></param>
+    private void OnOpponentProfileReceived(UsersInfoData oppoData)
+    {
+        mOpponentInfo = oppoData;
+        Debug.Log($"[GameLogic] Opponent userID={mOpponentInfo.userId}, nickname={mOpponentInfo.nickname}");
 
+        OnOpponentGameProfileUpdate?.Invoke(oppoData);
+    }
+    
     private void ResetGame(Enums.EMultiplayManagerState multiplayManagerState)
     {
         UnityThread.executeInUpdate(() =>
@@ -456,10 +483,7 @@ public class GameLogic : IDisposable
     {
         UnityThread.executeInUpdate(() =>
         {
-            if (mMultiplayManager != null)
-            {
-                mMultiplayManager.SendRematchRequest(mRoomId);
-            }
+            mMultiplayManager?.SendRematchRequest(mRoomId);
         });
     }
 
@@ -469,11 +493,36 @@ public class GameLogic : IDisposable
         {
             GameManager.Instance.OpenConfirmPanel("재대국 신청을 받았습니다. \n수락하시겠습니까?", () =>
             {
-                mMultiplayManager.AcceptRematch(mRoomId);
+                mMultiplayManager?.AcceptRematch(mRoomId);
             }, true, () =>
             {
-                mMultiplayManager.RejectRematch();
+                mMultiplayManager?.RejectRematch();
             });
+        });
+    }
+    
+    private void SendForfeit()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            mMultiplayManager?.SendForfeitRequest(mRoomId);
+        });
+    }
+    
+    private void ForfeitWin()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            EndGame(localPlayerType);
+        });
+    }
+
+    private void ForfeitLose()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            EndGame(localPlayerType == Enums.EPlayerType.Player_Black 
+                ? Enums.EPlayerType.Player_White : Enums.EPlayerType.Player_Black);
         });
     }
     

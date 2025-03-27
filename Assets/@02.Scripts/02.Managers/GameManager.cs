@@ -38,15 +38,23 @@ public class GameManager : Singleton<GameManager>
 
     // waitingPanel의 대기종료 여부(게임이 시작했는지)
     private bool mbIsStartGame = false;
-    private bool mbIsMultiPlay = false;
+    private bool mbIsMultiplay = false;
+    private bool mbIsSingleplay = false;
+
+    #region Callback
 
     public Action OnMainPanelUpdate;
     public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
     public Action<UsersInfoData> OnOpponentGameProfileUpdate;
     public Action OnRematchGame;
     public Action OnCloseScorePanel;
+    public Action OnSendForfeit;
+    public Action OnForfeitWin;
+    public Action OnForfeitLose;
     public Action OnCoinUpdated;
     public Action OnAdsRemoved;
+
+    #endregion
 
     private void Start()
     {
@@ -303,14 +311,24 @@ public class GameManager : Singleton<GameManager>
         mbIsStartGame = isStartGame;
     }
 
-    public bool GetIsMultiPlay()
+    public bool GetIsMultiplay()
     {
-        return mbIsMultiPlay;
+        return mbIsMultiplay;
     }
 
-    public void SetIsMultiPlay(bool isMultiPlay)
+    public void SetIsMultiplay(bool isMultiPlay)
     {
-        mbIsMultiPlay = isMultiPlay;
+        mbIsMultiplay = isMultiPlay;
+    }
+
+    public bool GetIsSingleplay()
+    {
+        return mbIsSingleplay;
+    }
+
+    public void SetIsSingleplay(bool isScoreCount)
+    {
+        mbIsSingleplay = isScoreCount;
     }
     
     // 콜백 초기화 메서드

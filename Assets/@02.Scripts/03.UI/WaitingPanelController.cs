@@ -105,9 +105,24 @@ public class WaitingPanelController : PopupPanelController
     {
         Hide();
         
-        GameManager.Instance.OpenConfirmPanel("다른 유저와의 매칭이 실패하였습니다.", () =>
+        GameManager.Instance.OpenConfirmPanel("다른 유저와의 매칭이 실패하였습니다. \n급수에 맞는 AI와 매칭됩니다.", () =>
         {
             GameManager.Instance.ChangeToGameScene(Enums.EGameType.SinglePlay);
-        }, false);
+        }, true, () =>
+        {
+            GameManager.Instance.OpenConfirmPanel("매칭을 취소하였습니다. \n소비한 코인을 돌려드립니다.", () =>
+            {
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddCoin(Constants.ConsumeCoin, i =>
+                    {
+                        GameManager.Instance.ChangeToMainScene();
+                    }, () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("돌려 받지 못함", null, false);
+                    });
+                });
+            }, false);
+        });
     }
 }

@@ -61,7 +61,6 @@ public class Enums
     {
         Turn_Black,
         Turn_White,
-        Record
     }
 
     public enum EGameImage
