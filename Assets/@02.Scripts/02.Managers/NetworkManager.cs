@@ -210,7 +210,7 @@ public class NetworkManager : Singleton<NetworkManager>
             GameManager.Instance.OpenConfirmPanel($"{userInfo.nickname}: \n자동 로그인 성공", () =>
             {
                 successCallback?.Invoke();
-            });
+            }, false);
         }
     }
 
