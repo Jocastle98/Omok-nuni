@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using DG.Tweening;
 using Unity.Mathematics;
@@ -30,7 +31,9 @@ public class MainButtonAnimation : MonoBehaviour
     [SerializeField] private Sprite whiteStoneSprite;       //메인 버튼에 있는 백돌
 
     private bool isBlackTurn = true;                        //흑, 백 번갈아
-    private List<int> occupiedIndexes = new ();
+    private List<int> occupiedIndexes = new List<int>();
+    private List<GameObject> placedStone = new List<GameObject>();
+    private int[] miniBoard = new int[9];
     
     /// <summary>
     /// 메인메뉴 버튼을 클릭했을 때
@@ -49,7 +52,7 @@ public class MainButtonAnimation : MonoBehaviour
         omoknuni.transform.DOMove(targetPos, flyDuration).SetEase(Ease.InQuad).OnComplete(() =>
         {
             PlayHitAnimation(omoknuni, buttonIndex); 
-            PlayFallingStoneAnimation();
+            PlayFallingStoneAnimation(buttonIndex);
             ExitAnimation(omoknuni, targetPos, buttonIndex);
             UpdateButtonStateDelayed(onClickAction);
         });
@@ -68,7 +71,7 @@ public class MainButtonAnimation : MonoBehaviour
         mStoneTargets[buttonIndex].gameObject.SetActive(false);                              //메인 버튼에 있는 돌 비활성화
     }
 
-    private void PlayFallingStoneAnimation()
+    private void PlayFallingStoneAnimation(int buttonIndex)
     {
         List<int> emptyIndexes = new();
         for (int i = 0; i < mFalling.Length; i++)
@@ -78,7 +81,25 @@ public class MainButtonAnimation : MonoBehaviour
 
         if (emptyIndexes.Count == 0)
         {
-            occupiedIndexes.Clear();
+            bool isWin = CheckMiniGameWin();
+            
+            if (!isWin)
+            {
+                foreach (var stone in placedStone)
+                {
+                    if (stone != null)
+                    {
+                        stone.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => Destroy(stone));
+                    }
+                }
+                placedStone.Clear();
+            
+                occupiedIndexes.Clear();
+            
+                Array.Clear(miniBoard, 0, miniBoard.Length);
+            }
+            
+            
             for (int i = 0; i < mFalling.Length; i++)
             {
                 emptyIndexes.Add(i);
@@ -86,14 +107,14 @@ public class MainButtonAnimation : MonoBehaviour
         }
 
         int targetIndex = emptyIndexes[Random.Range(0, emptyIndexes.Count)];
-        Vector3 spawnPos = mStoneTargets[targetIndex].position;                                         //오목판에 놓일 돌 생성 위치
+        Vector3 spawnPos = mStoneTargets[buttonIndex].position;                                         //오목판에 놓일 돌 생성 위치
         occupiedIndexes.Add(targetIndex);
         
         GameObject stonePrefab = isBlackTurn ? mBlackStonePrefab : mWhiteStonePrefab;                   //순서에 따라 흑백 돌 결정
         var fallingStone = Instantiate(stonePrefab, spawnPos, quaternion.identity); //돌 프리팹 생성
+        placedStone.Add(fallingStone);
 
-        int ranFallIndex = Random.Range(0, mFalling.Length);    //오목판 어디에 떨어질 건지 랜덤값
-        Vector3 fallTarget = mFalling[ranFallIndex].position;   //오목판 위치 결정
+        Vector3 fallTarget = mFalling[targetIndex].position;   //오목판 위치 결정
 
         fallingStone.transform.DOScale(1.1f, 0.1f).SetLoops(2, LoopType.Yoyo);              //돌 크기 요요
         fallingStone.transform.DORotate(new Vector3(0, 0, 360), 0.5f, RotateMode.FastBeyond360);    //돌 회전
@@ -101,6 +122,8 @@ public class MainButtonAnimation : MonoBehaviour
         {
             AudioManager.Instance.PlaySfxSound(2);                                              //착수 소리 재생
             Instantiate(stackEffectPrefab, fallingStone.transform.position, Quaternion.identity);    //착수 효과 생성
+            miniBoard[targetIndex] = isBlackTurn ? 1 : 2;
+            CheckMiniGameWin();
         });
     }
 
@@ -134,5 +157,77 @@ public class MainButtonAnimation : MonoBehaviour
     private void ToggleTurnColor()
     {
         isBlackTurn = !isBlackTurn;
+    }
+
+    public void HideAllStone()
+    {
+        foreach (var stone in placedStone)
+        {
+            if(stone != null) stone.SetActive(false);
+        }
+    }
+
+    public void ShowAllStone()
+    {
+        foreach (var stone in placedStone)
+        {
+            if(stone != null) stone.SetActive(true);
+        }
+    }
+
+    private bool CheckMiniGameWin()
+    {
+        int[][] winPatterns = new int[][]
+        {
+            new[] { 0, 1, 2 },
+            new[] { 3, 4, 5 },
+            new[] { 6, 7, 8 },
+            new[] { 0, 3, 6 },
+            new[] { 1, 4, 7 },
+            new[] { 2, 5, 8 },
+            new[] { 0, 4, 8 },
+            new[] { 2, 4, 6 }
+        };
+
+        foreach (var pattern in winPatterns)
+        {
+            int a = pattern[0];
+            int b = pattern[1];
+            int c = pattern[2];
+
+            if (miniBoard[a] != 0 && miniBoard[a] == miniBoard[b] && miniBoard[b] == miniBoard[c])
+            {
+                bool isBlackWin = miniBoard[a] == 1;
+                
+                Array.Clear(miniBoard, 0, miniBoard.Length);
+            
+                // 놓인 돌들 제거
+                foreach (var stone in placedStone)
+                {
+                    if (stone != null)
+                    {
+                        stone.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => Destroy(stone));
+                    }
+                }
+                placedStone.Clear();
+                occupiedIndexes.Clear();
+                
+                
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddCoin(50, i =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel($"?\n{(isBlackWin? "흑":"백")}이 이겼네요?\n50코인이라도...", null, false);
+                        GameManager.Instance.OnMainPanelUpdate?.Invoke();
+                    }, () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("미니게임 보상 오류", null, false);
+                    } );
+                });
+                return true;
+            }
+        }
+
+        return false;
     }
 }
