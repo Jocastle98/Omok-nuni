@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -80,12 +81,15 @@ public class ReplayListPanelController : PopupPanelController
         gameObject.SetActive(false);
     }
 
-
-
-
-
     public void OnCloseButtonClick()
     {
         Hide();
+    }
+    
+    public override void Hide(Action OnPanelControllerHide = null)
+    {
+        FindObjectOfType<MainButtonAnimation>().ShowAllStone();
+
+        base.Hide(OnPanelControllerHide);
     }
 }

@@ -77,6 +77,7 @@ public class MainPanelController : MonoBehaviour
 
     public void OnClickProfileButton()
     {
+        mainButtonAnimation.HideAllStone();
         GameManager.Instance.OpenProfilePanel();
     }
     
