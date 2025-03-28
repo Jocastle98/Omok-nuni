@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class SettingPanelController : PopupPanelController
@@ -14,5 +15,12 @@ public class SettingPanelController : PopupPanelController
     public void OnClickClosedButton()
     {
         Hide();
+    }
+    
+    public override void Hide(Action OnPanelControllerHide = null)
+    {
+        FindObjectOfType<MainButtonAnimation>().ShowAllStone();
+
+        base.Hide(OnPanelControllerHide);
     }
 }
