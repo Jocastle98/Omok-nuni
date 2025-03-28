@@ -131,6 +131,7 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
                 await NetworkManager.Instance.AddCoin(1000, i =>
                 {
                     GameManager.Instance.OpenConfirmPanel("코인이 1,000개 지급되었습니다!", null, false);
+                    AudioManager.Instance.PlaySfxSound(5);
                     GameManager.Instance.OnCoinUpdated?.Invoke();
                 }, () =>
                 {
@@ -145,6 +146,7 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
                 await NetworkManager.Instance.AddCoin(2000, i =>
                 {
                     GameManager.Instance.OpenConfirmPanel("코인이 2,000개 지급되었습니다!", null, false);
+                    AudioManager.Instance.PlaySfxSound(5);
                     GameManager.Instance.OnCoinUpdated?.Invoke();
                 }, () =>
                 {
@@ -159,6 +161,7 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
                 await NetworkManager.Instance.AddCoin(4500, i =>
                 {
                     GameManager.Instance.OpenConfirmPanel("코인이 4,500개 지급되었습니다!", null, false);
+                    AudioManager.Instance.PlaySfxSound(5);
                     GameManager.Instance.OnCoinUpdated?.Invoke();
                 }, () =>
                 {
@@ -173,6 +176,7 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
                 await NetworkManager.Instance.AddCoin(10000, i =>
                 {
                     GameManager.Instance.OpenConfirmPanel("코인이 10,000개 지급되었습니다!", null, false);
+                    AudioManager.Instance.PlaySfxSound(5);
                     GameManager.Instance.OnCoinUpdated?.Invoke();
                 }, () =>
                 {
@@ -209,6 +213,7 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
                 await NetworkManager.Instance.AddCoin(2000, i =>
                 {
                     GameManager.Instance.OpenConfirmPanel("광고제거와 코인이 2,000개 지급되었습니다!", null, false);
+                    AudioManager.Instance.PlaySfxSound(5);
                     GameManager.Instance.OnCoinUpdated?.Invoke();
                 }, () =>
                 {

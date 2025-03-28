@@ -76,7 +76,16 @@ public class GameManager : Singleton<GameManager>
             }
         });
     }
-    
+
+    private void Update()
+    {
+        if(Input.GetMouseButtonUp(0)) 
+            AudioManager.Instance.PlaySfxSound(4);
+        
+        if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            AudioManager.Instance.PlaySfxSound(4);
+    }
+
     #region  Score
 
     // TODO: 스코어 급수에 맞게 조정 현재는(-30~30)
