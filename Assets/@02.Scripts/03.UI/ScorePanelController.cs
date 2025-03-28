@@ -3,31 +3,21 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using DG.Tweening;
+
 
 public class ScorePanelController : PopupPanelController
 {
-    [SerializeField] private Transform addScoreObjects;    
-    [SerializeField] private Transform deleteScoreObjects; 
-    [SerializeField] private GameObject scoreImagePrefab;
     [SerializeField] private TextMeshProUGUI messageText;
     [SerializeField] private TextMeshProUGUI upgradeText;
-    [SerializeField] private HorizontalLayoutGroup addScoreLayoutGroup;
-    [SerializeField] private HorizontalLayoutGroup deleteScoreLayoutGroup;
     [SerializeField] private TextMeshProUGUI leftScoreText;
     [SerializeField] private TextMeshProUGUI rightScoreText;
     [SerializeField] private Button ResignButton;
- 
-    /// <summary>
-    /// 점수 패널 초기화
-    /// </summary>
-    /// <param name="currentScore">서버에서 가져온 (wincount - losecount)</param>
-    /// <param name="isWin">이번 게임 승/패</param>
-    /// <param name="addDelete">이번 게임 점수 증감</param>
-    /// <param name="rank">현재 등급(1급 ~ 18급)</param>
-    /// <param name="rankuppoints">현재 승급 포인트</param>
-        public void InitializePanel(int currentScore, bool isWin, int addDelete, int rank, int rankuppoints)
-    {
+    [SerializeField] private Image rankUpGaugeAdd;    // 0 이상
+    [SerializeField] private Image rankUpGaugeDelete; // 0 이하
 
+    public void InitializePanel(int currentScore, bool isWin, int addDelete, int rank, int rankuppoints)
+    {
         Show();
 
         ResignButton.gameObject.SetActive(GameManager.Instance.bIsMultiplay);
@@ -65,29 +55,58 @@ public class ScorePanelController : PopupPanelController
             rightScoreText.text = "100";
         }
 
+        // 18급 예외 처리 (rankuppoints가 -3보다 작아지지 않도록)
         if (rank == 18 && rankuppoints < -3)
         {
             rankuppoints = -3;
         }
         rankuppoints = Mathf.Clamp(rankuppoints, minScore, maxScore);
+
+        rankUpGaugeAdd.fillAmount    = 0f;
+        rankUpGaugeDelete.fillAmount = 0f;
+
+        float fillTargetAdd = 0f;
+        float fillTargetDelete = 0f;
+
+        if (rankuppoints > 0)
+        {
+            fillTargetAdd = (float) rankuppoints / threshold;
+        }
+        else if (rankuppoints < 0)
+        {
+            fillTargetDelete = (float) Mathf.Abs(rankuppoints) / threshold;
+        }
+
         
-        RefreshIcons(rankuppoints, threshold);
+        if (fillTargetAdd > 0f)
+        {
+            rankUpGaugeAdd.DOFillAmount(fillTargetAdd, 1f)
+                .SetEase(Ease.Linear); 
+        }
+        if (fillTargetDelete > 0f)
+        {
+            rankUpGaugeDelete.DOFillAmount(fillTargetDelete, 1f)
+                .SetEase(Ease.Linear);
+        }
 
         if (rank > 1 && rankuppoints >= threshold)
         {
             upgradeText.text = $"승급합니다!\n\n현재 등급: {rank}급.";
-            RefreshIcons(0, threshold);
+
+            // 승급 시 게이지가 가득 차도록
+            rankUpGaugeAdd.DOFillAmount(1f, 1f).SetEase(Ease.Linear);
             return; 
         }
         else if (rank < 18 && rankuppoints <= -threshold)
         {
             upgradeText.text = "강등합니다!";
-            RefreshIcons(0, threshold);
+
+            // 강등 시 delete 게이지를 가득
+            rankUpGaugeDelete.DOFillAmount(1f, 1f).SetEase(Ease.Linear);
             return; 
         }
         else
         {
-            // 남은 승/패 횟수
             int remain;
             if (rankuppoints >= 0)
             {
@@ -101,46 +120,6 @@ public class ScorePanelController : PopupPanelController
             }
         }
     }
-
-    /// <summary>
-    /// 아이콘 설정
-    /// </summary>
-    private void RefreshIcons(int currentScore, int threshold)
-    {
-
-        foreach (Transform child in addScoreObjects) Destroy(child.gameObject);
-        foreach (Transform child in deleteScoreObjects) Destroy(child.gameObject);
-
-        int iconCount = Mathf.Abs(currentScore);
-        if (iconCount == 0) return;
-
-        HorizontalLayoutGroup layoutGroup = (currentScore >= 0) ? addScoreLayoutGroup : deleteScoreLayoutGroup;
-        Transform parentToUse = (currentScore >= 0) ? addScoreObjects : deleteScoreObjects;
-
-        float parentWidth = layoutGroup.GetComponent<RectTransform>().rect.width; 
-        float spacing = layoutGroup.spacing; // Inspector에서 설정
-
-        float totalSpacing = (threshold - 1) * spacing;
-        float baseIconSize = (parentWidth - totalSpacing) / threshold;
-        if (baseIconSize < 0) baseIconSize = 0;
-
-        float scaleFactor = 1f;
-        if (iconCount > threshold)
-        {
-            scaleFactor = (float)threshold / iconCount;
-        }
-        float finalSize = baseIconSize * scaleFactor;
-
-        for (int i = 0; i < iconCount; i++)
-        {
-            var icon = Instantiate(scoreImagePrefab, parentToUse);
-            LayoutElement le = icon.AddComponent<LayoutElement>();
-            le.preferredWidth = finalSize;
-            le.preferredHeight = finalSize;
-        }
-
-    }
-
 
     public void OnClickCloseButton()
     {
