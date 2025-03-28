@@ -12,6 +12,7 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField]private Image mStoneImage;
     [SerializeField]private Image mUtilImage;
+    [SerializeField]private Image mUtilLastImage;
     [SerializeField]private List<Sprite> mImages;
     [SerializeField]private int mFadeCount = 5;
     private int fading; 
@@ -39,6 +40,9 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
         mStoneImage.sprite = GetImage(Enums.EGameImage.None);
         mUtilImage.DOFade(0,0);
         mUtilImage.sprite = GetImage(Enums.EGameImage.None);
+        mUtilLastImage.DOFade(0,0);
+        mUtilLastImage.sprite = GetImage(Enums.EGameImage.None);
+        
         IsForbidden = false;
         playerType = Enums.EPlayerType.None;
     }
@@ -74,6 +78,19 @@ public class BoardCell : MonoBehaviour, IPointerClickHandler
         {
             mUtilImage.DOFade(0,0);
             mUtilImage.sprite = GetImage(Enums.EGameImage.None);
+        }
+    }
+    public void PlacedMark(bool onMark)
+    {
+        if (onMark)
+        {
+            mUtilLastImage.DOFade(1,0);
+            mUtilLastImage.sprite = GetImage(Enums.EGameImage.LastPosMark);
+        }
+        else
+        {
+            mUtilLastImage.DOFade(0,0);
+            mUtilLastImage.sprite = GetImage(Enums.EGameImage.None);
         }
     }
 

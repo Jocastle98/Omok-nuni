@@ -36,6 +36,7 @@ public class PopupPanelController : MonoBehaviour
     /// <param name="OnPanelControllerHide"></param>
     public virtual void Hide(Action OnPanelControllerHide = null)
     {
+        FindObjectOfType<MainButtonAnimation>()?.ShowAllStone();
         // 사라지기 전 초기화
         mBackgroundCanvasGroup.alpha = 1;
         panelRectTransform.localScale = Vector3.one;

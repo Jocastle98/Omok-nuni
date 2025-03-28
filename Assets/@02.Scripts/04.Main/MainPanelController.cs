@@ -33,26 +33,46 @@ public class MainPanelController : MonoBehaviour
     
     public void OnClickStartButton()
     {
-        mainButtonAnimation.StartClickAnimation(0, ()=> GameManager.Instance.OpenGameTypeSelectPanel());
+        mainButtonAnimation.StartClickAnimation(0, ()=>
+        {
+            mainButtonAnimation.HideAllStone();
+            GameManager.Instance.OpenGameTypeSelectPanel();
+        });
     }
     
     public void OnClickRecordButton()
     {
-        mainButtonAnimation.StartClickAnimation(1, ()=> GameManager.Instance.OpenRecordPanel());
+        mainButtonAnimation.StartClickAnimation(1, ()=>
+        {
+            mainButtonAnimation.HideAllStone();
+            GameManager.Instance.OpenRecordPanel();
+        });
     }
 
     public void OnClickLeaderboardButton()
     {
-        mainButtonAnimation.StartClickAnimation(2, ()=> GameManager.Instance.OpenLeaderboardPanel());
+        mainButtonAnimation.StartClickAnimation(2, ()=>
+        {
+            mainButtonAnimation.HideAllStone();
+            GameManager.Instance.OpenLeaderboardPanel();
+        });
     }
     public void OnClickShopButton()
     {
-        mainButtonAnimation.StartClickAnimation(3, ()=> GameManager.Instance.OpenShopPanel());
+        mainButtonAnimation.StartClickAnimation(3, ()=>
+        {
+            mainButtonAnimation.HideAllStone();
+            GameManager.Instance.OpenShopPanel();
+        });
     }
 
     public void OnClickSettingsButton()
     {
-        mainButtonAnimation.StartClickAnimation(4, ()=> GameManager.Instance.OpenSettingsPanel());
+        mainButtonAnimation.StartClickAnimation(4, ()=>
+        {
+            mainButtonAnimation.HideAllStone();
+            GameManager.Instance.OpenSettingsPanel();
+        });
     }
 
     public void OnClickProfileButton()
