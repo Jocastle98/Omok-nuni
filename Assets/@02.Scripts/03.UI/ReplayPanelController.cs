@@ -109,6 +109,13 @@ public class ReplayPanelController : PopupPanelController
             _currentIndex++;
             ReloadBoard();
         }
+        else
+        {
+            GameManager.Instance.OpenConfirmPanel(" 마지막 수 입니다. \n 시작화면으로 \n돌아가겠습니까?", () =>
+            {
+                GameManager.Instance.ChangeToMainScene();
+            }, true);
+        }
     }
 
     /// <summary>
