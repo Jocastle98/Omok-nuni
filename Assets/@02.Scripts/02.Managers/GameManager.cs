@@ -41,7 +41,7 @@ public class GameManager : Singleton<GameManager>
     public bool bIsMultiplay = false;
     public bool bIsSingleplay = false;
     public bool bIsTryRematch = false;
-    public bool OnRecieveRematch = false;
+    public bool bIsRecieveRematch = false;
     
     #region Callback
 

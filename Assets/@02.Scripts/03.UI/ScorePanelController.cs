@@ -153,7 +153,7 @@ public class ScorePanelController : PopupPanelController
 
     public void OnClickRematchButton()
     {
-        if (GameManager.Instance.OnRecieveRematch)
+        if (GameManager.Instance.bIsRecieveRematch)
         {
             return;
         }
