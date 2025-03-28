@@ -1,4 +1,5 @@
-﻿using System;
+using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,21 @@ public class SettingPanelController : PopupPanelController
     {
         AudioManager.Instance.InitSliders(_bgmSlider, _sfxSlider);
     }
+
+    public void OnClickSignoutButton()
+    {
+        Hide(() =>
+        {
+            UniTask.Void(async () =>
+            {
+                await NetworkManager.Instance.Signout(() =>
+                {
+                    GameManager.Instance.OpenSigninPanel();
+                }, () => { });
+            });
+        });
+    }
+    
     public void OnClickClosedButton()
     {
         Hide();

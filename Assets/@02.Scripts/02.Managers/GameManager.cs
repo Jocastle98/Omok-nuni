@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
@@ -41,7 +42,6 @@ public class GameManager : Singleton<GameManager>
     public bool bIsMultiplay = false;
     public bool bIsSingleplay = false;
     public bool bIsTryRematch = false;
-    public bool OnRecieveRematch = false;
     
     #region Callback
 
@@ -60,7 +60,21 @@ public class GameManager : Singleton<GameManager>
 
     private void Start()
     {
-        OpenSigninPanel();
+        UniTask.Void(async () =>
+        {
+            if (UserInformations.IsAutoSignin)
+            {
+                await NetworkManager.Instance.AutoSignin(() =>
+                { }, () =>
+                {
+                    GameManager.Instance.OpenSigninPanel();
+                });
+            }
+            else
+            {
+                GameManager.Instance.OpenSigninPanel();
+            }
+        });
     }
     
     #region  Score
