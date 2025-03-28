@@ -52,7 +52,6 @@ public class GameLogic : IDisposable
         GameManager.Instance.bIsMultiplay = false;
         GameManager.Instance.bIsSingleplay = false;
         GameManager.Instance.bIsTryRematch = false;
-        GameManager.Instance.bIsRecieveRematch = false;
         
         OnMyGameProfileUpdate = onMyGameProfileUpdate;
         OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
@@ -466,6 +465,7 @@ public class GameLogic : IDisposable
 
             GameManager.Instance.OpenConfirmPanel("새로운 대국이 시작되었습니다.", () =>
             {
+                GameManager.Instance.bIsTryRematch = false;
                 isGameOver = false;
                 currentSelectedCell = Int32.MaxValue;
 
@@ -502,7 +502,6 @@ public class GameLogic : IDisposable
     {
         UnityThread.executeInUpdate(() =>
         {
-            GameManager.Instance.bIsRecieveRematch = true;
             GameManager.Instance.OpenConfirmPanel("재대국 신청을 받았습니다. \n수락하시겠습니까?", () =>
             {
                 mMultiplayManager?.AcceptRematch(mRoomId);
