@@ -53,7 +53,7 @@ public class ShopPanelController : PopupPanelController
 
     public void OnClickCloseButton()
     {
-        Hide();
+        Hide(GameManager.Instance.OnMainPanelUpdate);
     }
 
     public void OnClickRewardAds()

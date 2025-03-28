@@ -142,7 +142,13 @@ public class ScorePanelController : PopupPanelController
                     successCallback: (remainingCoins) => 
                     {
                         GameManager.Instance.OpenConfirmPanel($"남은 코인은 {remainingCoins} 입니다.",
-                            () => { }, false);
+                            () =>
+                            {
+                                if (!GameManager.Instance.bIsStartGame)
+                                {
+                                    GameManager.Instance.OpenWaitingPanel();
+                                }
+                            }, false);
                     },
                     failureCallback: () =>
                     {

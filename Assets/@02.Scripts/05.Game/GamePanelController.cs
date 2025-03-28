@@ -31,7 +31,7 @@ public class GamePanelController : MonoBehaviour
     //착수버튼이 눌렸을 때 플레이어에게 알림
     public delegate void OnBeginButtonClicked();
     public OnBeginButtonClicked onBeginButtonClicked;
-    
+
     /// <summary>
     /// Play하고 있을 때는 턴을 표시하는 turnUI를 보여주고
     /// Record(기보)하고 있을 때는 recordUI를 보여줌
@@ -46,7 +46,6 @@ public class GamePanelController : MonoBehaviour
                 turnUI.SetActive(true);
                 forfietButton.SetActive(true);
                 
-                timer.GetComponent<Timer>().InitTimer();
                 blackTurnPanel.alpha = mEnableAlpha;
                 whiteTurnPanel.alpha = mDisableAlpha;
                 break;
@@ -54,8 +53,7 @@ public class GamePanelController : MonoBehaviour
                 timer.SetActive(true);
                 turnUI.SetActive(true);
                 forfietButton.SetActive(true);
-
-                timer.GetComponent<Timer>().InitTimer();
+                
                 blackTurnPanel.alpha = mDisableAlpha;
                 whiteTurnPanel.alpha = mEnableAlpha;
                 break;
@@ -146,7 +144,6 @@ public class GamePanelController : MonoBehaviour
             }
             else if (GameManager.Instance.bIsSingleplay)
             {
-                StopClock();
                 GameManager.Instance.LoseGame();
             }
             else
