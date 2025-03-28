@@ -56,7 +56,7 @@ public class GameLogic : IDisposable
         OnMyGameProfileUpdate = onMyGameProfileUpdate;
         OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
         GameManagerCallbackHandler();
-            
+        
         //전달받은 플레이모드
         mPlayMode = playMode;
         switch (mPlayMode)
@@ -147,7 +147,7 @@ public class GameLogic : IDisposable
                                 UnityThread.executeInUpdate(() =>
                                 {
                                     GameManager.Instance.OpenConfirmPanel("상대방이 퇴장하였습니다. \n메인화면으로 돌아갑니다.", () =>
-                                    {
+                                    { 
                                         GameManager.Instance.ChangeToMainScene();
                                     }, false);
                                 });
@@ -319,6 +319,8 @@ public class GameLogic : IDisposable
     /// <param name="newState"></param>
     public void SetState(BasePlayerState newState)
     {
+        gamePanelController.InitClock();
+        
         mCurrentPlayer?.OnExit(this);
         mCurrentPlayer = newState;
         mCurrentPlayer?.OnEnter(this);
@@ -428,13 +430,13 @@ public class GameLogic : IDisposable
             {
                 if (mbIsGameStarted) return; // 이미 시작된 경우 중복 호출 방지
                 mbIsGameStarted = true;
-
+                
                 gamePanelController.StartClock();
                 mCurrentPlayer = mPlayer_White;
 
                 mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                 mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId);
-
+                
                 GameManager.Instance.OnCloseScorePanel?.Invoke();
 
                 // 방들어온 플레이어는 백
@@ -447,7 +449,7 @@ public class GameLogic : IDisposable
             {
                 if (mbIsGameStarted) return; // 다시 시작되지 않도록 방지
                 mbIsGameStarted = true;
-
+                
                 gamePanelController.StartClock();
                 mCurrentPlayer = mPlayer_Black;
 
@@ -475,7 +477,7 @@ public class GameLogic : IDisposable
                 boardCellController.InitBoard();
 
                 // UI 초기화
-                // gamePanelController.InitClock();
+                gamePanelController.StartClock();
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
 
                 GameManager.Instance.OnCloseScorePanel = null;
