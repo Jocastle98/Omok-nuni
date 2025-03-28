@@ -22,6 +22,7 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] private Image playerWhiteProfileImage;
     [SerializeField] private TMP_Text playerWhiteProfileText;
     
+    
     private const float mDisableAlpha = 0.3f;
     private const float mEnableAlpha = 1.0f;
     
@@ -158,5 +159,10 @@ public class GamePanelController : MonoBehaviour
     public void OnClickBeginButton()
     {
         onBeginButtonClicked?.Invoke();
+    }
+
+    public void OnClickBirdImage()
+    {
+        AudioManager.Instance.PlaySfxSound(3);
     }
 }

@@ -66,4 +66,11 @@ public class ShopPanelController : PopupPanelController
         Enums.EItemType selectedItem = (Enums.EItemType)type;
         IAPManager.Instance.BuyProduct(selectedItem);
     }
+    
+    public override void Hide(Action OnPanelControllerHide = null)
+    {
+        FindObjectOfType<MainButtonAnimation>().ShowAllStone();
+
+        base.Hide(OnPanelControllerHide);
+    }
 }

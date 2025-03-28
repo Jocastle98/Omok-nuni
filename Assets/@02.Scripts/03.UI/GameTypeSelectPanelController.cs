@@ -51,4 +51,11 @@ public class GameTypeSelectPanelController : PopupPanelController
     {
         Hide();
     }
+    
+    public override void Hide(Action OnPanelControllerHide = null)
+    {
+        FindObjectOfType<MainButtonAnimation>().ShowAllStone();
+
+        base.Hide(OnPanelControllerHide);
+    }
 }
