@@ -4293,6 +4293,11 @@ MonoBehaviour:
   - {fileID: 21300000, guid: d85c370662e65dd4cbf28b37ab90206a, type: 3}
   - {fileID: 21300000, guid: 9364033c20dc74c4589c596e0c8eaaee, type: 3}
   - {fileID: 21300000, guid: 887d7764292a62c4c805f401d4a20d7c, type: 3}
+  bIsStartGame: 0
+  bIsMultiplay: 0
+  bIsSingleplay: 0
+  bIsTryRematch: 0
+  bIsRecieveRematch: 0
 --- !u!4 &2140132619
 Transform:
   m_ObjectHideFlags: 0
