@@ -225,7 +225,7 @@ public class MainButtonAnimation : MonoBehaviour
                 {
                     await NetworkManager.Instance.AddCoin(50, i =>
                     {
-                        GameManager.Instance.OpenConfirmPanel($"?\n{(isBlackWin? "흑":"백")}이 이겼네요?\n50코인이라도...", null, false);
+                        GameManager.Instance.OpenConfirmPanel($"?\n{(isBlackWin? "흑":"백")}이 이겼네요?\n50코인이라도...", ()=>AudioManager.Instance.PlaySfxSound(5), false);
                         GameManager.Instance.OnMainPanelUpdate?.Invoke();
                     }, () =>
                     {
