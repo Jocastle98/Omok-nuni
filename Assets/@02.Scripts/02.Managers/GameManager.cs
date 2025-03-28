@@ -79,9 +79,10 @@ public class GameManager : Singleton<GameManager>
 
     private void Update()
     {
-        if(Input.GetMouseButtonUp(0)) 
-            AudioManager.Instance.PlaySfxSound(4);
+        /*if(Input.GetMouseButtonUp(0)) 
+            AudioManager.Instance.PlaySfxSound(4);*/
         
+        //모바일용 클릭 소리
         if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
             AudioManager.Instance.PlaySfxSound(4);
     }

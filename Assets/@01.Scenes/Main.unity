@@ -3633,6 +3633,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f97bb9f56ec6a0349afc9856c6ca3342, type: 3}
   - {fileID: 8300000, guid: 9426c6ce63a193842ab934055c12c222, type: 3}
   - {fileID: 8300000, guid: 3c1f15137af40f243b87905834991e23, type: 3}
+  - {fileID: 8300000, guid: 74c2df122e7c1c549a09e575c6dba366, type: 3}
+  - {fileID: 8300000, guid: b84212fbd15893d46a841cd54492cb49, type: 3}
+  - {fileID: 8300000, guid: 2bd5955c1a8f3d448a84e73b9cbf824c, type: 3}
 --- !u!4 &1797954141
 Transform:
   m_ObjectHideFlags: 0
@@ -4410,7 +4413,6 @@ MonoBehaviour:
   bIsMultiplay: 0
   bIsSingleplay: 0
   bIsTryRematch: 0
-  bIsRecieveRematch: 0
 --- !u!4 &2140132619
 Transform:
   m_ObjectHideFlags: 0
