@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,6 +25,11 @@ public class ReplayListPanelController : PopupPanelController
             failureCallback: () => { Debug.LogWarning("기보 목록 가져오기 실패"); }
         );
 
+        // 만약 기보가 15개보다 많다면 최신 15개만 사용 
+        if(records.Count > 15)
+        {
+            records = records.OrderByDescending(r => r.createdAt).Take(15).ToList();
+        }
         foreach (Transform child in content) 
         {
             Destroy(child.gameObject);
