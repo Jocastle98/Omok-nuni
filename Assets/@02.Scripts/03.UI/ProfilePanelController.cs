@@ -37,6 +37,8 @@ public class ProfilePanelController : PopupPanelController
 
     public override void Hide(Action hideDelegate = null)
     {
+        FindObjectOfType<MainButtonAnimation>().ShowAllStone();
+        
         foreach (var panel in mChildPanels)
         {
             if (panel != null)

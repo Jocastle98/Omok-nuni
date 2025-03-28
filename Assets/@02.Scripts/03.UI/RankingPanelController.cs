@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,5 +35,12 @@ public class RankingPanelController : PopupPanelController
     public void OnClickBackButton()
     {
         Hide();
+    }
+    
+    public override void Hide(Action OnPanelControllerHide = null)
+    {
+        FindObjectOfType<MainButtonAnimation>().ShowAllStone();
+
+        base.Hide(OnPanelControllerHide);
     }
 }

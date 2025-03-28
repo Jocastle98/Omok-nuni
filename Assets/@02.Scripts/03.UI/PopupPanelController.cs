@@ -34,9 +34,8 @@ public class PopupPanelController : MonoBehaviour
     /// Panel을 사라지게하는 메서드
     /// </summary>
     /// <param name="OnPanelControllerHide"></param>
-    public virtual void Hide(Action OnPanelControllerHide = null)
+    public virtual void Hide(Action onPanelControllerHide = null)
     {
-        FindObjectOfType<MainButtonAnimation>()?.ShowAllStone();
         // 사라지기 전 초기화
         mBackgroundCanvasGroup.alpha = 1;
         panelRectTransform.localScale = Vector3.one;
@@ -46,7 +45,7 @@ public class PopupPanelController : MonoBehaviour
         panelRectTransform.DOScale(0, 0.3f).SetEase(Ease.InBack).OnComplete(() =>
         {
             // 콜백이 있다면 실행 후 오브젝트 파괴
-            OnPanelControllerHide?.Invoke();
+            onPanelControllerHide?.Invoke();
             Destroy(gameObject);
         });
     }

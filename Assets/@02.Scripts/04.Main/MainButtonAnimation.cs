@@ -34,6 +34,7 @@ public class MainButtonAnimation : MonoBehaviour
     private List<int> occupiedIndexes = new List<int>();
     private List<GameObject> placedStone = new List<GameObject>();
     private int[] miniBoard = new int[9];
+    private bool isAnimationProgress = false;
     
     /// <summary>
     /// 메인메뉴 버튼을 클릭했을 때
@@ -42,6 +43,10 @@ public class MainButtonAnimation : MonoBehaviour
     /// <param name="onClickAction">버튼 애니메이션 후 진행할 액션</param>
     public void StartClickAnimation(int buttonIndex, Action onClickAction)
     {
+        if (isAnimationProgress) return;
+
+        isAnimationProgress = true;
+        
         int ranStartIndex = Random.Range(0, mStartPos.Length);      //처음 새가 생길 위치 정하기 위한 랜덤값
         Vector3 startPos = mStartPos[ranStartIndex].position;       //새의 시작위치
         Vector3 targetPos = mStoneTargets[buttonIndex].position;    //새가 도착할 위치(index를 받아와서 이동)
@@ -85,18 +90,7 @@ public class MainButtonAnimation : MonoBehaviour
             
             if (!isWin)
             {
-                foreach (var stone in placedStone)
-                {
-                    if (stone != null)
-                    {
-                        stone.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => Destroy(stone));
-                    }
-                }
-                placedStone.Clear();
-            
-                occupiedIndexes.Clear();
-            
-                Array.Clear(miniBoard, 0, miniBoard.Length);
+                ResetStoneState();
             }
             
             
@@ -151,6 +145,8 @@ public class MainButtonAnimation : MonoBehaviour
             {
                 mStoneTargets[i].GetComponent<Image>().sprite = isBlackTurn ? blackStoneSprite : whiteStoneSprite;
             }
+
+            isAnimationProgress = false;
         });
     }
 
@@ -172,6 +168,30 @@ public class MainButtonAnimation : MonoBehaviour
         foreach (var stone in placedStone)
         {
             if(stone != null) stone.SetActive(true);
+        }
+    }
+
+    public void ResetStoneState()
+    {
+        // 놓인 돌들 제거
+        foreach (var stone in placedStone)
+        {
+            if (stone != null)
+            {
+                stone.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => Destroy(stone));
+            }
+        }
+        Array.Clear(miniBoard, 0, miniBoard.Length);
+        HideAllStone();
+        
+        placedStone.Clear();
+        occupiedIndexes.Clear();
+
+        isBlackTurn = true;
+
+        for (int i = 0; i < mStoneTargets.Length; i++)
+        {
+            mStoneTargets[i].GetComponent<Image>().sprite = blackStoneSprite;
         }
     }
 
@@ -199,25 +219,13 @@ public class MainButtonAnimation : MonoBehaviour
             {
                 bool isBlackWin = miniBoard[a] == 1;
                 
-                Array.Clear(miniBoard, 0, miniBoard.Length);
-            
-                // 놓인 돌들 제거
-                foreach (var stone in placedStone)
-                {
-                    if (stone != null)
-                    {
-                        stone.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => Destroy(stone));
-                    }
-                }
-                placedStone.Clear();
-                occupiedIndexes.Clear();
-                
+                ResetStoneState();
                 
                 UniTask.Void(async () =>
                 {
                     await NetworkManager.Instance.AddCoin(50, i =>
                     {
-                        GameManager.Instance.OpenConfirmPanel($"?\n{(isBlackWin? "흑":"백")}이 이겼네요?\n50코인이라도...", null, false);
+                        GameManager.Instance.OpenConfirmPanel($"?\n{(isBlackWin? "흑":"백")}이 이겼네요?\n50코인이라도...", ()=>AudioManager.Instance.PlaySfxSound(5), false);
                         GameManager.Instance.OnMainPanelUpdate?.Invoke();
                     }, () =>
                     {

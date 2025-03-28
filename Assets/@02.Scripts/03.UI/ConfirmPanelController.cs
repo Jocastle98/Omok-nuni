@@ -28,7 +28,7 @@ public class ConfirmPanelController : PopupPanelController
         this.OnCancelButtonClick = onCancelButtonClick;
         this.cancelButton.SetActive(activeCancelButton);
     }
-
+    
     /// <summary>
     /// Confirm Button 클릭시 호출되는 메서드
     /// OnConfirmButtonClick에 구독된 콜백이 실행됨
