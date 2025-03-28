@@ -132,35 +132,27 @@ public class ScorePanelController : PopupPanelController
 
     public void OnClickRematchButton()
     {
-        if (GameManager.Instance.OnRecieveRematch)
+        Hide(() =>
         {
-            return;
-        }
-        else
-        {
-            Hide(() =>
+            UniTask.Void(async () =>
             {
-                UniTask.Void(async () =>
-                {
-                    await NetworkManager.Instance.ConsumeCoin(Constants.ConsumeCoin, 
-                        successCallback: (remainingCoins) => 
+                GameManager.Instance.OnRematchGame?.Invoke();
+                
+                await NetworkManager.Instance.ConsumeCoin(Constants.ConsumeCoin, 
+                    successCallback: (remainingCoins) => 
+                    {
+                        GameManager.Instance.OpenConfirmPanel($"남은 코인은 {remainingCoins} 입니다.",
+                            () => { }, false);
+                    },
+                    failureCallback: () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("코인이 부족합니다.", () =>
                         {
-                            GameManager.Instance.OpenConfirmPanel($"남은 코인은 {remainingCoins} 입니다.",
-                                () =>
-                                {
-                                    GameManager.Instance.OnRematchGame?.Invoke();
-                                }, false);
-                        },
-                        failureCallback: () =>
-                        {
-                            GameManager.Instance.OpenConfirmPanel("코인이 부족합니다.", () =>
-                            {
-                                GameManager.Instance.ChangeToMainScene();
-                            }, false);
-                        });
-                });
+                            GameManager.Instance.ChangeToMainScene();
+                        }, false);
+                    });
             });
-        }
+        });
     }
 
     private void Hide()

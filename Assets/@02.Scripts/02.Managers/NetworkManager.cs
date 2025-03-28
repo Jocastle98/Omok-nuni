@@ -174,6 +174,81 @@ public class NetworkManager : Singleton<NetworkManager>
         }
     }
 
+    public async UniTask AutoSignin(Action successCallback, Action failureCallback)
+    {
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/autosignin", UnityWebRequest.kHttpVerbGET))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+           
+            string sid = PlayerPrefs.GetString("sid", "");
+            if (!string.IsNullOrEmpty(sid))
+            {
+                www.SetRequestHeader("Cookie", sid);
+            }
+            
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("Exception caught: " + ex.Message);
+                if (www.responseCode == 403)
+                {
+                    GameManager.Instance.OpenConfirmPanel("로그인 기록이 없습니다.\n로그인이 필요합니다.", () =>
+                    {
+                        failureCallback?.Invoke();
+                    });
+                }
+                return;
+            }
+            
+            var result = www.downloadHandler.text;
+            var userInfo = JsonUtility.FromJson<UserInfoResult>(result);
+               
+            GameManager.Instance.OpenConfirmPanel($"{userInfo.nickname}: \n자동 로그인 성공", () =>
+            {
+                successCallback?.Invoke();
+            }, false);
+        }
+    }
+
+    public async UniTask Signout(Action successCallback, Action failureCallback)
+    {
+        using (UnityWebRequest www =
+               new UnityWebRequest(Constants.ServerURL + "/users/signout", UnityWebRequest.kHttpVerbPOST))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            
+            string sid = PlayerPrefs.GetString("sid", "");
+            if (!string.IsNullOrEmpty(sid))
+            {
+                www.SetRequestHeader("Cookie", sid);
+            }
+            
+            try
+            {
+                await www.SendWebRequest().ToUniTask();
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("Exception caught: " + ex.Message);
+                GameManager.Instance.OpenConfirmPanel($"로그아웃에 실패하였습니다.: {www.error}.", () =>
+                {
+                    failureCallback?.Invoke();
+                }, false);
+                return;
+            }
+            
+            PlayerPrefs.DeleteKey("sid");
+            GameManager.Instance.OpenConfirmPanel("로그아웃 하였습니다.", () =>
+            {
+                successCallback?.Invoke();
+            }, false);
+        }
+    }
+    
     // 비동기 방식
     public async UniTask<UserInfoResult> GetUserInfo(Action successCallback, Action failureCallback)
     {
