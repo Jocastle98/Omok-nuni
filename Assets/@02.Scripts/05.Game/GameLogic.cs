@@ -14,6 +14,7 @@ public class GameLogic : IDisposable
     public GamePanelController gamePanelController;
     
     public int currentSelectedCell = Int32.MaxValue;
+    public BoardCell currentplacedCell;
     
     private BasePlayerState mPlayer_Black;
     private BasePlayerState mPlayer_White;
@@ -549,7 +550,10 @@ public class GameLogic : IDisposable
         if (SetableStone(playerType, Y, X))
         {
             boardCellController.cells[Y, X].SetMark(playerType);
+            boardCellController.cells[Y, X].PlacedMark(true);
             boardCellController.cells[Y, X].playerType = playerType;
+            currentplacedCell?.PlacedMark(false);
+            currentplacedCell = boardCellController.cells[Y, X];
             
             //기보에 추가
             mMoveHistory.Add((Y, X, playerType));
