@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace UserDataStructs
         public string username;
         public string nickname;
         public string password;
+        public int profileimageindex;
     }
     
     public struct SigninData
@@ -32,6 +34,7 @@ namespace UserDataStructs
 
     public struct UserInfoResult
     {
+        public string userId;
         public string username;
         public string nickname;
         public int profileimageindex;
@@ -53,5 +56,35 @@ namespace UserDataStructs
         {
             this.profileimageindex = profileimageindex;
         }
+    }
+
+    [Serializable]
+    public struct UserRankProfileResult
+    {
+        public string username;
+        public string nickname;
+        public int rank;
+        public int wincount;
+        public int losecount;
+        public int profileimageindex;
+    }
+    
+    [Serializable]
+    public struct UsersRankInfo
+    {
+        public UserRankProfileResult[] userrankprofiles;
+        public UserRankProfileResult playerrankprofile;
+    }
+
+    public struct CoinData
+    {
+        public int amount;
+    }
+
+    public struct CoinResult
+    {
+        public bool success;
+        public int coin;
+        public string message;
     }
 }

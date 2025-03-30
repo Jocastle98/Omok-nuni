@@ -13,7 +13,8 @@ public class Enums
         JoinRoom,       // 생성된 방에 참여
         StartGame,      // 생성된 방에 다른 유저가 참여해서 게임 시작
         ExitRoom,       // 자신이 방을 빠져 나왔을 때
-        EndGame         // 상대방이 접속을 끊거나 방을 나갔을 때
+        EndGame,         // 상대방이 접속을 끊거나 방을 나갔을 때
+        RestartRoom,
     };
     
     public enum EPlayerType 
@@ -27,8 +28,8 @@ public class Enums
     {
         PassAndPlay,    // 1개 폰 2인 플레이
         SinglePlay,     // 싱글 플레이
-        DualPlay,
-        MultiPlay       // 멀티 플레이
+        MultiPlay,       // 멀티 플레이
+        PassAndPlayFade,
     }
 
     public enum EGameResult
@@ -60,6 +61,39 @@ public class Enums
     {
         Turn_Black,
         Turn_White,
-        Record
+    }
+
+    public enum EGameImage
+    {
+        BlackStone,
+        WhiteStone,
+        Selector,
+        XMarker,
+        LastPosMark,
+        None,
+    }
+
+    public enum EEasterEggMode
+    {
+        None,
+        FadeStone,
+    }
+}
+
+namespace AudioEnums
+{
+    public enum ESfxType
+    {
+        //Bgm
+        IntroBGM,
+        GameBGM,
+        
+        //SFX
+        Tic,
+        Bird,
+        Click,
+        Coin,
+        Coins,
+        BranchRustle
     }
 }

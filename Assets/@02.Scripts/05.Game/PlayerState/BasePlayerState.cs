@@ -5,6 +5,13 @@ using UnityEngine;
 public abstract class BasePlayerState
 {
     public Enums.EPlayerType playerType;
+    public Enums.EEasterEggMode easterEggMode;
+    
+    public delegate void OnForbbidenMark(bool onMark);
+    public OnForbbidenMark onForbbidenMark;
+    
+    public delegate void OnMode(BasePlayerState player);
+    public OnMode onMode;
 
     public abstract void OnEnter(GameLogic gameLogic);
     public abstract void OnExit(GameLogic gameLogic);
@@ -14,10 +21,16 @@ public abstract class BasePlayerState
     {
         if (gameLogic.SetStone(player, Y, X))
         {
+
+            if (easterEggMode == Enums.EEasterEggMode.FadeStone)
+            {
+                onMode += gameLogic.boardCellController.cells[Y,X].FadeMode;
+            }
+            
             bool gameResult = gameLogic.GameResult(player, Y, X);
             if (gameResult)
             {
-                gameLogic.EndGame();
+                gameLogic.EndGame(player);
             }
             else
             {

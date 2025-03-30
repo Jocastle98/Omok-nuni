@@ -1,6 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using UserDataStructs;
 
 /// <summary>
 /// 메인 화면에서 UI 버튼 입력을 처리하는 컨트롤러.
@@ -8,34 +12,75 @@ using UnityEngine;
 /// </summary>
 public class MainPanelController : MonoBehaviour
 {
+    [SerializeField] private Image profileImage;
+    [SerializeField] private TMP_Text userInfoText;
+    [SerializeField] private TMP_Text coinText;
+    private MainButtonAnimation mainButtonAnimation;
+
+    private void Awake()
+    {
+        mainButtonAnimation = GetComponent<MainButtonAnimation>();
+    }
+
+    public async void SetProfileInfo()
+    {
+        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
+
+        profileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+        userInfoText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+        coinText.text = $"코인: {userInfo.coin}";
+    }
+    
     public void OnClickStartButton()
     {
-        GameManager.Instance.OpenGameTypeSelectPanel();
+        mainButtonAnimation.StartClickAnimation(0, ()=>
+        {
+            mainButtonAnimation.HideAllStone();
+            GameManager.Instance.OpenGameTypeSelectPanel();
+        });
     }
     
     public void OnClickRecordButton()
     {
-        GameManager.Instance.OpenRecordPanel();
+        mainButtonAnimation.StartClickAnimation(1, ()=>
+        {
+            mainButtonAnimation.HideAllStone();
+            GameManager.Instance.OpenRecordPanel();
+        });
     }
 
     public void OnClickLeaderboardButton()
     {
-        GameManager.Instance.OpenLeaderboardPanel();
+        mainButtonAnimation.StartClickAnimation(2, ()=>
+        {
+            mainButtonAnimation.HideAllStone();
+            GameManager.Instance.OpenLeaderboardPanel();
+        });
     }
     public void OnClickShopButton()
     {
-        GameManager.Instance.OpenShopPanel();
+        mainButtonAnimation.StartClickAnimation(3, ()=>
+        {
+            mainButtonAnimation.HideAllStone();
+            GameManager.Instance.OpenShopPanel();
+        });
     }
 
     public void OnClickSettingsButton()
     {
-        GameManager.Instance.OpenSettingsPanel();
+        mainButtonAnimation.StartClickAnimation(4, ()=>
+        {
+            mainButtonAnimation.HideAllStone();
+            GameManager.Instance.OpenSettingsPanel();
+        });
     }
 
     public void OnClickProfileButton()
     {
+        mainButtonAnimation.HideAllStone();
         GameManager.Instance.OpenProfilePanel();
     }
     
     // 로그아웃 클릭 시 호출되는 메서드 구현
+    
 }

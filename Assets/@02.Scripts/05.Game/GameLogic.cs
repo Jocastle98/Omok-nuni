@@ -2,14 +2,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using UserDataStructs;
 
 public class GameLogic : IDisposable
 {
     public BoardCellController boardCellController;
     public GamePanelController gamePanelController;
-
+    
+    public int currentSelectedCell = Int32.MaxValue;
+    public BoardCell currentplacedCell;
+    
     private BasePlayerState mPlayer_Black;
     private BasePlayerState mPlayer_White;
     private BasePlayerState mCurrentPlayer;
@@ -17,74 +23,190 @@ public class GameLogic : IDisposable
     private MultiplayManager mMultiplayManager;
     private string mRoomId;
     
+    //승점 패널
+    public Enums.EPlayerType localPlayerType = Enums.EPlayerType.Player_Black;
+    public bool isGameOver = false;
+    private Action<Enums.EPlayerType> OnMyGameProfileUpdate;
+    private Action<UsersInfoData> OnOpponentGameProfileUpdate;
+    
+    //기보 리스트
+    private List<(int y, int x, Enums.EPlayerType stone)> mMoveHistory = new List<(int, int, Enums.EPlayerType)>();
+    //현재 플레이 모드
+    private Enums.EGameType mPlayMode;
+    // 상대방 정보를 저장할 필드
+    private UsersInfoData mOpponentInfo;
+    
+    private bool mbIsGameStarted = false;
+    
     /// <summary>
     /// 게임 시작 메서드
     /// </summary>
     /// <param name="boardCellController"></param>
     /// <param name="playMode"></param>
-    public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController,Enums.EGameType playMode)
+    public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController, Enums.EGameType playMode, 
+        Action<Enums.EPlayerType> onMyGameProfileUpdate, Action<UsersInfoData> onOpponentGameProfileUpdate)
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;
         
-        switch (playMode)
+        GameManager.Instance.bIsMultiplay = false;
+        GameManager.Instance.bIsSingleplay = false;
+        GameManager.Instance.bIsTryRematch = false;
+        
+        OnMyGameProfileUpdate = onMyGameProfileUpdate;
+        OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
+        GameManagerCallbackHandler();
+        
+        //전달받은 플레이모드
+        mPlayMode = playMode;
+        switch (mPlayMode)
         {
             case Enums.EGameType.PassAndPlay:
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new PlayerState(false);
                 
+                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
                 break;
             case Enums.EGameType.SinglePlay:
+                GameManager.Instance.bIsSingleplay = true;
+                
                 mPlayer_Black = new PlayerState(true);
-                // mPlayer_White = new AIState(false)
+                mPlayer_White = new AIState(false);
 
-                SetState(mPlayer_Black);
+                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
+                
+                NetworkManager.Instance.GetUserInfo(() =>
+                {
+                }, () =>
+                {
+                    //랭크 로드 실패시 기본난이도 중간으로 설정
+                    MinimaxAIController.SetLevel(Enums.EDifficultyLevel.Medium);
+                    Debug.Log("난이도 기본 중 설정");
+                    SetState(mPlayer_Black);
+                }).ContinueWith(userInfo =>
+                {
+                    if (string.IsNullOrEmpty(userInfo.nickname) && userInfo.rank == 0) return;
+                    int rank = userInfo.rank;
+                    Enums.EDifficultyLevel level;
+                    if (rank >= 10 && rank <= 18)
+                    {
+                        level = Enums.EDifficultyLevel.Easy;
+                        Debug.Log("난이도 하 설정");
+                    }
+                    else if (rank >= 5 && rank <= 9)
+                    {
+                        level = Enums.EDifficultyLevel.Medium;
+                        Debug.Log("난이도 중 설정");
+                    }
+                    else
+                    {
+                        level = Enums.EDifficultyLevel.Hard;
+                        Debug.Log("난이도 상 설정");
+                    }
+
+                    MinimaxAIController.SetLevel(level);
+                    SetState(mPlayer_Black);
+                });
+                
                 break;
             case Enums.EGameType.MultiPlay:
-                mMultiplayManager = new MultiplayManager((state, roomId) =>
+                mMultiplayManager =  new MultiplayManager((state, roomId) =>
                 {
+                    GameManager.Instance.bIsMultiplay = true;
+                    
                     mRoomId = roomId;
+                    MultiplayCallbackHandler();
+                    
                     switch (state)
                     {
                         case Enums.EMultiplayManagerState.CreateRoom:
                             Debug.Log("## Create Room");
                             
-                            // todo: 대기화면 표시(제한시간 동안 급수에 맞는 상대 매칭 실패 시 싱글 플레이로 모드 전환)
                             WaitingMatch();
                             break;
                         case Enums.EMultiplayManagerState.JoinRoom:
                             Debug.Log("## Join Room");
-                            mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
-                            mPlayer_White = new PlayerState(false, mMultiplayManager, roomId);
                             
-                            SetState(mPlayer_Black);
+                            ResetGame(Enums.EMultiplayManagerState.JoinRoom);
                             break;
                         case Enums.EMultiplayManagerState.StartGame:
                             Debug.Log("## Start Game");
-                            GameManager.Instance.SetIsStartGame(true);
                             
-                            mPlayer_Black = new PlayerState(true, mMultiplayManager, roomId);
-                            mPlayer_White = new MultiplayerState(false, mMultiplayManager);
-                            
-                            SetState(mPlayer_Black);
+                            ResetGame(Enums.EMultiplayManagerState.StartGame);
                             break;
                         case Enums.EMultiplayManagerState.ExitRoom:
                             Debug.Log("## Exit Room");
-                            // todo: 퇴장 처리
+                            
                             break;
                         case Enums.EMultiplayManagerState.EndGame:
                             Debug.Log("## End Game");
-                            // todo: 게임 종료 처리
+
+                            if (!GameManager.Instance.bIsTryRematch)
+                            {
+                                UnityThread.executeInUpdate(() =>
+                                {
+                                    GameManager.Instance.OpenConfirmPanel("상대방이 퇴장하였습니다. \n메인화면으로 돌아갑니다.", () =>
+                                    { 
+                                        GameManager.Instance.ChangeToMainScene();
+                                    }, false);
+                                });
+                            }
+                            break;
+                        case Enums.EMultiplayManagerState.RestartRoom:
+                            Debug.Log("## Restart Room");
+                            
                             break;
                     }
                 });
+                 
+                // 나의 급수 가져오기
+                UserInfoResult myInfo = NetworkManager.Instance.GetUserInfoSync(() => {}, () => {});
+                int myRank = myInfo.rank;
+
+                // 소켓연결 성공 시 0.1초후 서버로 나의급수 전송
+                UniTask.Delay(100).ContinueWith(() => {
+                    mMultiplayManager.SendMyRank(myRank);
+                });
+                break;
+            case Enums.EGameType.PassAndPlayFade:
+                mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone);
+                mPlayer_White = new PlayerState(false,Enums.EEasterEggMode.FadeStone);
+                
+                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
+                SetState(mPlayer_Black);
                 break;
         }
     }
+
+    #region CallbackHandler
+    
+    private void GameManagerCallbackHandler()
+    {
+        GameManager.Instance.OnRematchGame -= SendRematchGameRequest;
+        GameManager.Instance.OnRematchGame += SendRematchGameRequest;
+        GameManager.Instance.OnSendForfeit -= SendForfeit;
+        GameManager.Instance.OnSendForfeit += SendForfeit;
+        GameManager.Instance.OnForfeitWin -= ForfeitWin;
+        GameManager.Instance.OnForfeitWin += ForfeitWin;
+        GameManager.Instance.OnForfeitLose -= ForfeitLose;
+        GameManager.Instance.OnForfeitLose += ForfeitLose;
+    }
+    
+    private void MultiplayCallbackHandler()
+    {
+        mMultiplayManager.OnOpponentProfileUpdate -= OnOpponentGameProfileUpdate;
+        mMultiplayManager.OnOpponentProfileUpdate += OnOpponentGameProfileUpdate;
+        mMultiplayManager.OnOpponentProfileUpdate -= OnOpponentProfileReceived;
+        mMultiplayManager.OnOpponentProfileUpdate += OnOpponentProfileReceived;
+        mMultiplayManager.OnRematchRequestReceived -= RematchGameRequestReceived;
+        mMultiplayManager.OnRematchRequestReceived += RematchGameRequestReceived;
+    }
+    
+    #endregion
     
     /// <summary>
-    /// 턴을 변경하는 메서드
+    /// 턴을 변경하면 메서드
     /// </summary>
     /// <param name="player"></param>
     public void NextTurn(Enums.EPlayerType player)
@@ -103,8 +225,68 @@ public class GameLogic : IDisposable
     /// <summary>
     /// 게임 종료 처리를 해주는 메서드
     /// </summary>
-    public void EndGame()
+    public void EndGame(Enums.EPlayerType winnerType)
     {
+        if (isGameOver) return; 
+        isGameOver = true;
+        mbIsGameStarted = false;
+        
+        // 서버에 기보 기록 전송, recordID 는 날짜 시간
+        // TODO: recordID를 플레이어 이름과 상대플레이어로 변경
+        string recordId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+        if (mPlayMode == Enums.EGameType.MultiPlay)
+        {
+            var myInfo = NetworkManager.Instance.GetUserInfoSync(() => {}, () => {});
+            string myUserId = myInfo.userId;
+
+            
+            if (localPlayerType == Enums.EPlayerType.Player_Black)
+            {
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddOmokRecord(
+                        recordId,
+                        blackUserId: myUserId,
+                        whiteUserId: mOpponentInfo.userId, 
+                        mMoveHistory,
+                        () => Debug.Log("기보 저장 성공"),
+                        () => Debug.Log("기보 저장 실패")
+                    );
+                });
+                
+            }
+            else
+            {
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddOmokRecord(
+                        recordId,
+                        blackUserId: mOpponentInfo.userId, 
+                        whiteUserId: myUserId,
+                        mMoveHistory,
+                        () => Debug.Log("기보 저장 성공"),
+                        () => Debug.Log("기보 저장 실패")
+                    );
+                });
+            }
+        }
+        else
+        {
+            var myInfo = NetworkManager.Instance.GetUserInfoSync(() => {}, () => {});
+            // 패스앤플레이 / AI 모드는 흑백 모두 나로설정
+
+            UniTask.Void(async () =>
+            {
+                await NetworkManager.Instance.AddOmokRecord(
+                        recordId,
+                        blackUserId: myInfo.userId,
+                        whiteUserId: myInfo.userId,
+                        mMoveHistory
+                        );
+            });
+        }
+
         SetState(null);
         mPlayer_Black = null;
         mPlayer_White = null;
@@ -112,13 +294,23 @@ public class GameLogic : IDisposable
         gamePanelController.StopClock();
         gamePanelController.InitClock();
         
-        // 점수 확인 패널 호출: 멀티플레이이거나 AI플레이일 경우 -> 승자 점수 확인, 패자 점수 확인
-        if (mMultiplayManager != null /* && AI */)
+        if (winnerType == Enums.EPlayerType.None)
         {
-            GameManager.Instance.OpenScoreConfirmationPanel();
+            // 무승부
+            Debug.Log("무승부!");
         }
-        //점수 랭킹 업데이트
-        //씬 혹은 게임화면 위치 변경
+        else if (winnerType == localPlayerType)
+        {
+            // 내가 이긴 경우
+            Debug.Log("내가 승리했습니다!");
+            GameManager.Instance.WinGame();
+        }
+        else
+        {
+            // 상대가 이긴 경우 => 나는 패배
+            Debug.Log("상대가 승리");
+            GameManager.Instance.LoseGame();
+        }
     }
 
     /// <summary>
@@ -127,23 +319,14 @@ public class GameLogic : IDisposable
     /// <param name="newState"></param>
     public void SetState(BasePlayerState newState)
     {
+        gamePanelController.InitClock();
+        
         mCurrentPlayer?.OnExit(this);
         mCurrentPlayer = newState;
         mCurrentPlayer?.OnEnter(this);
         
         TurnUIUpdate();
         gamePanelController.StartClock();
-    }
-
-    /// <summary>
-    /// 매칭 대기 시간을 알려주는 팝업창을 호출하는 메서드
-    /// </summary>
-    private void WaitingMatch()
-    {
-        UnityThread.executeInUpdate(() =>
-        {
-            GameManager.Instance.OpenWaitingPanel();
-        });
     }
     
     /// <summary>
@@ -181,6 +364,182 @@ public class GameLogic : IDisposable
     }
     
     /// <summary>
+    /// 매칭 대기 시간을 알려주는 팝업창을 호출하는 메서드
+    /// </summary>
+    private void WaitingMatch()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenWaitingPanel();
+        });
+    }
+    
+    private void MyGameProfileUpdate(Enums.EPlayerType playerType)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            OnMyGameProfileUpdate?.Invoke(playerType);
+        });
+    }
+    
+    private void SendOpponentGameProfile(string roomId, Enums.EPlayerType playerType)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            mMultiplayManager.SendOpponentProfile(roomId, SetMyUserInfo(roomId, playerType));
+        });
+    }
+
+    private UsersInfoData SetMyUserInfo(string roomId, Enums.EPlayerType playerType)
+    {
+        // 네트워크에서 실제 사용자 정보를 받아옵니다
+        UserInfoResult userInfo = NetworkManager.Instance.GetUserInfoSync(() => { }, () => { });
+
+        // 실제 데이터를 기반으로 사용자 정보를 설정
+        UsersInfoData usersInfoData = new UsersInfoData
+        {
+            roomId = roomId,
+            //userId도 함께 넘겨줌 
+            userId = userInfo.userId,
+            nickname = userInfo.nickname,
+            profileimageindex = userInfo.profileimageindex,
+            rank = userInfo.rank,
+            playerType = playerType
+        };
+
+        return usersInfoData;
+    }
+    
+    /// <summary>
+    /// 상대 프로필 정보 수신 시 GameLogic에서도 보관
+    /// </summary>
+    /// <param name="oppoData"></param>
+    private void OnOpponentProfileReceived(UsersInfoData oppoData)
+    {
+        mOpponentInfo = oppoData;
+        Debug.Log($"[GameLogic] Opponent userID={mOpponentInfo.userId}, nickname={mOpponentInfo.nickname}");
+
+        OnOpponentGameProfileUpdate?.Invoke(oppoData);
+    }
+    
+    private void ResetGame(Enums.EMultiplayManagerState multiplayManagerState)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            if (multiplayManagerState == Enums.EMultiplayManagerState.JoinRoom)
+            {
+                if (mbIsGameStarted) return; // 이미 시작된 경우 중복 호출 방지
+                mbIsGameStarted = true;
+                
+                gamePanelController.StartClock();
+                mCurrentPlayer = mPlayer_White;
+
+                mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
+                mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId);
+                
+                GameManager.Instance.OnCloseScorePanel?.Invoke();
+
+                // 방들어온 플레이어는 백
+                localPlayerType = mPlayer_White.playerType;
+                MyGameProfileUpdate(Enums.EPlayerType.Player_White);
+                SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_White);
+                SetState(mPlayer_Black);
+            }
+            else if (multiplayManagerState == Enums.EMultiplayManagerState.StartGame)
+            {
+                if (mbIsGameStarted) return; // 다시 시작되지 않도록 방지
+                mbIsGameStarted = true;
+                
+                gamePanelController.StartClock();
+                mCurrentPlayer = mPlayer_Black;
+
+                mPlayer_Black = new PlayerState(true, mMultiplayManager, mRoomId);
+                mPlayer_White = new MultiplayerState(false, mMultiplayManager);
+
+                GameManager.Instance.bIsStartGame = true;
+
+                // 첫 수 두는 플레이어 흑
+                localPlayerType = mPlayer_Black.playerType;
+                MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
+                SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_Black);
+                SetState(mPlayer_Black);
+            }
+
+            GameManager.Instance.OpenConfirmPanel("새로운 대국이 시작되었습니다.", () =>
+            {
+                GameManager.Instance.bIsTryRematch = false;
+                isGameOver = false;
+                currentSelectedCell = Int32.MaxValue;
+
+                AudioManager.Instance.PlayGameBgm();
+
+                // 보드 초기화
+                boardCellController.InitBoard();
+
+                // UI 초기화
+                gamePanelController.StartClock();
+                gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
+
+                GameManager.Instance.OnCloseScorePanel = null;
+
+                OnMyGameProfileUpdate -= gamePanelController.SetMyProfile;
+                OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
+
+                OnOpponentGameProfileUpdate -= gamePanelController.SetOpponentProfile;
+                OnOpponentGameProfileUpdate += gamePanelController.SetOpponentProfile;
+            }, false);
+        });
+    }
+
+    private void SendRematchGameRequest()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.bIsTryRematch = true;
+            mMultiplayManager?.SendRematchRequest(mRoomId);
+        });
+    }
+
+    private void RematchGameRequestReceived()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenConfirmPanel("재대국 신청을 받았습니다. \n수락하시겠습니까?", () =>
+            {
+                mMultiplayManager?.AcceptRematch(mRoomId);
+            }, true, () =>
+            {
+                mMultiplayManager?.RejectRematch();
+            });
+        });
+    }
+    
+    private void SendForfeit()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            mMultiplayManager?.SendForfeitRequest(mRoomId);
+        });
+    }
+    
+    private void ForfeitWin()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            EndGame(localPlayerType);
+        });
+    }
+
+    private void ForfeitLose()
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            EndGame(localPlayerType == Enums.EPlayerType.Player_Black 
+                ? Enums.EPlayerType.Player_White : Enums.EPlayerType.Player_Black);
+        });
+    }
+    
+    /// <summary>
     /// (Y, X) 좌표에 해당 플레이어의 돌을 놓는 메서드
     /// </summary>
     /// <param name="playerType"></param>
@@ -192,7 +551,13 @@ public class GameLogic : IDisposable
         if (SetableStone(playerType, Y, X))
         {
             boardCellController.cells[Y, X].SetMark(playerType);
+            boardCellController.cells[Y, X].PlacedMark(true);
             boardCellController.cells[Y, X].playerType = playerType;
+            currentplacedCell?.PlacedMark(false);
+            currentplacedCell = boardCellController.cells[Y, X];
+            
+            //기보에 추가
+            mMoveHistory.Add((Y, X, playerType));
             
             BoardCell[][] lists = MakeLists(boardCellController.size,Y,X,4);
             
@@ -202,8 +567,8 @@ public class GameLogic : IDisposable
                 {
                     //금수 최신화
                     if(lists[i][k] == null) continue;
-                    int x = lists[i][k].blockIndex % (boardCellController.size + 1);
-                    int y = lists[i][k].blockIndex / (boardCellController.size + 1);
+                    int x = lists[i][k].cellIndex % (boardCellController.size + 1);
+                    int y = lists[i][k].cellIndex / (boardCellController.size + 1);
                     CheckCellInRule(y,x);
                 }
             }
@@ -213,6 +578,22 @@ public class GameLogic : IDisposable
             GameManager.Instance.OpenConfirmPanel("그 곳에 둘 수 없습니다.", null, false);
             return false;
         }
+        
+        //NextTurn() 중복 호출 문제로 주석처리 
+        /*//승점 패널
+        bool isWin = GameResult(playerType, Y, X);
+        if (isWin)
+        {
+            // 승리 플레이어 엔드게임
+            EndGame(playerType);
+        }
+        else
+        {
+            // 5목 아니면 다음 턴
+            NextTurn(playerType);
+        }
+        */
+        
 
         return true;
     }
@@ -236,7 +617,12 @@ public class GameLogic : IDisposable
         
         return true;
     }
-
+    
+    /// <summary>
+    /// X,Y좌표를 기준으로 firstScanRange * 2 의 길이 만큼 4방향으로 금수가 있는지 확인하는 메서드 
+    /// </summary>
+    /// <param name="Y"></param>
+    /// <param name="X"></param>
     public void CheckCellInRule(int Y, int X)
     {
         int firstScanRange = 5;
@@ -259,7 +645,7 @@ public class GameLogic : IDisposable
         {
             if (result6Bools[i] != null)
             {
-                result6Bools[i].IsForbidden = true;
+                result6Bools[i].OnForbbiden(true, mPlayer_Black);
                 return;
             }
 
@@ -267,12 +653,12 @@ public class GameLogic : IDisposable
             {
                 if (!FakeForbidden(result44Cell[i],lists[i],lists[i]))
                 {
-                    result44Cell[i].IsForbidden = true;
+                    result44Cell[i].OnForbbiden(true, mPlayer_Black);
                     return;
                 }
                 else
                 {
-                    result44Cell[i].IsForbidden = false;
+                    result44Cell[i].OnForbbiden(false, mPlayer_Black);
                 }
             }
 
@@ -286,12 +672,12 @@ public class GameLogic : IDisposable
                     {
                         if (!FakeForbidden(cell,lists[i],lists[k]))
                         {
-                            cell.IsForbidden = true;
+                            cell.OnForbbiden(true, mPlayer_Black);
                             return;
                         }
                         else
                         {
-                            cell.IsForbidden = false;
+                            cell.OnForbbiden(false, mPlayer_Black);
                         }
                     }
                 }
@@ -304,29 +690,35 @@ public class GameLogic : IDisposable
                     {
                         if (!FakeForbidden(cell,lists[i],lists[k]))
                         {
-                            cell.IsForbidden = true;
+                            cell.OnForbbiden(true, mPlayer_Black);
                             return;
                         }
                         else
                         {
-                            cell.IsForbidden = false;
+                            cell.OnForbbiden(false, mPlayer_Black);
                         }
                     }
                 }
             }
         }
 
-        boardCellController.cells[Y, X].IsForbidden = false;
+        boardCellController.cells[Y, X].OnForbbiden(false, mPlayer_Black);
     }
     
     public bool ForbiddenSelf(BoardCell cell)
     {
-        int X = cell.blockIndex % (boardCellController.size + 1);
-        int Y = cell.blockIndex / (boardCellController.size + 1);
+        int X = cell.cellIndex % (boardCellController.size + 1);
+        int Y = cell.cellIndex / (boardCellController.size + 1);
         return ForbiddenSelf(Y, X);
     }
     
-    //자신의 좌표가 금수라면 false를 반환하는 목적으로 만든 함수
+    /// <summary>
+    /// 자신의 위치가 금수인지 확인하는 메서드
+    /// 금수라면 false, 금수가 아니라면 true
+    /// </summary>
+    /// <param name="Y"></param>
+    /// <param name="X"></param>
+    /// <returns></returns>
     public bool ForbiddenSelf(int Y, int X)
     {
         int firstScanRange = 5;
@@ -392,9 +784,16 @@ public class GameLogic : IDisposable
         return true;
     }
 
-    //거짓금수
-    //금수가 될 위치 놓았을 때 금수가 되는 배열에 새로운 금수가 있다면 거짓금수
-    //false == 금수 , true == 거짓금수
+    
+    /// <summary>
+    ///거짓금수를 확인하는 메서드
+    ///금수가 될 위치 놓았을 때 자신의 위치에서, 자신이 금수간 된 배열의 2칸 이내에 새로운 금수가 있다면 거짓금수
+    ///false == 금수 , true == 거짓금수
+    /// </summary>
+    /// <param name="cell"></param>
+    /// <param name="firstList"></param>
+    /// <param name="secondList"></param>
+    /// <returns></returns>
     public bool FakeForbidden(BoardCell cell, BoardCell[] firstList, BoardCell[] secondList)
     {
         //첫번째 금수가 되는 칸
@@ -454,7 +853,12 @@ public class GameLogic : IDisposable
         return false;
     }
 
-    //렌주룰 (33 44 룰)
+    /// <summary>
+    /// 렌주룰
+    /// 매개변수로 받은 배열의 모든 칸에 금수 체크를 하고 리스트를 반환하는 메서드
+    /// </summary>
+    /// <param name="list"></param>
+    /// <returns></returns>
     public (List<BoardCell>, List<BoardCell>, BoardCell result44, BoardCell rule6) RenjuRule(BoardCell[] list)
     {
         //33이 될 수 있는 최대길이는 4이다
@@ -678,13 +1082,14 @@ public class GameLogic : IDisposable
         return false;
     }
 
-    public BoardCell[][] MakeLists(int boardSize, BoardCell cell, int checkLength)
-    {
-        int X = cell.blockIndex % (boardSize + 1);
-        int Y = cell.blockIndex / (boardSize + 1);
-        return MakeLists(boardSize, Y, X, checkLength);
-    }
-
+    /// <summary>
+    /// 받은 좌표를 중심으로 전방향으로 리스트를 만들고 반환하는 메서드
+    /// </summary>
+    /// <param name="boardSize"></param>
+    /// <param name="Y"></param>
+    /// <param name="X"></param>
+    /// <param name="checkLenght"></param>
+    /// <returns></returns>
     public BoardCell[][] MakeLists(int boardSize,int Y, int X,int checkLenght)
     {
         int endOfLeft = checkLenght * -1;
@@ -730,6 +1135,22 @@ public class GameLogic : IDisposable
         }
 
         return lists;
+    }
+
+    public Enums.EPlayerType[,] GetBoard()
+    {
+        int size = boardCellController.size;
+        Enums.EPlayerType[,] board = new Enums.EPlayerType[size, size];
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                board[y, x] = boardCellController.cells[y, x].playerType;
+            }
+        }
+
+        return board;
     }
 
     // 멀티 모드에서 룸 초기화하는 메서드

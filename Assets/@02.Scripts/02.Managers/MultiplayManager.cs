@@ -1,11 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SocketIOClient;
-using Unity.Burst.CompilerServices;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class RoomData
 {
@@ -19,13 +18,36 @@ public class MoveData
     public int position { get; set; }
 }
 
+public class UsersInfoData
+{
+    [JsonProperty("userId")]
+    public string userId { get; set; }
+    
+    [JsonProperty("roomId")]
+    public string roomId { get; set; }
+    
+    [JsonProperty("nickname")]
+    public string nickname { get; set; }
+    
+    [JsonProperty("profileimageindex")]
+    public int profileimageindex { get; set; }
+    
+    [JsonProperty("rank")]
+    public int rank { get; set; }
+    
+    [JsonProperty("playerType")]
+    public Enums.EPlayerType playerType { get; set; }
+}
+
 public class MultiplayManager : IDisposable
 {
     private SocketIOUnity mSocket;
     
     private event Action<Enums.EMultiplayManagerState, string> mOnMultiplayStateChange;
     public Action<MoveData> OnOpponentMove;
-
+    public Action<UsersInfoData> OnOpponentProfileUpdate;
+    public Action OnRematchRequestReceived;
+    
     public MultiplayManager(Action<Enums.EMultiplayManagerState, string> onMultiplayStateChange)
     {
         mOnMultiplayStateChange = onMultiplayStateChange;
@@ -35,14 +57,27 @@ public class MultiplayManager : IDisposable
         {
             Transport = SocketIOClient.Transport.TransportProtocol.WebSocket
         });
-        
+        mSocket.OnConnected += (sender, e) => {
+            Debug.Log("[MultiplayManager] 소켓 연결 성공!");
+        };
         mSocket.On("createRoom", CreateRoom);
         mSocket.On("joinRoom", JoinRoom);
         mSocket.On("startGame", StartGame);
         mSocket.On("exitRoom", ExitRoom);
         mSocket.On("endGame", EndGame);
+        mSocket.On("restartRoom", RestartRoom);
+        
         mSocket.On("doOpponent", DoOpponent);
-        mSocket.On("rematchStart", RematchStart);
+        mSocket.On("opponentProfile", OpponentProfileReceived);
+        
+        // 재대국 관련 이벤트 핸들러 추가
+        mSocket.On("rematchRequestReceived", RematchRequestReceived);
+        mSocket.On("rematchFailed", RematchFailed);
+        mSocket.On("rematchAcceptedReceived", AcceptRematchReceived);
+        mSocket.On("rematchRejectedReceived", RejectedRematchReceived);
+        
+        mSocket.On("forfeitWinReceived", ForfeitWinReceived);
+        mSocket.On("forfeitLoseReceived", ForfeitLoseReceived);
         
         mSocket.Connect();
     }
@@ -79,19 +114,58 @@ public class MultiplayManager : IDisposable
     {
         mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.EndGame, null);
     }
-    
-    // 재대국 신청 메서드
-    public void RequestRematch(string roomId)
+
+    private void RestartRoom(SocketIOResponse response)
     {
-        mSocket.Emit("requestRematch", new { roomId });
+        mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.RestartRoom, null);
     }
     
-    // 새로운 방으로 이동 (서버에서 받은 새로운 방 정보 처리)
-    private void RematchStart(SocketIOResponse response)
+    public void LeaveRoom(string roomId)
     {
-        var data = response.GetValue<RoomData>();
-        mOnMultiplayStateChange?.Invoke(Enums.EMultiplayManagerState.StartGame, data.roomId);
+        mSocket.Emit("leaveRoom", new { roomId });
     }
+    
+    #region ProfileData
+    
+    // 나의 급수를 서버로 전달
+    public void SendMyRank(int myRank)
+    {
+        Debug.Log($"[MultiplayManager] SendMyRank 호출, rank={myRank}");
+        mSocket.Emit("setRank", new { myRank });
+    }
+    
+    // 상대방의 프로필 정보를 서버로부터 수신
+    private void OpponentProfileReceived(SocketIOResponse response)
+    {
+        try
+        {
+            var data = response.GetValue<UsersInfoData>();
+            OnOpponentProfileUpdate?.Invoke(data); // 프로필 정보를 UI로 전달
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error in OnOpponentProfileReceived: {ex.Message}");
+        }
+    }
+
+    // 자신의 프로필 정보를 서버로 송신
+    public void SendOpponentProfile(string roomId, UsersInfoData profileData)
+    {
+        var data = new 
+        {
+            roomId,
+            userId = profileData.userId,
+            nickname = profileData.nickname,
+            profileimageindex = profileData.profileimageindex,
+            rank = profileData.rank,
+            playerType = profileData.playerType
+        };
+        
+        mSocket.Emit("opponentProfile", data);
+    }
+    #endregion
+    
+    #region MoveData
     
     // 서버로부터 상대방의 마커 정보를 받기 위한 메서드
     private void DoOpponent(SocketIOResponse response)
@@ -106,17 +180,117 @@ public class MultiplayManager : IDisposable
             Debug.LogError($"Error in DoOpponent: {ex.Message}");
         }
     }
-
+    
     // 플레이어의 마커 위치를 서버로 전달하기 위한 메서드
     public void SendPlayerMove(string roomId, int position)
     {
         mSocket.Emit("doPlayer", new { roomId , position });
     }
+    
+    #endregion
 
-    public void LeaveRoom(string roomId)
+    #region RematchData
+
+    // 재대국 요청을 서버에 보냄
+    public void SendRematchRequest(string roomId)
     {
-        mSocket.Emit("leaveRoom", new { roomId });
+        Debug.Log("재대국 요청 보냄");
+        mSocket.Emit("sendRematchRequest", new { roomId });
     }
+
+    // 서버로부터 재대국 요청을 받았을 때 처리
+    private void RematchRequestReceived(SocketIOResponse response)
+    {
+        Debug.Log("재대국 요청 받음");
+        OnRematchRequestReceived?.Invoke();
+    }
+
+    private void RematchFailed(SocketIOResponse response)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenConfirmPanel("상대방이 퇴장하였습니다. \n코인을 돌려받고 \n메인 화면으로 돌아갑니다.", () =>
+            {
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddCoin(Constants.ConsumeCoin, i =>
+                    {
+                        GameManager.Instance.ChangeToMainScene();
+                    }, () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("돌려 받지 못함", null, false);
+                    });
+                });
+            });
+        });
+    }
+
+    // 재대국 요청 승낙
+    public void AcceptRematch(string roomId)
+    {
+        mSocket.Emit("rematchAccepted", new { roomId });
+    }
+
+    private void AcceptRematchReceived(SocketIOResponse response)
+    {
+        mSocket.Emit("startRematch");
+    }
+
+    // 재대국 요청 거절
+    public void RejectRematch()
+    {
+        mSocket.Emit("rematchRejected");
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenConfirmPanel("상대방의 요청을 거절했습니다. \n메인 화면으로 돌아갑니다.", () =>
+            {
+                GameManager.Instance.ChangeToMainScene();
+            }, false);
+        });
+    }
+    
+    private void RejectedRematchReceived(SocketIOResponse response)
+    {
+        UnityThread.executeInUpdate(() =>
+        {
+            GameManager.Instance.OpenConfirmPanel("상대방이 거절했습니다. \n코인을 돌려받고 \n메인 화면으로 돌아갑니다.", () =>
+            {
+                UniTask.Void(async () =>
+                {
+                    await NetworkManager.Instance.AddCoin(Constants.ConsumeCoin, i =>
+                    {
+                        GameManager.Instance.ChangeToMainScene();
+                    }, () =>
+                    {
+                        GameManager.Instance.OpenConfirmPanel("돌려 받지 못함", null, false);
+                    });
+                });
+            }, false);
+        });
+    }
+
+    #endregion
+
+    #region ForfeitData
+
+    public void SendForfeitRequest(string roomId)
+    {
+        mSocket.Emit("sendForfeitRequest", new { roomId });
+    }
+
+    private void ForfeitWinReceived(SocketIOResponse response)
+    {
+        Debug.Log("기권승리 메시지 받음");
+        GameManager.Instance.OnForfeitWin?.Invoke();
+    }
+
+    private void ForfeitLoseReceived(SocketIOResponse response)
+    {
+        Debug.Log("기권패배 메시지 받음");
+        GameManager.Instance.OnForfeitLose?.Invoke();
+    }
+
+    #endregion
     
     public void Dispose()
     {

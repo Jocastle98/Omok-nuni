@@ -4,17 +4,30 @@ using UnityEngine;
 
 public class AIState : BasePlayerState
 {
+    public AIState(bool Black)
+    {
+        if (Black)
+        {
+            playerType = Enums.EPlayerType.Player_Black;
+        }
+        else
+        {
+            playerType = Enums.EPlayerType.Player_White;
+        }
+    }
+    
     public override void OnEnter(GameLogic gameLogic)
     {
-        /*var result = MinimaxAIController.GetBestMove(gameLogic.GetBoard());
+        if (gameLogic.isGameOver) return; 
+        var result = MinimaxAIController.GetBestMove(gameLogic.GetBoard());
         if (result.HasValue)
         {
             HandleMove(gameLogic, result.Value.row, result.Value.col);
         }
         else
         {
-            gameLogic.EndGame(Enums.EGameResult.Draw);
-        }*/
+            gameLogic.EndGame(Enums.EPlayerType.None);
+        }
     }
 
     public override void OnExit(GameLogic gameLogic)
@@ -22,8 +35,8 @@ public class AIState : BasePlayerState
         
     }
 
-    public override void HandleMove(GameLogic gameLogic, int x, int y)
+    public override void HandleMove(GameLogic gameLogic, int y, int x)
     {
-        //ProcessMove(gameLogic, Enums.EPlayerType.PlayerB, row, col);
+        ProcessMove(gameLogic, playerType, y, x);
     }
 }
