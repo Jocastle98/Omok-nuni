@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AudioEnums;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -77,6 +78,7 @@ public class MainPanelController : MonoBehaviour
 
     public void OnClickProfileButton()
     {
+        AudioManager.Instance.PlayAudioClip(ESfxType.Bird);
         mainButtonAnimation.HideAllStone();
         GameManager.Instance.OpenProfilePanel();
     }

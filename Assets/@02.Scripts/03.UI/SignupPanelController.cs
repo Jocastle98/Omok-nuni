@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
+using AudioEnums;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
@@ -97,6 +98,7 @@ public class SignupPanelController : PopupPanelController
     
     public void OnClickProfileButton()
     {
+        AudioManager.Instance.PlayAudioClip(ESfxType.Bird);
         var childPanel = GameManager.Instance.OpenSelectProfilePanelFromSignupPanel();
         SelectProfilePanelController selectPanel = childPanel as SelectProfilePanelController;
         if (selectPanel != null)

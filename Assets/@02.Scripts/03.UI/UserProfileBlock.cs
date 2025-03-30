@@ -1,3 +1,4 @@
+using AudioEnums;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,5 +35,10 @@ public class UserProfileBlock : MonoBehaviour
         {
             Debug.LogWarning("Invalid hex color string: " + hexColor);
         }
+    }
+
+    public void OnClickProfileImage()
+    {
+        AudioManager.Instance.PlayAudioClip(ESfxType.Bird);
     }
 }
