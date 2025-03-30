@@ -30,7 +30,7 @@ public class ScorePanelController : PopupPanelController
             messageText.text = $"오목에서 패배했습니다.\n {Mathf.Abs(addDelete)*10}점을 잃었습니다.";
 
         int minScore, maxScore, threshold;
-        if (rank >= 11) 
+        if (rank >= 10) 
         {
             minScore = -3; 
             maxScore = 3;  
@@ -38,7 +38,7 @@ public class ScorePanelController : PopupPanelController
             leftScoreText.text = "-30";
             rightScoreText.text = "30";
         }
-        else if (rank >= 6) // 10~6급
+        else if (rank >= 5) // 9~5급
         {
             minScore = -5; 
             maxScore = 5;
@@ -46,7 +46,7 @@ public class ScorePanelController : PopupPanelController
             leftScoreText.text = "-50";
             rightScoreText.text = "50";
         }
-        else // 5~1급
+        else // 4~1급
         {
             minScore = -10; 
             maxScore = 10;
