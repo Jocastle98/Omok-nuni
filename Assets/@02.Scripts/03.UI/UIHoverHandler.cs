@@ -1,3 +1,4 @@
+using AudioEnums;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
@@ -13,6 +14,7 @@ public class UIHoverHandler : MonoBehaviour, IPointerEnterHandler
         if (Animator != null)
         {
             Animator.SetTrigger(IsMouseOverHash);
+            AudioManager.Instance.PlayAudioClip(ESfxType.BranchRustle);
         }
     }
 }
