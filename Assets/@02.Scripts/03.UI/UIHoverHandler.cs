@@ -13,8 +13,13 @@ public class UIHoverHandler : MonoBehaviour, IPointerEnterHandler
     {
         if (Animator != null)
         {
-            Animator.SetTrigger(IsMouseOverHash);
-            AudioManager.Instance.PlayAudioClip(ESfxType.BranchRustle);
+            AnimatorStateInfo stateInfo = Animator.GetCurrentAnimatorStateInfo(0);
+        
+            if (stateInfo.IsName("Branch_Idle"))
+            {
+                Animator.SetTrigger(IsMouseOverHash);
+                AudioManager.Instance.PlayAudioClip(ESfxType.BranchRustle);
+            }
         }
     }
 }
