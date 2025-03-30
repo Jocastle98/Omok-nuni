@@ -16,4 +16,13 @@ public static class Constants
     public const string SFXVolumeKey = "SFXVolume";
     
     public const int ConsumeCoin = 100;
+    
+    // TODO: Scriptable Object로 구현
+    public const string RankingPlayerColor = "#FF80AB";
+    public static readonly string[] RankingColors = new string[]
+    {
+        "#FFC300", // 1등
+        "#2BA3FF",  // 2등
+        "#B87333"  // 3등
+    };
 }

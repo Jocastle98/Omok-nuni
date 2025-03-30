@@ -22,4 +22,17 @@ public class UserProfileBlock : MonoBehaviour
     {
         GetComponent<Image>().color = color;
     }
+    
+    public void SetColor(string hexColor)
+    {
+        Color parsedColor;
+        if (ColorUtility.TryParseHtmlString(hexColor, out parsedColor))
+        {
+            GetComponent<Image>().color = parsedColor;
+        }
+        else
+        {
+            Debug.LogWarning("Invalid hex color string: " + hexColor);
+        }
+    }
 }
