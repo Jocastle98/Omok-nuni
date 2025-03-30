@@ -79,3 +79,21 @@ public class Enums
         FadeStone,
     }
 }
+
+namespace AudioEnums
+{
+    public enum ESfxType
+    {
+        //Bgm
+        IntroBGM,
+        GameBGM,
+        
+        //SFX
+        Tic,
+        Bird,
+        Click,
+        Coin,
+        Coins,
+        BranchRustle
+    }
+}
