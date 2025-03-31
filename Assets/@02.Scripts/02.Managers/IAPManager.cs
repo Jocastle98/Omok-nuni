@@ -101,6 +101,7 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
                     {
                         await NetworkManager.Instance.RemoveAds(() =>
                         {
+                            GameManager.Instance.OnAdsRemoved?.Invoke();
                         }, () =>
                         {
                             GameManager.Instance.OpenConfirmPanel("광고제거 실패", null, false);
