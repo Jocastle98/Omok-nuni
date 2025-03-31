@@ -27,8 +27,8 @@ public class ReplayPanelController : PopupPanelController
         UserInfoResult blackInfo = default,
         UserInfoResult whiteInfo = default)
     {
-        if (moves == null || moves.Count == 0) return;
-        _moves = moves;
+        // moves가 null이면 빈리스트로 초기화
+        _moves = moves ?? new List<(int, int, Enums.EPlayerType)>();
         _currentIndex = -1;
 
         blackUserInfo = blackInfo;
@@ -104,6 +104,16 @@ public class ReplayPanelController : PopupPanelController
     /// </summary>
     public void OnNextButtonClick()
     {
+        // _moves가 null이거나 비어있으면 바로 confirm 창을 띄웁니다.
+        if (_moves == null || _moves.Count == 0)
+        {
+            GameManager.Instance.OpenConfirmPanel("기록이 없습니다. \n시작화면으로 돌아가겠습니까?", () =>
+            {
+                GameManager.Instance.ChangeToMainScene();
+            }, true);
+            return;
+        }
+
         if (_currentIndex + 1 < _moves.Count)
         {
             _currentIndex++;
@@ -111,7 +121,7 @@ public class ReplayPanelController : PopupPanelController
         }
         else
         {
-            GameManager.Instance.OpenConfirmPanel(" 마지막 수 입니다. \n 시작화면으로 \n돌아가겠습니까?", () =>
+            GameManager.Instance.OpenConfirmPanel("마지막 수입니다. \n시작화면으로 돌아가겠습니까?", () =>
             {
                 GameManager.Instance.ChangeToMainScene();
             }, true);
