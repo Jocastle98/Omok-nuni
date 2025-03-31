@@ -67,6 +67,8 @@ public class GameLogic : IDisposable
                 
                 OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
+
+                TimeOut();
                 break;
             case Enums.EGameType.SinglePlay:
                 GameManager.Instance.bIsSingleplay = true;
@@ -108,6 +110,8 @@ public class GameLogic : IDisposable
                     MinimaxAIController.SetLevel(level);
                     SetState(mPlayer_Black);
                 });
+
+                TimeOut();
                 
                 break;
             case Enums.EGameType.MultiPlay:
@@ -168,6 +172,8 @@ public class GameLogic : IDisposable
                 UniTask.Delay(100).ContinueWith(() => {
                     mMultiplayManager.SendMyRank(myRank);
                 });
+
+                TimeOut();
                 break;
             case Enums.EGameType.PassAndPlayFade:
                 mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone);
@@ -175,6 +181,8 @@ public class GameLogic : IDisposable
                 
                 OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
+
+                TimeOut();
                 break;
         }
     }
@@ -328,7 +336,18 @@ public class GameLogic : IDisposable
         TurnUIUpdate();
         gamePanelController.StartClock();
     }
-    
+
+    /// <summary>
+    /// 게임 종료 처리를 위한 콜백 함수 설정
+    /// 시간이 종료되었을 때 호출할 종료 로직을 지정합니다.
+    /// </summary>
+    public void TimeOut()
+    {
+        gamePanelController.SetTimeOutAction(() => EndGame((mCurrentPlayer.playerType == Enums.EPlayerType.Player_Black)
+            ? Enums.EPlayerType.Player_White
+            : Enums.EPlayerType.Player_Black));
+    }
+
     /// <summary>
     /// 게임 진행 중일 때 Turn UI 표시
     /// </summary>
@@ -436,7 +455,7 @@ public class GameLogic : IDisposable
 
                 mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
                 mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId);
-                
+
                 GameManager.Instance.OnCloseScorePanel?.Invoke();
 
                 // 방들어온 플레이어는 백
@@ -538,7 +557,8 @@ public class GameLogic : IDisposable
                 ? Enums.EPlayerType.Player_White : Enums.EPlayerType.Player_Black);
         });
     }
-    
+
+    #region Omok Argorithm
     /// <summary>
     /// (Y, X) 좌표에 해당 플레이어의 돌을 놓는 메서드
     /// </summary>
@@ -1152,6 +1172,7 @@ public class GameLogic : IDisposable
 
         return board;
     }
+    #endregion
 
     // 멀티 모드에서 룸 초기화하는 메서드
     public void Dispose()
