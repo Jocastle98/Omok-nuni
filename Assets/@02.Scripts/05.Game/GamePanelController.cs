@@ -10,10 +10,10 @@ using UserDataStructs;
 public class GamePanelController : MonoBehaviour
 {
     [SerializeField] private GameObject timer;
-    
+
     [SerializeField] private GameObject turnUI;
     [SerializeField] private GameObject forfietButton;
-    
+
     [SerializeField] private CanvasGroup blackTurnPanel;
     [SerializeField] private CanvasGroup whiteTurnPanel;
 
@@ -21,15 +21,16 @@ public class GamePanelController : MonoBehaviour
     [SerializeField] private TMP_Text playerBlackProfileText;
     [SerializeField] private Image playerWhiteProfileImage;
     [SerializeField] private TMP_Text playerWhiteProfileText;
-    
-    
+
+
     private const float mDisableAlpha = 0.3f;
     private const float mEnableAlpha = 1.0f;
-    
+
     private MultiplayManager mMultiplayManager;
 
     //착수버튼이 눌렸을 때 플레이어에게 알림
     public delegate void OnBeginButtonClicked();
+
     public OnBeginButtonClicked onBeginButtonClicked;
 
     /// <summary>
@@ -45,7 +46,7 @@ public class GamePanelController : MonoBehaviour
                 timer.SetActive(true);
                 turnUI.SetActive(true);
                 forfietButton.SetActive(true);
-                
+
                 blackTurnPanel.alpha = mEnableAlpha;
                 whiteTurnPanel.alpha = mDisableAlpha;
                 break;
@@ -53,7 +54,7 @@ public class GamePanelController : MonoBehaviour
                 timer.SetActive(true);
                 turnUI.SetActive(true);
                 forfietButton.SetActive(true);
-                
+
                 blackTurnPanel.alpha = mDisableAlpha;
                 whiteTurnPanel.alpha = mEnableAlpha;
                 break;
@@ -69,9 +70,9 @@ public class GamePanelController : MonoBehaviour
             Debug.LogWarning("프로필 UI 객체가 유효하지 않습니다.");
             return;
         }
-        
+
         UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
-        
+
         if (playerType == Enums.EPlayerType.Player_Black)
         {
             playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
@@ -95,9 +96,9 @@ public class GamePanelController : MonoBehaviour
                 Debug.LogWarning("프로필 UI 객체가 유효하지 않습니다.");
                 return;
             }
-            
+
             if (opponentInfo == null) return;
-        
+
             if (opponentInfo.playerType == Enums.EPlayerType.Player_Black)
             {
                 playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(opponentInfo.profileimageindex);
@@ -117,7 +118,7 @@ public class GamePanelController : MonoBehaviour
     {
         timer.GetComponent<Timer>().InitTimer();
     }
-    
+
     public void StartClock()
     {
         timer.GetComponent<Timer>().StartTimer();
@@ -127,9 +128,9 @@ public class GamePanelController : MonoBehaviour
     {
         timer.GetComponent<Timer>().PauseTimer();
     }
-    
+
     #endregion
-    
+
     /// <summary>
     /// 기권버튼 클릭 시 패배 처리 호출하는 메서드
     /// 확인 팝업 후 확인 시 패배처리
@@ -162,6 +163,14 @@ public class GamePanelController : MonoBehaviour
         onBeginButtonClicked?.Invoke();
     }
 
+    /// <summary>
+    /// 패배함수를 액션에 등록하는 메서드
+    /// </summary>
+    public void SetTimeOutAction(Action action)
+    {
+        timer.GetComponent<Timer>().OnTimeOut -= action;
+        timer.GetComponent<Timer>().OnTimeOut += action;
+    }
     public void OnClickBirdImage()
     {
         AudioManager.Instance.PlaySfxSound(3);
