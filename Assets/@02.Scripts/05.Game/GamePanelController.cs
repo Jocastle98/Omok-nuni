@@ -146,7 +146,9 @@ public class GamePanelController : MonoBehaviour
                 // 기권 시 플레이어가 패배하므로 반대편이 승리합니다.
                 Enums.EPlayerType winner = (currentLogic.localPlayerType == Enums.EPlayerType.Player_Black) ?
                     Enums.EPlayerType.Player_White : Enums.EPlayerType.Player_Black;
+                
                 currentLogic.EndGame(winner);
+                GameManager.Instance.OnSendForfeit?.Invoke(); //추가한 부분
             }
             else
             {
