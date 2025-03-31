@@ -463,7 +463,7 @@ GameObject:
   - component: {fileID: 3918852278271030561}
   - component: {fileID: 233558090104820642}
   m_Layer: 5
-  m_Name: Pass And Play Button
+  m_Name: Pass And Play Fade Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -573,7 +573,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 4653671268558213336}
         m_TargetAssemblyTypeName: GameTypeSelectPanelController, Assembly-CSharp
-        m_MethodName: OnClickMultiplayFadeButton
+        m_MethodName: OnClickPassAndPlayFadeButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1281,8 +1281,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5632318683274732684}
-  - {fileID: 1294577899685701618}
   - {fileID: 5630537496185480865}
+  - {fileID: 1294577899685701618}
   m_Father: {fileID: 872588114947155797}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
