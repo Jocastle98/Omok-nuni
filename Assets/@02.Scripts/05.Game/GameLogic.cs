@@ -52,12 +52,11 @@ public class GameLogic : IDisposable
         GameManager.Instance.bIsMultiplay = false;
         GameManager.Instance.bIsSingleplay = false;
         GameManager.Instance.bIsTryRematch = false;
-        GameManager.Instance.OnRecieveRematch = false;
         
         OnMyGameProfileUpdate = onMyGameProfileUpdate;
         OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
         GameManagerCallbackHandler();
-            
+        
         //전달받은 플레이모드
         mPlayMode = playMode;
         switch (mPlayMode)
@@ -148,7 +147,7 @@ public class GameLogic : IDisposable
                                 UnityThread.executeInUpdate(() =>
                                 {
                                     GameManager.Instance.OpenConfirmPanel("상대방이 퇴장하였습니다. \n메인화면으로 돌아갑니다.", () =>
-                                    {
+                                    { 
                                         GameManager.Instance.ChangeToMainScene();
                                     }, false);
                                 });
@@ -320,6 +319,8 @@ public class GameLogic : IDisposable
     /// <param name="newState"></param>
     public void SetState(BasePlayerState newState)
     {
+        gamePanelController.InitClock();
+        
         mCurrentPlayer?.OnExit(this);
         mCurrentPlayer = newState;
         mCurrentPlayer?.OnEnter(this);
@@ -429,7 +430,7 @@ public class GameLogic : IDisposable
             {
                 if (mbIsGameStarted) return; // 이미 시작된 경우 중복 호출 방지
                 mbIsGameStarted = true;
-
+                
                 gamePanelController.StartClock();
                 mCurrentPlayer = mPlayer_White;
 
@@ -448,7 +449,7 @@ public class GameLogic : IDisposable
             {
                 if (mbIsGameStarted) return; // 다시 시작되지 않도록 방지
                 mbIsGameStarted = true;
-
+                
                 gamePanelController.StartClock();
                 mCurrentPlayer = mPlayer_Black;
 
@@ -466,6 +467,7 @@ public class GameLogic : IDisposable
 
             GameManager.Instance.OpenConfirmPanel("새로운 대국이 시작되었습니다.", () =>
             {
+                GameManager.Instance.bIsTryRematch = false;
                 isGameOver = false;
                 currentSelectedCell = Int32.MaxValue;
 
@@ -475,7 +477,7 @@ public class GameLogic : IDisposable
                 boardCellController.InitBoard();
 
                 // UI 초기화
-                // gamePanelController.InitClock();
+                gamePanelController.StartClock();
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
 
                 GameManager.Instance.OnCloseScorePanel = null;
@@ -502,7 +504,6 @@ public class GameLogic : IDisposable
     {
         UnityThread.executeInUpdate(() =>
         {
-            GameManager.Instance.OnRecieveRematch = true;
             GameManager.Instance.OpenConfirmPanel("재대국 신청을 받았습니다. \n수락하시겠습니까?", () =>
             {
                 mMultiplayManager?.AcceptRematch(mRoomId);

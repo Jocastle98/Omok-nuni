@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
@@ -41,7 +42,6 @@ public class GameManager : Singleton<GameManager>
     public bool bIsMultiplay = false;
     public bool bIsSingleplay = false;
     public bool bIsTryRematch = false;
-    public bool OnRecieveRematch = false;
     
     #region Callback
 
@@ -60,9 +60,33 @@ public class GameManager : Singleton<GameManager>
 
     private void Start()
     {
-        OpenSigninPanel();
+        UniTask.Void(async () =>
+        {
+            if (UserInformations.IsAutoSignin)
+            {
+                await NetworkManager.Instance.AutoSignin(() =>
+                { }, () =>
+                {
+                    GameManager.Instance.OpenSigninPanel();
+                });
+            }
+            else
+            {
+                GameManager.Instance.OpenSigninPanel();
+            }
+        });
     }
-    
+
+    private void Update()
+    {
+        /*if(Input.GetMouseButtonUp(0)) 
+            AudioManager.Instance.PlaySfxSound(4);*/
+        
+        //모바일용 클릭 소리
+        if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            AudioManager.Instance.PlaySfxSound(4);
+    }
+
     #region  Score
 
     // TODO: 스코어 급수에 맞게 조정 현재는(-30~30)

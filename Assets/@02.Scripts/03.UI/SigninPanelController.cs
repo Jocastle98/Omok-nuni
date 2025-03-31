@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 using UserDataStructs;
 
 
@@ -14,6 +15,7 @@ public class SigninPanelController : PopupPanelController
 {
     [SerializeField] private TMP_InputField mUsernameInputField;
     [SerializeField] private TMP_InputField mPasswordInputField;
+    [SerializeField] private Image mAutoSigninButtonCheckImage;
 
     private Action OnSigninButtonClick;
 
@@ -22,6 +24,13 @@ public class SigninPanelController : PopupPanelController
         base.Show();
         
         OnSigninButtonClick = onSigninButtonClick;
+        mAutoSigninButtonCheckImage.gameObject.SetActive(UserInformations.IsAutoSignin);
+    }
+
+    public void OnClickAutoSigninButton()
+    {
+        UserInformations.IsAutoSignin  = !UserInformations.IsAutoSignin;
+        mAutoSigninButtonCheckImage.gameObject.SetActive(UserInformations.IsAutoSignin);
     }
     
     public async void OnClickSigninButton()

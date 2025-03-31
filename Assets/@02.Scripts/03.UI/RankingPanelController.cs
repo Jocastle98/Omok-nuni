@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,11 @@ public class RankingPanelController : PopupPanelController
         {
             var userRankBlock = Instantiate(mUserProfileBlockPrefab, mContentsBoard.transform);
             userRankBlock.GetComponent<UserProfileBlock>().SetProfileBlock(in usersRankInfo.userrankprofiles[i], i + 1);
-
+            if (i < 3)
+            {
+                userRankBlock.GetComponent<UserProfileBlock>().SetColor(Constants.RankingColors[i]);
+            }
+            
             if (usersRankInfo.userrankprofiles[i].username == usersRankInfo.playerrankprofile.username)
             {
                 playerRank = i + 1;
@@ -26,7 +31,7 @@ public class RankingPanelController : PopupPanelController
         }
         
         mPlayerProfileBlock.SetProfileBlock(usersRankInfo.playerrankprofile, playerRank);
-        mPlayerProfileBlock.SetColor(Color.red);
+        mPlayerProfileBlock.SetColor(Constants.RankingPlayerColor);
         
         base.Show();
     }
@@ -34,5 +39,12 @@ public class RankingPanelController : PopupPanelController
     public void OnClickBackButton()
     {
         Hide();
+    }
+    
+    public override void Hide(Action OnPanelControllerHide = null)
+    {
+        FindObjectOfType<MainButtonAnimation>().ShowAllStone();
+
+        base.Hide(OnPanelControllerHide);
     }
 }

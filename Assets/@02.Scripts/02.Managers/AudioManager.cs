@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using AudioEnums;
 
 public class AudioManager : Singleton<AudioManager>
 {
@@ -9,7 +10,8 @@ public class AudioManager : Singleton<AudioManager>
     [SerializeField] private AudioSource _sfxSource;
 
     [Header("Audio Clips")]
-    // 0: 인트로, 1: 메인, 2: 바둑 둘 때, 3: 새 소리
+    // 0: 인트로, 1: 메인, 2: 바둑 둘 때, 3: 새 소리 4: 클릭소리, 5: 코인, 6: 많은 코인
+    // 7: 나뭇가지 흔들림
     [SerializeField] private AudioClip[] _audioClips;
 
     private void Start()
@@ -84,6 +86,22 @@ public class AudioManager : Singleton<AudioManager>
         if (_sfxSource != null && index >= 2 && index < _audioClips.Length && _audioClips[index] != null)
         {
             _sfxSource.PlayOneShot(_audioClips[index]);
+        }
+    }
+
+    public void PlayAudioClip(ESfxType clipType)
+    {
+        if (clipType == ESfxType.IntroBGM)
+        {
+            PlayIntroBgm();
+        }
+        else if (clipType == ESfxType.GameBGM)
+        {
+            PlayGameBgm();
+        }
+        else
+        {
+            PlaySfxSound((int)clipType);
         }
     }
 

@@ -9,7 +9,6 @@ using UserDataStructs;
 
 
 /// <summary>
-/// TODO: 테스트 광고 ID 변경
 /// 사용방법 : ShowRewardedAd 호출
 /// </summary>
 public class AdmobAdsManager : Singleton<AdmobAdsManager>
@@ -64,6 +63,7 @@ public class AdmobAdsManager : Singleton<AdmobAdsManager>
             await NetworkManager.Instance.AddCoin(500, i =>
             {
                 GameManager.Instance.OpenConfirmPanel("코인이 500개 지급되었습니다!", null, false);
+                AudioManager.Instance.PlaySfxSound(5);
                 GameManager.Instance.OnCoinUpdated?.Invoke();
             }, () =>
             {
