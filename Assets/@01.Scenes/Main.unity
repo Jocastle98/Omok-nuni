@@ -3084,7 +3084,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1361863924}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 954880501}
+        m_TargetAssemblyTypeName: MainPanelController, Assembly-CSharp
+        m_MethodName: OnClickExitButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1361863924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3725,6 +3737,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 74c2df122e7c1c549a09e575c6dba366, type: 3}
   - {fileID: 8300000, guid: b84212fbd15893d46a841cd54492cb49, type: 3}
   - {fileID: 8300000, guid: 2bd5955c1a8f3d448a84e73b9cbf824c, type: 3}
+  - {fileID: 8300000, guid: 646ca578380444549bc5dc41361ea086, type: 3}
 --- !u!4 &1797954141
 Transform:
   m_ObjectHideFlags: 0

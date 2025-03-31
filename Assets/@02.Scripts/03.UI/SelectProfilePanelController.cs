@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AudioEnums;
 using UnityEngine;
 using UnityEngine.UI;
 using UserDataStructs;
@@ -27,6 +28,7 @@ public class SelectProfilePanelController : PopupPanelController
 
     public async void OnClickSelectProfileButtonFromProfilePanel(int profileIndex)
     {
+        AudioManager.Instance.PlayAudioClip(ESfxType.Bird);
         await NetworkManager.Instance.ChangeProfileImage(new ProfileImageData(profileIndex), () => { }, () => { });
         OnProfileSelected?.Invoke();
         Hide(() => GameManager.Instance.OnMainPanelUpdate?.Invoke());
@@ -34,6 +36,7 @@ public class SelectProfilePanelController : PopupPanelController
     
     public void OnClickSelectProfileButtonFromSignupPanel(int profileIndex)
     {
+        AudioManager.Instance.PlayAudioClip(ESfxType.Bird);
         OnProfileSelectedReturn?.Invoke(profileIndex);
         Hide();
     }

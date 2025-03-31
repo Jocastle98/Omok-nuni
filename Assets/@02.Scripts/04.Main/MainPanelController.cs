@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AudioEnums;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,34 @@ public class MainPanelController : MonoBehaviour
     private void Awake()
     {
         mainButtonAnimation = GetComponent<MainButtonAnimation>();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if(TryCloseTopPopup())
+                return;
+            GameManager.Instance.OpenConfirmPanel("정말 게임을 종료하시겠습니까?", () =>
+            {
+                Application.Quit();
+            }, true, () => { });
+        }
+    }
+
+    private bool TryCloseTopPopup()
+    {
+        PopupPanelController[] popups = FindObjectsOfType<PopupPanelController>();
+        foreach (var popup in popups)
+        {
+            if (popup.gameObject.activeInHierarchy)
+            {
+                popup.Hide();
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public async void SetProfileInfo()
@@ -77,10 +106,15 @@ public class MainPanelController : MonoBehaviour
 
     public void OnClickProfileButton()
     {
+        AudioManager.Instance.PlayAudioClip(ESfxType.Bird);
         mainButtonAnimation.HideAllStone();
         GameManager.Instance.OpenProfilePanel();
     }
     
     // 로그아웃 클릭 시 호출되는 메서드 구현
-    
+    public void OnClickExitButton()
+    {
+        GameManager.Instance.OpenConfirmPanel("정말 게임을 종료하시겠습니까?", ()=>Application.Quit(),true, () => { }) ;
+        
+    }
 }
