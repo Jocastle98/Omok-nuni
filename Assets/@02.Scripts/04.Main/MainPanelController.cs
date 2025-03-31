@@ -22,35 +22,21 @@ public class MainPanelController : MonoBehaviour
     {
         mainButtonAnimation = GetComponent<MainButtonAnimation>();
     }
-
+    
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if(TryCloseTopPopup())
+            if (GameManager.Instance.TryCloseTopmostPopup())
                 return;
+
             GameManager.Instance.OpenConfirmPanel("정말 게임을 종료하시겠습니까?", () =>
             {
                 Application.Quit();
-            }, true, () => { });
+            }, true);
         }
     }
-
-    private bool TryCloseTopPopup()
-    {
-        PopupPanelController[] popups = FindObjectsOfType<PopupPanelController>();
-        foreach (var popup in popups)
-        {
-            if (popup.gameObject.activeInHierarchy)
-            {
-                popup.Hide();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
+    
     public async void SetProfileInfo()
     {
         UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
