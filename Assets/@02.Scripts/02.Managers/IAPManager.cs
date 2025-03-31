@@ -22,6 +22,9 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
     private IStoreController mStoreController; //구매 과정을 제어하는 함수를 제공
     private IExtensionProvider mStoreExtensionProvider; //여러 플랫폼을 위한 확장 처리를 제공
 
+    //광고 상품 결제 테스트(하드 코딩)
+    public bool isTest = true;
+
     private void Start()
     {
         if (mStoreController == null)
@@ -55,6 +58,88 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
 
     public void BuyProduct(Enums.EItemType itemType)
     {
+        if (isTest)
+        {
+            int coinAmount = 0;
+            string message = "";
+            
+            switch (itemType)
+            {
+                case Enums.EItemType.Coin_1000:
+                    coinAmount = 1000;
+                    message = "코인이 1,000개 지급되었습니다!";
+                    break;
+                case Enums.EItemType.Coin_2000:
+                    coinAmount = 2000;
+                    message = "코인이 2,000개 지급되었습니다!";
+                    break;
+                case Enums.EItemType.Coin_4500:
+                    coinAmount = 4500;
+                    message = "코인이 4,500개 지급되었습니다!";
+                    break;
+                case Enums.EItemType.Coin_10000:
+                    coinAmount = 10000;
+                    message = "코인이 10,000개 지급되었습니다!";
+                    break;
+                case Enums.EItemType.NoAds:
+                    UniTask.Void(async () =>
+                    {
+                        await NetworkManager.Instance.RemoveAds(() =>
+                        {
+                            GameManager.Instance.OpenConfirmPanel("광고제거가 적용되었습니다!", null, false);
+                            GameManager.Instance.OnAdsRemoved?.Invoke();
+                        }, () =>
+                        {
+                            GameManager.Instance.OpenConfirmPanel("광고제거 실패", null, false);
+                        });
+                    });
+                    return;
+
+                case Enums.EItemType.NoAds_Coin_2000:
+
+                    UniTask.Void(async () =>
+                    {
+                        await NetworkManager.Instance.RemoveAds(() =>
+                        {
+                        }, () =>
+                        {
+                            GameManager.Instance.OpenConfirmPanel("광고제거 실패", null, false);
+                            return;
+                        });
+
+                        await NetworkManager.Instance.AddCoin(2000, i =>
+                        {
+                            GameManager.Instance.OpenConfirmPanel("광고제거와 코인이 2,000개 지급되었습니다!", null, false);
+                            AudioManager.Instance.PlaySfxSound(6);
+                            GameManager.Instance.OnCoinUpdated?.Invoke();
+                        }, () =>
+                        {
+                            GameManager.Instance.OpenConfirmPanel("구매 오류", null, false);
+                        });
+                    });
+                    return;
+                default:
+                    Debug.Log("테스트 모드: 알 수 없는 아이템");
+                    return;
+            }
+            
+            UniTask.Void(async () =>
+            {
+                await NetworkManager.Instance.AddCoin(coinAmount, i =>
+                {
+                    GameManager.Instance.OpenConfirmPanel(message, null, false);
+                    AudioManager.Instance.PlaySfxSound(6);
+                    GameManager.Instance.OnCoinUpdated?.Invoke();
+                }, () =>
+                {
+                    GameManager.Instance.OpenConfirmPanel("코인 지급 실패 (테스트)", null, false);
+                });
+            });
+
+            return;
+            
+        }
+        
         switch (itemType)
         {
             case Enums.EItemType.Coin_1000:
