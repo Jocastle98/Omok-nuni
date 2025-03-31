@@ -103,7 +103,7 @@ public class GameManager : Singleton<GameManager>
     
     public async void WinGame()
     {
-        if(mGameType == Enums.EGameType.PassAndPlay)
+        if(mGameType == Enums.EGameType.PassAndPlay || mGameType == Enums.EGameType.PassAndPlayFade)
         {
             OpenConfirmPanel("게임이 종료되었습니다.\n 메인 화면으로 돌아가시겠습니까?", () =>
             {
@@ -136,7 +136,7 @@ public class GameManager : Singleton<GameManager>
     public async void LoseGame()
     {
         // PassAndPlay 모드에서는 승리 처리를 서버에 업데이트하지 않습니다.
-        if(mGameType == Enums.EGameType.PassAndPlay)
+        if(mGameType == Enums.EGameType.PassAndPlay || mGameType == Enums.EGameType.PassAndPlayFade)
         {
             OpenConfirmPanel("게임이 종료되었습니다.\n 메인 화면으로 돌아가시겠습니까?", () =>
             {
