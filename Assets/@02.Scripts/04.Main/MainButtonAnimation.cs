@@ -7,7 +7,6 @@ using Unity.Mathematics;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-//TODO: objectPool방식으로 관리
 public class MainButtonAnimation : MonoBehaviour
 {
     [Header("Prefab")]
