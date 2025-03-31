@@ -440,7 +440,6 @@ public class GameLogic : IDisposable
                 // 방들어온 플레이어는 백
                 localPlayerType = mPlayer_White.playerType;
                 gamePanelController.SetMyProfile(Enums.EGameType.MultiPlay, Enums.EPlayerType.Player_White);
-                // MyGameProfileUpdate(Enums.EPlayerType.Player_White);
                 SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_White);
                 SetState(mPlayer_Black);
             }
@@ -460,7 +459,6 @@ public class GameLogic : IDisposable
                 // 첫 수 두는 플레이어 흑
                 localPlayerType = mPlayer_Black.playerType;
                 gamePanelController.SetMyProfile(Enums.EGameType.MultiPlay, Enums.EPlayerType.Player_Black);
-                //MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
                 SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
             }
@@ -481,9 +479,6 @@ public class GameLogic : IDisposable
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
 
                 GameManager.Instance.OnCloseScorePanel = null;
-
-                //OnMyGameProfileUpdate -= gamePanelController.SetMyProfile;
-                //OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
 
                 OnOpponentGameProfileUpdate -= gamePanelController.SetOpponentProfile;
                 OnOpponentGameProfileUpdate += gamePanelController.SetOpponentProfile;
