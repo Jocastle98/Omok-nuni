@@ -44,7 +44,7 @@ public class GameLogic : IDisposable
     /// <param name="boardCellController"></param>
     /// <param name="playMode"></param>
     public void GameStart(BoardCellController boardCellController, GamePanelController gamePanelController, Enums.EGameType playMode, 
-        Action<Enums.EPlayerType> onMyGameProfileUpdate, Action<UsersInfoData> onOpponentGameProfileUpdate)
+        Action<UsersInfoData> onOpponentGameProfileUpdate)
     {
         this.boardCellController = boardCellController;
         this.gamePanelController = gamePanelController;
@@ -53,7 +53,6 @@ public class GameLogic : IDisposable
         GameManager.Instance.bIsSingleplay = false;
         GameManager.Instance.bIsTryRematch = false;
         
-        OnMyGameProfileUpdate = onMyGameProfileUpdate;
         OnOpponentGameProfileUpdate = onOpponentGameProfileUpdate;
         GameManagerCallbackHandler();
         
@@ -65,7 +64,8 @@ public class GameLogic : IDisposable
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new PlayerState(false);
                 
-                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
+                gamePanelController.SetMyProfile(Enums.EGameType.PassAndPlay, Enums.EPlayerType.Player_Black);
+                gamePanelController.SetOpponentProfile_NonMultiplay(mPlayMode, Enums.EDifficultyLevel.Easy);
                 SetState(mPlayer_Black);
 
                 TimeOut();
@@ -75,9 +75,8 @@ public class GameLogic : IDisposable
                 
                 mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new AIState(false);
-
-                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 
+                gamePanelController.SetMyProfile(Enums.EGameType.SinglePlay, Enums.EPlayerType.Player_Black);
                 NetworkManager.Instance.GetUserInfo(() =>
                 {
                 }, () =>
@@ -94,16 +93,19 @@ public class GameLogic : IDisposable
                     if (rank >= 10 && rank <= 18)
                     {
                         level = Enums.EDifficultyLevel.Easy;
+                        gamePanelController.SetOpponentProfile_NonMultiplay(mPlayMode, level);
                         Debug.Log("난이도 하 설정");
                     }
                     else if (rank >= 5 && rank <= 9)
                     {
                         level = Enums.EDifficultyLevel.Medium;
+                        gamePanelController.SetOpponentProfile_NonMultiplay(mPlayMode, level);
                         Debug.Log("난이도 중 설정");
                     }
                     else
                     {
                         level = Enums.EDifficultyLevel.Hard;
+                        gamePanelController.SetOpponentProfile_NonMultiplay(mPlayMode, level);
                         Debug.Log("난이도 상 설정");
                     }
 
@@ -179,7 +181,8 @@ public class GameLogic : IDisposable
                 mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone);
                 mPlayer_White = new PlayerState(false,Enums.EEasterEggMode.FadeStone);
                 
-                OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
+                gamePanelController.SetMyProfile(Enums.EGameType.PassAndPlayFade, Enums.EPlayerType.Player_Black);
+                gamePanelController.SetOpponentProfile_NonMultiplay(mPlayMode, Enums.EDifficultyLevel.Easy);
                 SetState(mPlayer_Black);
 
                 TimeOut();
@@ -320,7 +323,7 @@ public class GameLogic : IDisposable
             GameManager.Instance.LoseGame();
         }
     }
-
+    
     /// <summary>
     /// 현재 턴의 플레이어 상태(자신, AI, 멀티플레이어)를 변경하는 메서드
     /// </summary>
@@ -393,14 +396,6 @@ public class GameLogic : IDisposable
         });
     }
     
-    private void MyGameProfileUpdate(Enums.EPlayerType playerType)
-    {
-        UnityThread.executeInUpdate(() =>
-        {
-            OnMyGameProfileUpdate?.Invoke(playerType);
-        });
-    }
-    
     private void SendOpponentGameProfile(string roomId, Enums.EPlayerType playerType)
     {
         UnityThread.executeInUpdate(() =>
@@ -460,7 +455,8 @@ public class GameLogic : IDisposable
 
                 // 방들어온 플레이어는 백
                 localPlayerType = mPlayer_White.playerType;
-                MyGameProfileUpdate(Enums.EPlayerType.Player_White);
+                gamePanelController.SetMyProfile(Enums.EGameType.MultiPlay, Enums.EPlayerType.Player_White);
+                // MyGameProfileUpdate(Enums.EPlayerType.Player_White);
                 SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_White);
                 SetState(mPlayer_Black);
             }
@@ -479,7 +475,8 @@ public class GameLogic : IDisposable
 
                 // 첫 수 두는 플레이어 흑
                 localPlayerType = mPlayer_Black.playerType;
-                MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
+                gamePanelController.SetMyProfile(Enums.EGameType.MultiPlay, Enums.EPlayerType.Player_Black);
+                //MyGameProfileUpdate(Enums.EPlayerType.Player_Black);
                 SendOpponentGameProfile(mRoomId, Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
             }
@@ -501,8 +498,8 @@ public class GameLogic : IDisposable
 
                 GameManager.Instance.OnCloseScorePanel = null;
 
-                OnMyGameProfileUpdate -= gamePanelController.SetMyProfile;
-                OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
+                //OnMyGameProfileUpdate -= gamePanelController.SetMyProfile;
+                //OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
 
                 OnOpponentGameProfileUpdate -= gamePanelController.SetOpponentProfile;
                 OnOpponentGameProfileUpdate += gamePanelController.SetOpponentProfile;
