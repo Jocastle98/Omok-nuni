@@ -60,7 +60,7 @@ public class GamePanelController : MonoBehaviour
         }
     }
 
-    public async void SetMyProfile(Enums.EPlayerType playerType)
+    public void SetMyProfile(Enums.EGameType gameType, Enums.EPlayerType playerType)
     {
         // 객체가 유효한지 확인
         if (playerBlackProfileImage == null || playerBlackProfileText == null ||
@@ -70,17 +70,30 @@ public class GamePanelController : MonoBehaviour
             return;
         }
         
-        UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
-        
-        if (playerType == Enums.EPlayerType.Player_Black)
+        UserInfoResult userInfo = NetworkManager.Instance.GetUserInfoSync(() => { }, () => { });
+
+        if (gameType == Enums.EGameType.PassAndPlay || gameType == Enums.EGameType.PassAndPlayFade)
+        {
+            playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            playerBlackProfileText.text = "Player 1";
+        }
+        else if (gameType == Enums.EGameType.SinglePlay)
         {
             playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
             playerBlackProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
         }
-        else if (playerType == Enums.EPlayerType.Player_White)
+        else if (gameType == Enums.EGameType.MultiPlay)
         {
-            playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
-            playerWhiteProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+            if (playerType == Enums.EPlayerType.Player_Black)
+            {
+                playerBlackProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+                playerBlackProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+            }
+            else if (playerType == Enums.EPlayerType.Player_White)
+            {
+                playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+                playerWhiteProfileText.text = $"{userInfo.rank}급 {userInfo.nickname}";
+            }
         }
     }
 
@@ -88,6 +101,10 @@ public class GamePanelController : MonoBehaviour
     {
         UnityThread.executeInUpdate(() =>
         {
+            Debug.Log($"상대방 프로필 닉네임: {opponentInfo.nickname}");
+            Debug.Log($"상대방 프로필 이미지 번호: {opponentInfo.profileimageindex}");
+            Debug.Log($"상대방 프로필 급수: {opponentInfo.rank}");
+            
             // 객체가 유효한지 확인
             if (playerBlackProfileImage == null || playerBlackProfileText == null ||
                 playerWhiteProfileImage == null || playerWhiteProfileText == null)
@@ -111,6 +128,34 @@ public class GamePanelController : MonoBehaviour
         });
     }
 
+    public void SetOpponentProfile_NonMultiplay(Enums.EGameType gameType, Enums.EDifficultyLevel difficultyLevel)
+    {
+        UserInfoResult userInfo = NetworkManager.Instance.GetUserInfoSync(() => { }, () => { });
+        
+        if (gameType == Enums.EGameType.PassAndPlay || gameType == Enums.EGameType.PassAndPlayFade)
+        {
+            playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            playerWhiteProfileText.text = "Player 2";
+        }
+        else if (gameType == Enums.EGameType.SinglePlay)
+        {
+            playerWhiteProfileImage.sprite = GameManager.Instance.GetProfileSprite(userInfo.profileimageindex);
+            
+            if (difficultyLevel == Enums.EDifficultyLevel.Easy)
+            {
+                playerWhiteProfileText.text = "하급 AI";
+            }
+            else if (difficultyLevel == Enums.EDifficultyLevel.Medium)
+            {
+                playerWhiteProfileText.text = "중급 AI";
+            }
+            else if (difficultyLevel == Enums.EDifficultyLevel.Hard)
+            {
+                playerWhiteProfileText.text = "상급 AI";
+            }
+        }
+    }
+    
     #region TimerController
 
     public void InitClock()
@@ -138,6 +183,8 @@ public class GamePanelController : MonoBehaviour
     {
         GameManager.Instance.OpenConfirmPanel("기권하시겠습니까?", () =>
         {
+            StopClock();
+            
             if (GameManager.Instance.bIsMultiplay)
             {
                 GameManager.Instance.OnSendForfeit?.Invoke();

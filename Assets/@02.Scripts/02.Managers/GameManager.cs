@@ -46,7 +46,6 @@ public class GameManager : Singleton<GameManager>
     #region Callback
 
     public Action OnMainPanelUpdate;
-    public Action<Enums.EPlayerType> OnMyGameProfileUpdate;
     public Action<UsersInfoData> OnOpponentGameProfileUpdate;
     public Action OnRematchGame;
     public Action OnCloseScorePanel;
@@ -347,7 +346,6 @@ public class GameManager : Singleton<GameManager>
     private void ClearAllCallbacks()
     {
         OnMainPanelUpdate = null;
-        OnMyGameProfileUpdate = null;
         OnOpponentGameProfileUpdate = null;
         
         OnRematchGame = null;
@@ -401,7 +399,6 @@ public class GameManager : Singleton<GameManager>
                 gamePanelController.SetGameUI(Enums.EGameUIState.Turn_Black);
 
                 ClearAllCallbacks();
-                OnMyGameProfileUpdate += gamePanelController.SetMyProfile;
                 OnOpponentGameProfileUpdate += gamePanelController.SetOpponentProfile;
             }
 
@@ -413,7 +410,7 @@ public class GameManager : Singleton<GameManager>
 
             mGameLogic = new GameLogic();
             mGameLogic.GameStart(boardCellController, gamePanelController, mGameType, 
-                OnMyGameProfileUpdate, OnOpponentGameProfileUpdate);
+                OnOpponentGameProfileUpdate);
         }
     }
 

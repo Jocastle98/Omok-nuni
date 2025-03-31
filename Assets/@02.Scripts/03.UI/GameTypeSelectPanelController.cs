@@ -39,7 +39,7 @@ public class GameTypeSelectPanelController : PopupPanelController
         });
     }
     
-    public void OnClickMultiplayFadeButton()
+    public void OnClickPassAndPlayFadeButton()
     {
         Hide(() =>
         {
