@@ -25,13 +25,13 @@ public class IAPManager : Singleton<IAPManager>, IStoreListener
     //광고 상품 결제 테스트(하드 코딩)
     public bool isTest = true;
 
-    private void Start()
+    /*private void Start()
     {
         if (mStoreController == null)
         {
             InitPurchasing();
         }
-    }
+    }*/
     
     //초기화 작업
     private void InitPurchasing()
