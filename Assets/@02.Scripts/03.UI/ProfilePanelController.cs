@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AudioEnums;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -53,6 +54,7 @@ public class ProfilePanelController : PopupPanelController
 
     public void OnClickProfileButton()
     {
+        AudioManager.Instance.PlayAudioClip(ESfxType.Bird);
         var childPanel = GameManager.Instance.OpenSelectProfilePanelFromProfilePanel();
         SelectProfilePanelController selectPanel = childPanel as SelectProfilePanelController;
         if (selectPanel != null)

@@ -709,9 +709,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ProfilePanelController, Assembly-CSharp
-        m_MethodName: OnClickProfileButton
+      - m_Target: {fileID: 8620009233706276271}
+        m_TargetAssemblyTypeName: UserProfileBlock, Assembly-CSharp
+        m_MethodName: OnClickProfileImage
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
