@@ -23,6 +23,34 @@ public class MainPanelController : MonoBehaviour
         mainButtonAnimation = GetComponent<MainButtonAnimation>();
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if(TryCloseTopPopup())
+                return;
+            GameManager.Instance.OpenConfirmPanel("정말 게임을 종료하시겠습니까?", () =>
+            {
+                Application.Quit();
+            }, true, () => { });
+        }
+    }
+
+    private bool TryCloseTopPopup()
+    {
+        PopupPanelController[] popups = FindObjectsOfType<PopupPanelController>();
+        foreach (var popup in popups)
+        {
+            if (popup.gameObject.activeInHierarchy)
+            {
+                popup.Hide();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public async void SetProfileInfo()
     {
         UserInfoResult userInfo = await NetworkManager.Instance.GetUserInfo(() => { }, () => { });
@@ -84,5 +112,9 @@ public class MainPanelController : MonoBehaviour
     }
     
     // 로그아웃 클릭 시 호출되는 메서드 구현
-    
+    public void OnClickExitButton()
+    {
+        GameManager.Instance.OpenConfirmPanel("정말 게임을 종료하시겠습니까?", ()=>Application.Quit(),true, () => { }) ;
+        
+    }
 }
