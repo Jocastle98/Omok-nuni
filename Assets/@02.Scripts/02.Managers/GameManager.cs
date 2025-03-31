@@ -44,6 +44,13 @@ public class GameManager : Singleton<GameManager>
     public bool bIsSingleplay = false;
     public bool bIsTryRematch = false;
     
+    //GameLoic을 접근하도록
+    public GameLogic GetGameLogic()
+    {
+        return mGameLogic;
+    }
+
+    
     #region Callback
 
     public Action OnMainPanelUpdate;
