@@ -139,13 +139,14 @@ public class GamePanelController : MonoBehaviour
     {
         GameManager.Instance.OpenConfirmPanel("기권하시겠습니까?", () =>
         {
-            if (GameManager.Instance.bIsMultiplay)
+            // GameManager에서 현재 GameLogic 가져옴
+            var currentLogic = GameManager.Instance.GetGameLogic();
+            if (currentLogic != null)
             {
-                GameManager.Instance.OnSendForfeit?.Invoke();
-            }
-            else if (GameManager.Instance.bIsSingleplay)
-            {
-                GameManager.Instance.LoseGame();
+                // 기권 시 플레이어가 패배하므로 반대편이 승리합니다.
+                Enums.EPlayerType winner = (currentLogic.localPlayerType == Enums.EPlayerType.Player_Black) ?
+                    Enums.EPlayerType.Player_White : Enums.EPlayerType.Player_Black;
+                currentLogic.EndGame(winner);
             }
             else
             {
