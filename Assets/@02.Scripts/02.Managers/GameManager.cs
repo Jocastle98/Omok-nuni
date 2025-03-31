@@ -32,6 +32,7 @@ public class GameManager : Singleton<GameManager>
     private Canvas mCanvas;
 
     private Enums.EGameType mGameType;
+    private Stack<PopupPanelController> mPopupStack = new Stack<PopupPanelController>();
 
     // GamePanelController, GameLogic 구현
     private GamePanelController mGamePanelController;
@@ -67,6 +68,9 @@ public class GameManager : Singleton<GameManager>
 
     private void Start()
     {
+        QualitySettings.vSyncCount = 0; // VSync 끔
+        Application.targetFrameRate = 60; // 프레임 고정
+        
         UniTask.Void(async () =>
         {
             if (UserInformations.IsAutoSignin)
@@ -422,6 +426,49 @@ public class GameManager : Singleton<GameManager>
             mGameLogic.GameStart(boardCellController, gamePanelController, mGameType, 
                 OnMyGameProfileUpdate, OnOpponentGameProfileUpdate);
         }
+    }
+
+    public void PushPopup(PopupPanelController popup)
+    {
+        if(!mPopupStack.Contains(popup))
+            mPopupStack.Push(popup);
+    }
+
+    public void PopPopup(PopupPanelController popup)
+    {
+        if (mPopupStack.Count > 0 && mPopupStack.Peek() == popup)
+        {
+            mPopupStack.Pop();
+        }
+        else
+        {
+            var newStack = new Stack<PopupPanelController>();
+            while (mPopupStack.Count > 0)
+            {
+                var top = mPopupStack.Pop();
+                if(top != popup)
+                    newStack.Push(top);
+            }
+
+            while (newStack.Count > 0)
+            {
+                mPopupStack.Push(newStack.Pop());
+            }
+        }
+    }
+    
+    public bool TryCloseTopmostPopup()
+    {
+        if (mPopupStack.Count > 0)
+        {
+            var top = mPopupStack.Peek();
+            if (top != null && top.gameObject.activeInHierarchy)
+            {
+                top.Hide();
+                return true;
+            }
+        }
+        return false;
     }
 
     private void OnApplicationQuit()
