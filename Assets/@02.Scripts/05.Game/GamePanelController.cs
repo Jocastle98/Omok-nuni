@@ -184,8 +184,9 @@ public class GamePanelController : MonoBehaviour
         GameManager.Instance.OpenConfirmPanel("기권하시겠습니까?", () =>
         {
             StopClock();
-            
-            if (GameManager.Instance.bIsMultiplay)
+
+            if (GameManager.Instance.bIsMultiplay) { }
+
             // GameManager에서 현재 GameLogic 가져옴
             var currentLogic = GameManager.Instance.GetGameLogic();
             if (currentLogic != null)
