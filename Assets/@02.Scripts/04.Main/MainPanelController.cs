@@ -84,5 +84,9 @@ public class MainPanelController : MonoBehaviour
     }
     
     // 로그아웃 클릭 시 호출되는 메서드 구현
-    
+    public void OnClickExitButton()
+    {
+        GameManager.Instance.OpenConfirmPanel("정말 게임을 종료하시겠습니까?", ()=>Application.Quit(),true, () => { }) ;
+        
+    }
 }
