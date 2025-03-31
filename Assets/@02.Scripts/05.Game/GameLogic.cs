@@ -67,8 +67,6 @@ public class GameLogic : IDisposable
                 gamePanelController.SetMyProfile(Enums.EGameType.PassAndPlay, Enums.EPlayerType.Player_Black);
                 gamePanelController.SetOpponentProfile_NonMultiplay(mPlayMode, Enums.EDifficultyLevel.Easy);
                 SetState(mPlayer_Black);
-
-                TimeOut();
                 break;
             case Enums.EGameType.SinglePlay:
                 GameManager.Instance.bIsSingleplay = true;
@@ -112,8 +110,6 @@ public class GameLogic : IDisposable
                     MinimaxAIController.SetLevel(level);
                     SetState(mPlayer_Black);
                 });
-
-                TimeOut();
                 
                 break;
             case Enums.EGameType.MultiPlay:
@@ -165,17 +161,16 @@ public class GameLogic : IDisposable
                             break;
                     }
                 });
-                 
+                
                 // 나의 급수 가져오기
                 UserInfoResult myInfo = NetworkManager.Instance.GetUserInfoSync(() => {}, () => {});
                 int myRank = myInfo.rank;
 
                 // 소켓연결 성공 시 0.1초후 서버로 나의급수 전송
-                UniTask.Delay(100).ContinueWith(() => {
+                UniTask.Delay(600).ContinueWith(() => {
                     mMultiplayManager.SendMyRank(myRank);
                 });
-
-                TimeOut();
+                
                 break;
             case Enums.EGameType.PassAndPlayFade:
                 mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone);
@@ -184,10 +179,10 @@ public class GameLogic : IDisposable
                 gamePanelController.SetMyProfile(Enums.EGameType.PassAndPlayFade, Enums.EPlayerType.Player_Black);
                 gamePanelController.SetOpponentProfile_NonMultiplay(mPlayMode, Enums.EDifficultyLevel.Easy);
                 SetState(mPlayer_Black);
-
-                TimeOut();
                 break;
         }
+        
+        TimeOut();
     }
 
     #region CallbackHandler

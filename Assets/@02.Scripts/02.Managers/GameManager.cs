@@ -33,7 +33,7 @@ public class GameManager : Singleton<GameManager>
 
     private Enums.EGameType mGameType;
     private Stack<PopupPanelController> mPopupStack = new Stack<PopupPanelController>();
-
+    
     // GamePanelController, GameLogic 구현
     private GamePanelController mGamePanelController;
     private GameLogic mGameLogic;
@@ -392,11 +392,11 @@ public class GameManager : Singleton<GameManager>
         if (scene.name == "Game")
         {
             AudioManager.Instance.PlayGameBgm();
-
+            
             // 씬에 배치된 오브젝트 찾기(BoardCellController, GamePanelController)
             BoardCellController boardCellController = GameObject.FindObjectOfType<BoardCellController>();
             GamePanelController gamePanelController = GameObject.FindObjectOfType<GamePanelController>();
-
+            
             // BoardCellController 초기화
             if (boardCellController != null)
             {

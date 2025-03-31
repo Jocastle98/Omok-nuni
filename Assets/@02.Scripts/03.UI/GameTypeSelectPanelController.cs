@@ -20,6 +20,14 @@ public class GameTypeSelectPanelController : PopupPanelController
         });
     }
     
+    public void OnClickPassAndPlayFadeButton()
+    {
+        Hide(() =>
+        {
+            GameManager.Instance.ChangeToGameScene(Enums.EGameType.PassAndPlayFade);
+        });
+    }
+    
     public void OnClickMultiplayButton()
     {
         Hide(() =>
@@ -36,14 +44,6 @@ public class GameTypeSelectPanelController : PopupPanelController
                         GameManager.Instance.OpenConfirmPanel("코인이 부족합니다.", () => { }, false);
                     });
             });
-        });
-    }
-    
-    public void OnClickPassAndPlayFadeButton()
-    {
-        Hide(() =>
-        {
-            GameManager.Instance.ChangeToGameScene(Enums.EGameType.PassAndPlayFade);
         });
     }
 
