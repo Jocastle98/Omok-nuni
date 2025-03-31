@@ -62,16 +62,18 @@ public class GameLogic : IDisposable
         switch (mPlayMode)
         {
             case Enums.EGameType.PassAndPlay:
-                mPlayer_Black = new PlayerState(true,this);
-                mPlayer_White = new PlayerState(false,this);
+                mPlayer_Black = new PlayerState(true);
+                mPlayer_White = new PlayerState(false);
                 
                 OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
+
+                TimeOut();
                 break;
             case Enums.EGameType.SinglePlay:
                 GameManager.Instance.bIsSingleplay = true;
                 
-                mPlayer_Black = new PlayerState(true,this);
+                mPlayer_Black = new PlayerState(true);
                 mPlayer_White = new AIState(false);
 
                 OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
@@ -108,6 +110,8 @@ public class GameLogic : IDisposable
                     MinimaxAIController.SetLevel(level);
                     SetState(mPlayer_Black);
                 });
+
+                TimeOut();
                 
                 break;
             case Enums.EGameType.MultiPlay:
@@ -168,13 +172,17 @@ public class GameLogic : IDisposable
                 UniTask.Delay(100).ContinueWith(() => {
                     mMultiplayManager.SendMyRank(myRank);
                 });
+
+                TimeOut();
                 break;
             case Enums.EGameType.PassAndPlayFade:
-                mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone,this);
-                mPlayer_White = new PlayerState(false,Enums.EEasterEggMode.FadeStone,this);
+                mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone);
+                mPlayer_White = new PlayerState(false,Enums.EEasterEggMode.FadeStone);
                 
                 OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
+
+                TimeOut();
                 break;
         }
     }
@@ -328,7 +336,18 @@ public class GameLogic : IDisposable
         TurnUIUpdate();
         gamePanelController.StartClock();
     }
-    
+
+    /// <summary>
+    /// 게임 종료 처리를 위한 콜백 함수 설정
+    /// 시간이 종료되었을 때 호출할 종료 로직을 지정합니다.
+    /// </summary>
+    public void TimeOut()
+    {
+        gamePanelController.SetTimeOutAction(() => EndGame((mCurrentPlayer.playerType == Enums.EPlayerType.Player_Black)
+            ? Enums.EPlayerType.Player_White
+            : Enums.EPlayerType.Player_Black));
+    }
+
     /// <summary>
     /// 게임 진행 중일 때 Turn UI 표시
     /// </summary>
@@ -435,7 +454,7 @@ public class GameLogic : IDisposable
                 mCurrentPlayer = mPlayer_White;
 
                 mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
-                mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId,this);
+                mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId);
 
                 GameManager.Instance.OnCloseScorePanel?.Invoke();
 
@@ -453,7 +472,7 @@ public class GameLogic : IDisposable
                 gamePanelController.StartClock();
                 mCurrentPlayer = mPlayer_Black;
 
-                mPlayer_Black = new PlayerState(true, mMultiplayManager, mRoomId,this);
+                mPlayer_Black = new PlayerState(true, mMultiplayManager, mRoomId);
                 mPlayer_White = new MultiplayerState(false, mMultiplayManager);
 
                 GameManager.Instance.bIsStartGame = true;
