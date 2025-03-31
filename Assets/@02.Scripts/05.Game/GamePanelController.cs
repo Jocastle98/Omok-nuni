@@ -140,7 +140,12 @@ public class GamePanelController : MonoBehaviour
         {
             // GameManager에서 현재 GameLogic 가져옴
             var currentLogic = GameManager.Instance.GetGameLogic();
-            if (currentLogic != null)
+
+            if (GameManager.Instance.bIsMultiplay)
+            {
+                GameManager.Instance.OnSendForfeit?.Invoke();
+            }
+            else if (currentLogic != null)
             {
                 // 기권 시 플레이어가 패배하므로 반대편이 승리합니다.
                 Enums.EPlayerType winner = (currentLogic.localPlayerType == Enums.EPlayerType.Player_Black) ?

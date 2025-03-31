@@ -235,35 +235,19 @@ public class GameLogic : IDisposable
         // TODO: recordID를 플레이어 이름과 상대플레이어로 변경
         string recordId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
+        // 멀티플레이일 경우, 흑 플레이어만 기록 업로드
         if (mPlayMode == Enums.EGameType.MultiPlay)
         {
-            var myInfo = NetworkManager.Instance.GetUserInfoSync(() => {}, () => {});
-            string myUserId = myInfo.userId;
-
-            
             if (localPlayerType == Enums.EPlayerType.Player_Black)
             {
+                var myInfo = NetworkManager.Instance.GetUserInfoSync(() => { }, () => { });
+                string myUserId = myInfo.userId;
                 UniTask.Void(async () =>
                 {
                     await NetworkManager.Instance.AddOmokRecord(
                         recordId,
                         blackUserId: myUserId,
-                        whiteUserId: mOpponentInfo.userId, 
-                        mMoveHistory,
-                        () => Debug.Log("기보 저장 성공"),
-                        () => Debug.Log("기보 저장 실패")
-                    );
-                });
-                
-            }
-            else
-            {
-                UniTask.Void(async () =>
-                {
-                    await NetworkManager.Instance.AddOmokRecord(
-                        recordId,
-                        blackUserId: mOpponentInfo.userId, 
-                        whiteUserId: myUserId,
+                        whiteUserId: mOpponentInfo.userId,
                         mMoveHistory,
                         () => Debug.Log("기보 저장 성공"),
                         () => Debug.Log("기보 저장 실패")
