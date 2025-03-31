@@ -102,10 +102,6 @@ public class GamePanelController : MonoBehaviour
     {
         UnityThread.executeInUpdate(() =>
         {
-            Debug.Log($"상대방 프로필 닉네임: {opponentInfo.nickname}");
-            Debug.Log($"상대방 프로필 이미지 번호: {opponentInfo.profileimageindex}");
-            Debug.Log($"상대방 프로필 급수: {opponentInfo.rank}");
-            
             // 객체가 유효한지 확인
             if (playerBlackProfileImage == null || playerBlackProfileText == null ||
                 playerWhiteProfileImage == null || playerWhiteProfileText == null)
