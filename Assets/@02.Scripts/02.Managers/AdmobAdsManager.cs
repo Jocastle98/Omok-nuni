@@ -9,7 +9,6 @@ using UserDataStructs;
 
 
 /// <summary>
-/// TODO: 테스트 광고 ID 변경
 /// 사용방법 : ShowRewardedAd 호출
 /// </summary>
 public class AdmobAdsManager : Singleton<AdmobAdsManager>
