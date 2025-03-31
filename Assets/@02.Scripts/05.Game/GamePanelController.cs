@@ -162,4 +162,13 @@ public class GamePanelController : MonoBehaviour
     {
         onBeginButtonClicked?.Invoke();
     }
+
+    /// <summary>
+    /// 패배함수를 액션에 등록하는 메서드
+    /// </summary>
+    public void SetTimeOutAction(Action action)
+    {
+        timer.GetComponent<Timer>().OnTimeOut -= action;
+        timer.GetComponent<Timer>().OnTimeOut += action;
+    }
 }

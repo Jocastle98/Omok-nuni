@@ -63,8 +63,8 @@ public class GameLogic : IDisposable
         switch (mPlayMode)
         {
             case Enums.EGameType.PassAndPlay:
-                mPlayer_Black = new PlayerState(true);
-                mPlayer_White = new PlayerState(false);
+                mPlayer_Black = new PlayerState(true,this);
+                mPlayer_White = new PlayerState(false,this);
                 
                 OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
@@ -72,7 +72,7 @@ public class GameLogic : IDisposable
             case Enums.EGameType.SinglePlay:
                 GameManager.Instance.bIsSingleplay = true;
                 
-                mPlayer_Black = new PlayerState(true);
+                mPlayer_Black = new PlayerState(true,this);
                 mPlayer_White = new AIState(false);
 
                 OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
@@ -171,8 +171,8 @@ public class GameLogic : IDisposable
                 });
                 break;
             case Enums.EGameType.PassAndPlayFade:
-                mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone);
-                mPlayer_White = new PlayerState(false,Enums.EEasterEggMode.FadeStone);
+                mPlayer_Black = new PlayerState(true,Enums.EEasterEggMode.FadeStone,this);
+                mPlayer_White = new PlayerState(false,Enums.EEasterEggMode.FadeStone,this);
                 
                 OnMyGameProfileUpdate?.Invoke(Enums.EPlayerType.Player_Black);
                 SetState(mPlayer_Black);
@@ -434,7 +434,7 @@ public class GameLogic : IDisposable
                 mCurrentPlayer = mPlayer_White;
 
                 mPlayer_Black = new MultiplayerState(true, mMultiplayManager);
-                mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId);
+                mPlayer_White = new PlayerState(false, mMultiplayManager, mRoomId,this);
 
                 GameManager.Instance.OnCloseScorePanel?.Invoke();
 
@@ -452,7 +452,7 @@ public class GameLogic : IDisposable
                 gamePanelController.StartClock();
                 mCurrentPlayer = mPlayer_Black;
 
-                mPlayer_Black = new PlayerState(true, mMultiplayManager, mRoomId);
+                mPlayer_Black = new PlayerState(true, mMultiplayManager, mRoomId,this);
                 mPlayer_White = new MultiplayerState(false, mMultiplayManager);
 
                 GameManager.Instance.bIsStartGame = true;
@@ -537,7 +537,8 @@ public class GameLogic : IDisposable
                 ? Enums.EPlayerType.Player_White : Enums.EPlayerType.Player_Black);
         });
     }
-    
+
+    #region Omok Argorithm
     /// <summary>
     /// (Y, X) 좌표에 해당 플레이어의 돌을 놓는 메서드
     /// </summary>
@@ -1151,6 +1152,7 @@ public class GameLogic : IDisposable
 
         return board;
     }
+    #endregion
 
     // 멀티 모드에서 룸 초기화하는 메서드
     public void Dispose()

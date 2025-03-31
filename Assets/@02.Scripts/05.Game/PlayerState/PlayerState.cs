@@ -11,33 +11,24 @@ public class PlayerState : BasePlayerState
     private bool mbIsMultiplay;
     private int size;
     
-    public PlayerState(bool Black)
+    public PlayerState(bool Black,GameLogic gameLogic)
     {
         if (Black)
         {
             playerType = Enums.EPlayerType.Player_Black;
+            gameLogic.gamePanelController.SetTimeOutAction(() => gameLogic.EndGame(Enums.EPlayerType.Player_White));
         }
         else
         {
             playerType = Enums.EPlayerType.Player_White;
+            gameLogic.gamePanelController.SetTimeOutAction(() => gameLogic.EndGame(Enums.EPlayerType.Player_Black));
         }
         
         mbIsMultiplay = false;
     }
     
-    public PlayerState(bool Black,Enums.EEasterEggMode mode)
+    public PlayerState(bool Black,Enums.EEasterEggMode mode,GameLogic gameLogic) : this(Black,gameLogic)
     {
-        if (Black)
-        {
-            playerType = Enums.EPlayerType.Player_Black;
-        }
-        else
-        {
-            playerType = Enums.EPlayerType.Player_White;
-        }
-        
-        mbIsMultiplay = false;
-
         switch (mode)
         {
             case Enums.EEasterEggMode.None:
@@ -48,7 +39,7 @@ public class PlayerState : BasePlayerState
         }
     }
 
-    public PlayerState(bool Black, MultiplayManager multiplayManager, string roomId) : this(Black)
+    public PlayerState(bool Black, MultiplayManager multiplayManager, string roomId,GameLogic gameLogic) : this(Black,gameLogic)
     {
         mMultiplayManager = multiplayManager;
         mRoomId = roomId;
